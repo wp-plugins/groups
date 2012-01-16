@@ -124,9 +124,9 @@ class Groups_Controller {
 			$capability_table = _groups_get_tablename( 'capability' );
 			$queries[] = "CREATE TABLE " . $capability_table . "(
 							capability_id BIGINT(20) UNSIGNED NOT NULL auto_increment,
-							capability	VARCHAR(20) UNIQUE NOT NULL,
-							class		 VARCHAR(100) DEFAULT NULL,
-							object		VARCHAR(100) DEFAULT NULL,
+							capability	VARCHAR(255) UNIQUE NOT NULL,
+							class		 VARCHAR(255) DEFAULT NULL,
+							object		VARCHAR(255) DEFAULT NULL,
 							name		  VARCHAR(100) DEFAULT NULL,
 							description   LONGTEXT DEFAULT NULL,
 							PRIMARY KEY   (capability_id),

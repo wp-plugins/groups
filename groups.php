@@ -21,7 +21,7 @@
  * Plugin Name: Groups
  * Plugin URI: http://www.itthinx.com/plugins/groups
  * Description: Groups provides important generic group- and capability-handling features.
- * Version: 1.0.0-beta-1
+ * Version: 1.0.0-beta-2
  * Author: itthinx (Karim Rahimpur)
  * Author URI: http://www.itthinx.com
  * Donate-Link: http://www.itthinx.com

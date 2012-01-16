@@ -80,7 +80,7 @@ function groups_admin_groups_edit( $group_id ) {
 		'</div>' .
 	
 		'<div class="field">' .
-		'<label for="description-field" class="field-label">' .__( 'Description', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
+		'<label for="description-field" class="field-label description-field">' .__( 'Description', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
 		'<textarea id="description-field" name="description-field" rows="5" cols="45">' . wp_filter_nohtml_kses( $description ) . '</textarea>' .
 		'</div>' .
 	

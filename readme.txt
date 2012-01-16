@@ -202,10 +202,18 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.0.0-beta-2 =
+* Increased length of capability.capability, capability.class, capability.object columns to support long capabilities.
+* Improved admin CSS.
+
 = 1.0.0-beta-1 =
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.0.0-beta-2 =
+* Increased length of capability.capability, capability.class and capability.object columns from to 255 => you need to update your DB manually if you want that updated.
+* Improved some admin CSS.
 
 = 1.0.0-beta-1 =
 * This is the first public beta release.
