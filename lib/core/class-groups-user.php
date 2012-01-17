@@ -105,7 +105,7 @@ class Groups_User implements I_Capable {
 			
 			// if administrators can override access, let them
 			if ( get_option( GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE, GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE_DEFAULT ) ) {
-				if ( user_can( $this->user, 'administrator' ) ) {
+				if ( user_can( $this->user->ID, 'administrator' ) ) { // just using $this->user would raise a warning on 3.2.1
 					return true;
 				}
 			}
