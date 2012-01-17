@@ -4,7 +4,7 @@ Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, group, groups, member, members, membership, permission, permissions
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 1.0.0-beta-2
+Stable tag: 1.0.0-beta-3
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
 
@@ -170,6 +170,36 @@ For each role these permissions can be set:
 A convenient option is provided to delete all data that has been stored by the Groups plugin.
 This option is useful if you just need to start from fresh after you have been testing the plugin.
 
+### Shortcodes ###
+
+#### Limit content visibility ####
+
+These shortcodes are used to limit the visibility of the content they enclose:
+
+- [groups_member]
+- [groups_non_member]
+- [groups_can]
+- [groups_can_not]
+
+See above for examples and descriptions.
+
+#### Show group information ####
+
+- [groups_group_info]
+
+This shortcode takes the following attributes to show information about a group:
+
+- _group_ : (required) the group ID or name
+- _show_ : (required) what to show, accepted values are: _name_, _description_, _count_
+- _single_ : (optional) used when show="count" and there is 1 member in the group
+- _plural_ : (optional) used when show="count" and there is more than 1 member in the group, must contain %d to show the number of members
+ 
+Examples:
+
+* [groups_group_info group="Registered" show="count"]
+
+* There [groups_group_info group="1" show="count" single="is one member" plural="are %d members"] in the [groups_group_info group="1" show="name"] group.
+
 == Installation ==
 
 1. Upload or extract the `groups` folder to your site's `/wp-content/plugins/` directory. You can also use the *Add new* option found in the *Plugins* menu in WordPress.  
@@ -202,6 +232,10 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.0.0-beta-3 =
+* Groups wouldn't activate due to a fatal error on WP <= 3.2.1 : is_user_member_of_blog() is defined in ms-functions.php
+* Added [groups_group_info] shortcode 
+
 = 1.0.0-beta-2 =
 * Increased length of capability.capability, capability.class, capability.object columns to support long capabilities.
 * Improved admin CSS.
@@ -210,6 +244,9 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.0.0-beta-3 =
+* New shortcode to show group info & WP <= 3.2.1 compatibility fix.
 
 = 1.0.0-beta-2 =
 * Increased length of capability.capability, capability.class and capability.object columns from to 255 => you need to update your DB manually if you want that updated.

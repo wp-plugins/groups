@@ -93,25 +93,30 @@ if ( defined( 'ABSPATH' ) ) {
 		// *** users *** 
 		
 		// create test users
-		$foo_user_id = wp_create_user( 'foo' . rand(0, 100), 'foo' );
+		$fooname = 'foo' . rand(0, 100);
+		$foo_user_id = wp_create_user( $fooname, 'foo', $fooname . '@example.com' );
 		assert( '$foo_user_id instanceof WP_Error === false');
 		
-		$bar_user_id = wp_create_user( 'bar' . rand(0, 100), 'bar' );
+		$barname = 'bar' . rand(0, 100);
+		$bar_user_id = wp_create_user( $barname, 'bar', $barname . '@example.com' );
 		assert( '$bar_user_id instanceof WP_Error === false');
 		
 		// this user is used to test the automatic resolution of its relationship
 		// with the banana group when the group is deleted
 		// it's also used to test automatic resolution of its "clap" capability
 		// after that capability has been deleted
-		$baz_user_id = wp_create_user( 'baz' . rand(0, 100), 'baz' );
+		$bazname = 'baz' . rand(0, 100);
+		$baz_user_id = wp_create_user( $bazname, 'baz', $bazname . '@example.com' );
 		assert( '$baz_user_id instanceof WP_Error === false');
 		
 		// this user is deleted, the group relation must be deleted automatically
-		$dol_user_id = wp_create_user( 'dol' . rand(0, 100), 'dol' );
+		$dolname = 'dol' . rand(0, 100);
+		$dol_user_id = wp_create_user( $dolname, 'dol', $dolname . ' @example.com' );
 		assert( '$dol_user_id instanceof WP_Error === false');
 		
 		// this user is a simple editor, used to test WordPress capabilities
-		$editor_user_id = wp_create_user( 'rotide' . rand(0, 100), 'rotide' );
+		$editorname = 'rotide' . rand(0, 100); 
+		$editor_user_id = wp_create_user( $editorname, 'rotide', $editorname . '@example.com' );
 		assert( '$editor_user_id instanceof WP_Error === false');
 		if ( !( $editor_user_id instanceof WP_Error ) ) {
 			$editor_user = new WP_User( $editor_user_id );

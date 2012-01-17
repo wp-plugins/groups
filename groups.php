@@ -20,8 +20,8 @@
  *
  * Plugin Name: Groups
  * Plugin URI: http://www.itthinx.com/plugins/groups
- * Description: Groups provides important generic group- and capability-handling features.
- * Version: 1.0.0-beta-2
+ * Description: Groups provides group-based user membership management, group-based capabilities and content access control.
+ * Version: 1.0.0-beta-3
  * Author: itthinx (Karim Rahimpur)
  * Author URI: http://www.itthinx.com
  * Donate-Link: http://www.itthinx.com
@@ -43,6 +43,9 @@ if ( !defined( 'GROUPS_ADMIN_LIB' ) ) {
 }
 if ( !defined( 'GROUPS_AUTO_LIB' ) ) {
 	define( 'GROUPS_AUTO_LIB', GROUPS_CORE_DIR . '/lib/auto' );
+}
+if ( !defined( 'GROUPS_VIEWS_LIB' ) ) {
+	define( 'GROUPS_VIEWS_LIB', GROUPS_CORE_DIR . '/lib/views' );
 }
 if ( !defined( 'GROUPS_WP_LIB' ) ) {
 	define( 'GROUPS_WP_LIB', GROUPS_CORE_DIR . '/lib/wp' );
