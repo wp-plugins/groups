@@ -42,14 +42,29 @@ class Groups_Access_Meta_Boxes {
 	 * Triggered by init() to add capability meta box. 
 	 */
 	public static function add_meta_boxes() {
-		add_meta_box(
-			"groups-access",
-			__( "Access restrictions", GROUPS_PLUGIN_DOMAIN ),
-			array( __CLASS__, "capability" ),
-			null,
-			"side",
-			"high"
-		);
+		global $wp_version;
+		if ( $wp_version < 3.3 ) {
+			$post_types = get_post_types();
+			foreach ( $post_types as $post_type ) {
+				add_meta_box(
+					"groups-access",
+					__( "Access restrictions", GROUPS_PLUGIN_DOMAIN ),
+					array( __CLASS__, "capability" ),
+					$post_type,
+					"side",
+					"high"
+				);
+			}
+		} else {
+			add_meta_box(
+				"groups-access",
+				__( "Access restrictions", GROUPS_PLUGIN_DOMAIN ),
+				array( __CLASS__, "capability" ),
+				null,
+				"side",
+				"high"
+			);
+		}
 	}
 	
 	/**
