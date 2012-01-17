@@ -31,7 +31,9 @@ if ( !isset( $groups_version ) ) {
 
 // <= 3.2.1
 if ( !function_exists( 'is_user_member_of_blog' ) ) {
-	require( ABSPATH . WPINC . '/ms-functions.php' );
+	function is_user_member_of_blog( $user_id, $blog_id = 0 ) {
+		return false !== get_user_by( "id", $user_id );
+	}
 }
 
 /**
