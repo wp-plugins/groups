@@ -1,6 +1,6 @@
 <?php
 /**
- * class-groups-post-access.php
+ * class-groups-access-shortcodes.php
  *
  * Copyright (c) "kento" Karim Rahimpur www.itthinx.com
  *
@@ -18,10 +18,10 @@
  * @package groups
  * @since groups 1.0.0
  */
-class Groups_Shortcodes {
+class Groups_Access_Shortcodes {
 	
 	/**
-	 * Defines shortcodes.
+	 * Defines access shortcodes.
 	 */
 	public static function init() {
 		
@@ -144,4 +144,4 @@ class Groups_Shortcodes {
 		return $output;
 	}
 }
-Groups_Shortcodes::init();
+Groups_Access_Shortcodes::init();

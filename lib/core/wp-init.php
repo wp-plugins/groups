@@ -29,6 +29,11 @@ if ( !isset( $groups_version ) ) {
 	$groups_version = GROUPS_CORE_VERSION;
 }
 
+// <= 3.2.1
+if ( !function_exists( 'is_user_member_of_blog' ) ) {
+	require( ABSPATH . WPINC . '/ms-functions.php' );
+}
+
 /**
  * Load core :
  */
@@ -70,7 +75,8 @@ require_once( GROUPS_ACCESS_LIB . '/class-groups-post-access.php' );
 if ( is_admin() ) {
 	require_once( GROUPS_ACCESS_LIB . '/class-groups-access-meta-boxes.php' );
 }
-require_once( GROUPS_ACCESS_LIB . '/class-groups-shortcodes.php' );
+require_once( GROUPS_ACCESS_LIB . '/class-groups-access-shortcodes.php' );
+require_once( GROUPS_VIEWS_LIB . '/class-groups-shortcodes.php' );
 
 /**
  * Load wp :
