@@ -58,6 +58,7 @@ function groups_admin_options() {
 				$admin_override = true;
 			}
 			// Don't move this to the plugin options, access will be faster
+			add_option( GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE, $admin_override ); // WP 3.3.1 : update alone wouldn't create the option when value is false
 			update_option( GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE, $admin_override );
 			
 			// tree view

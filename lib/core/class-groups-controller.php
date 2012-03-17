@@ -110,53 +110,58 @@ class Groups_Controller {
 		// create tables	
 		$group_table = _groups_get_tablename( 'group' );
 		if ( $wpdb->get_var( "SHOW TABLES LIKE '" . $group_table . "'" ) != $group_table ) {
-			$queries[] = "CREATE TABLE " . $group_table . "(
-							group_id	 BIGINT(20) UNSIGNED NOT NULL auto_increment,
-							parent_id	BIGINT(20) DEFAULT NULL,
-							creator_id   BIGINT(20) DEFAULT NULL,
-							datetime	 DATETIME DEFAULT NULL,
-							name		 VARCHAR(100) NOT NULL,
-							description  LONGTEXT DEFAULT NULL,
-							PRIMARY KEY  (group_id),
-							UNIQUE INDEX group_n (name)
-						);";
-				
-			$capability_table = _groups_get_tablename( 'capability' );
-			$queries[] = "CREATE TABLE " . $capability_table . "(
-							capability_id BIGINT(20) UNSIGNED NOT NULL auto_increment,
-							capability	VARCHAR(255) UNIQUE NOT NULL,
-							class		 VARCHAR(255) DEFAULT NULL,
-							object		VARCHAR(255) DEFAULT NULL,
-							name		  VARCHAR(100) DEFAULT NULL,
-							description   LONGTEXT DEFAULT NULL,
-							PRIMARY KEY   (capability_id),
-							INDEX		 capability_kco (capability,class,object)
-						);";
-		
-			$user_group_table = _groups_get_tablename( 'user_group' );
-			$queries[] = "CREATE TABLE " . $user_group_table . "(
-							user_id	 bigint(20) unsigned NOT NULL,
-							group_id	bigint(20) unsigned NOT NULL,
-							PRIMARY KEY (user_id, group_id),
-							INDEX	   user_group_gu (group_id,user_id)
-						);";
-		
-			$user_capability_table = _groups_get_tablename( 'user_capability' );
-			$queries[] = "CREATE TABLE " . $user_capability_table . "(
-							user_id	   bigint(20) unsigned NOT NULL,
-							capability_id bigint(20) unsigned NOT NULL,
-							PRIMARY KEY   (user_id, capability_id),
-							INDEX		 user_capability_cu (capability_id,user_id)
-						);";
-		
-			$group_capability_table = _groups_get_tablename( 'group_capability' );
-			$queries[] = "CREATE TABLE " . $group_capability_table . "(
-							group_id	  bigint(20) unsigned NOT NULL,
-							capability_id bigint(20) unsigned NOT NULL,
-							PRIMARY KEY   (group_id, capability_id),
-							INDEX		 group_capability_cg (capability_id,group_id)
-						);";
-		
+			$queries[] = "CREATE TABLE " . $group_table . " (
+				group_id     BIGINT(20) UNSIGNED NOT NULL auto_increment,
+				parent_id    BIGINT(20) DEFAULT NULL,
+				creator_id   BIGINT(20) DEFAULT NULL,
+				datetime     DATETIME DEFAULT NULL,
+				name         VARCHAR(100) NOT NULL,
+				description  LONGTEXT DEFAULT NULL,
+				PRIMARY KEY  (group_id),
+				UNIQUE INDEX group_n (name)
+			);";
+		}
+		$capability_table = _groups_get_tablename( 'capability' );
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '" . $capability_table . "'" ) != $capability_table ) {
+			$queries[] = "CREATE TABLE " . $capability_table . " (
+				capability_id BIGINT(20) UNSIGNED NOT NULL auto_increment,
+				capability    VARCHAR(255) UNIQUE NOT NULL,
+				class         VARCHAR(255) DEFAULT NULL,
+				object        VARCHAR(255) DEFAULT NULL,
+				name          VARCHAR(100) DEFAULT NULL,
+				description   LONGTEXT DEFAULT NULL,
+				PRIMARY KEY   (capability_id),
+				INDEX         capability_kco (capability,class,object)
+			);";
+		}
+		$user_group_table = _groups_get_tablename( 'user_group' );
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '" . $user_group_table . "'" ) != $user_group_table ) {
+			$queries[] = "CREATE TABLE " . $user_group_table . " (
+				user_id     bigint(20) unsigned NOT NULL,
+				group_id    bigint(20) unsigned NOT NULL,
+				PRIMARY KEY (user_id, group_id),
+				INDEX       user_group_gu (group_id,user_id)
+			);";
+		}
+		$user_capability_table = _groups_get_tablename( 'user_capability' );
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '" . $user_capability_table . "'" ) != $user_capability_table ) {
+			$queries[] = "CREATE TABLE " . $user_capability_table . " (
+				user_id	      bigint(20) unsigned NOT NULL,
+				capability_id bigint(20) unsigned NOT NULL,
+				PRIMARY KEY   (user_id, capability_id),
+				INDEX         user_capability_cu (capability_id,user_id)
+			);";
+		}
+		$group_capability_table = _groups_get_tablename( 'group_capability' );
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '" . $group_capability_table . "'" ) != $group_capability_table ) {
+			$queries[] = "CREATE TABLE " . $group_capability_table . " (
+				group_id      bigint(20) unsigned NOT NULL,
+				capability_id bigint(20) unsigned NOT NULL,
+				PRIMARY KEY   (group_id, capability_id),
+				INDEX         group_capability_cg (capability_id,group_id)
+			);";
+		}
+		if ( !empty( $queries ) ) {
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 			dbDelta( $queries );
 		}

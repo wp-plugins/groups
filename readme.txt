@@ -4,7 +4,7 @@ Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, group, groups, member, members, membership, permission, permissions
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 1.0.0-beta-3
+Stable tag: 1.0.0-beta-3b
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
 
@@ -232,6 +232,10 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.0.0-beta-3b =
+* Fixed admin override option not being updated
+* DB tables checked individually to create (motivated by case of all but capability table not being created)
+
 = 1.0.0-beta-3 =
 * Groups wouldn't activate due to a fatal error on WP <= 3.2.1 : is_user_member_of_blog() is defined in ms-functions.php
 * Added [groups_group_info] shortcode 
@@ -244,6 +248,9 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.0.0-beta-3b =
+* Admin override fix and DB tables checked individually to create them.
 
 = 1.0.0-beta-3 =
 * New shortcode to show group info & WP <= 3.2.1 compatibility fix.
