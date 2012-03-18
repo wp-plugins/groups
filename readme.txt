@@ -266,3 +266,6 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 The Groups plugin provides an extensive framework to handle memberships, group-based capabilities and access control.
 Read more on the official [Groups](http://www.itthinx.com/plugins/groups/) page and the [Groups documentation](http://www.itthinx.com/documentation/groups/) page.
+
+     
+
