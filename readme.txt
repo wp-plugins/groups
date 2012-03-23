@@ -4,7 +4,7 @@ Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, group, groups, member, members, membership, permission, permissions
 Requires at least: 3.0
 Tested up to: 3.3.1
-Stable tag: 1.0.0-beta-3b
+Stable tag: 1.0.0-beta-3c
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
 
@@ -232,6 +232,9 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.0.0-beta-3c =
+* Groups shortcodes now allow nesting.
+
 = 1.0.0-beta-3b =
 * Fixed admin override option not being updated
 * DB tables checked individually to create (motivated by case of all but capability table not being created)
@@ -248,6 +251,9 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.0.0-beta-3c =
+* Groups shortcodes now allow nesting: [groups_member], [groups_non_member], [groups_can], [groups_can_not]
 
 = 1.0.0-beta-3b =
 * Admin override fix and DB tables checked individually to create them.
@@ -266,6 +272,3 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 The Groups plugin provides an extensive framework to handle memberships, group-based capabilities and access control.
 Read more on the official [Groups](http://www.itthinx.com/plugins/groups/) page and the [Groups documentation](http://www.itthinx.com/documentation/groups/) page.
-
-     
-
