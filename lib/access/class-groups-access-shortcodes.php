@@ -63,6 +63,9 @@ class Groups_Access_Shortcodes {
 				}
 			}
 			if ( $show_content ) {
+				remove_shortcode( 'groups_member' );
+				$content = do_shortcode( $content );
+				add_shortcode( 'groups_member', array( __CLASS__, 'groups_member' ) );
 				$output = $content;
 			}
 		}
@@ -98,6 +101,9 @@ class Groups_Access_Shortcodes {
 				}
 			}
 			if ( $show_content ) {
+				remove_shortcode( 'groups_non_member' );
+				$content = do_shortcode( $content );
+				add_shortcode( 'groups_non_member', array( __CLASS__, 'groups_non_member' ) );
 				$output = $content;
 			}
 		}
@@ -118,6 +124,9 @@ class Groups_Access_Shortcodes {
 			$groups_user = new Groups_User( get_current_user_id() );
 			$capability = $options['capability'];
 			if ( $groups_user->can( $capability ) ) {
+				remove_shortcode( 'groups_can' );
+				$content = do_shortcode( $content );
+				add_shortcode( 'groups_can', array( __CLASS__, 'groups_can' ) );
 				$output = $content;
 			}
 		}
@@ -138,6 +147,9 @@ class Groups_Access_Shortcodes {
 			$groups_user = new Groups_User( get_current_user_id() );
 			$capability = $options['capability'];
 			if ( !$groups_user->can( $capability ) ) {
+				remove_shortcode( 'groups_can_not' );
+				$content = do_shortcode( $content );
+				add_shortcode( 'groups_can_not', array( __CLASS__, 'groups_can_not' ) );
 				$output = $content;
 			}
 		}
