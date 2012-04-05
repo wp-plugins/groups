@@ -106,11 +106,19 @@ class Groups_Controller {
 		
 		// create WP capabilities
 		Groups_Controller::set_default_capabilities();
+		
+		$charset_collate = '';
+		if ( ! empty( $wpdb->charset ) ) {
+			$charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
+		}
+		if ( ! empty( $wpdb->collate ) ) {
+			$charset_collate .= " COLLATE $wpdb->collate";
+		}
 
 		// create tables	
 		$group_table = _groups_get_tablename( 'group' );
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '" . $group_table . "'" ) != $group_table ) {
-			$queries[] = "CREATE TABLE " . $group_table . " (
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$group_table'" ) != $group_table ) {
+			$queries[] = "CREATE TABLE $group_table (
 				group_id     BIGINT(20) UNSIGNED NOT NULL auto_increment,
 				parent_id    BIGINT(20) DEFAULT NULL,
 				creator_id   BIGINT(20) DEFAULT NULL,
@@ -119,11 +127,11 @@ class Groups_Controller {
 				description  LONGTEXT DEFAULT NULL,
 				PRIMARY KEY  (group_id),
 				UNIQUE INDEX group_n (name)
-			);";
+			) $charset_collate;";
 		}
 		$capability_table = _groups_get_tablename( 'capability' );
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '" . $capability_table . "'" ) != $capability_table ) {
-			$queries[] = "CREATE TABLE " . $capability_table . " (
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$capability_table'" ) != $capability_table ) {
+			$queries[] = "CREATE TABLE $capability_table (
 				capability_id BIGINT(20) UNSIGNED NOT NULL auto_increment,
 				capability    VARCHAR(255) UNIQUE NOT NULL,
 				class         VARCHAR(255) DEFAULT NULL,
@@ -131,35 +139,35 @@ class Groups_Controller {
 				name          VARCHAR(100) DEFAULT NULL,
 				description   LONGTEXT DEFAULT NULL,
 				PRIMARY KEY   (capability_id),
-				INDEX         capability_kco (capability,class,object)
-			);";
+				INDEX         capability_kco (capability(20),class(20),object(20))
+			) $charset_collate;";
 		}
 		$user_group_table = _groups_get_tablename( 'user_group' );
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '" . $user_group_table . "'" ) != $user_group_table ) {
-			$queries[] = "CREATE TABLE " . $user_group_table . " (
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$user_group_table'" ) != $user_group_table ) {
+			$queries[] = "CREATE TABLE $user_group_table (
 				user_id     bigint(20) unsigned NOT NULL,
 				group_id    bigint(20) unsigned NOT NULL,
 				PRIMARY KEY (user_id, group_id),
 				INDEX       user_group_gu (group_id,user_id)
-			);";
+			) $charset_collate;";
 		}
 		$user_capability_table = _groups_get_tablename( 'user_capability' );
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '" . $user_capability_table . "'" ) != $user_capability_table ) {
-			$queries[] = "CREATE TABLE " . $user_capability_table . " (
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$user_capability_table'" ) != $user_capability_table ) {
+			$queries[] = "CREATE TABLE $user_capability_table (
 				user_id	      bigint(20) unsigned NOT NULL,
 				capability_id bigint(20) unsigned NOT NULL,
 				PRIMARY KEY   (user_id, capability_id),
 				INDEX         user_capability_cu (capability_id,user_id)
-			);";
+			) $charset_collate;";
 		}
 		$group_capability_table = _groups_get_tablename( 'group_capability' );
-		if ( $wpdb->get_var( "SHOW TABLES LIKE '" . $group_capability_table . "'" ) != $group_capability_table ) {
-			$queries[] = "CREATE TABLE " . $group_capability_table . " (
+		if ( $wpdb->get_var( "SHOW TABLES LIKE '$group_capability_table'" ) != $group_capability_table ) {
+			$queries[] = "CREATE TABLE $group_capability_table (
 				group_id      bigint(20) unsigned NOT NULL,
 				capability_id bigint(20) unsigned NOT NULL,
 				PRIMARY KEY   (group_id, capability_id),
 				INDEX         group_capability_cg (capability_id,group_id)
-			);";
+			) $charset_collate;";
 		}
 		if ( !empty( $queries ) ) {
 			require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
@@ -198,6 +206,14 @@ class Groups_Controller {
 		$result = true;
 		$queries = array();
 		switch ( $previous_version ) {
+			case '1.0.0' :
+				// fix hideously big index
+				$capability_table = _groups_get_tablename( 'capability' );
+				if ( $wpdb->get_var( "SHOW TABLES LIKE '$capability_table'" ) == $capability_table ) {
+					$queries[] = "ALTER TABLE $capability_table DROP INDEX capability_kco;";
+					$queries[] = "ALTER TABLE $capability_table ADD INDEX capability_kco (capability(20),class(20),object(20));";
+				}
+				break;
 			default :
 		} // switch
 		foreach ( $queries as $query ) {

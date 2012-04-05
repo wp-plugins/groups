@@ -232,6 +232,11 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.0.0-beta-3d =
+* Fixed issues caused by an excessively long index for the capability DB table.
+Some installations wouldn't work correctly, showing no capabilities and making it impossible to add new ones.  
+* Taking into account blog charset/collation on newly created tables.
+
 = 1.0.0-beta-3c =
 * Groups shortcodes now allow nesting.
 
@@ -251,6 +256,9 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.0.0-beta-3d =
+* The capability DB table had a ridiculously long index, this update fixes it.
 
 = 1.0.0-beta-3c =
 * Groups shortcodes now allow nesting: [groups_member], [groups_non_member], [groups_can], [groups_can_not]
@@ -272,5 +280,3 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 The Groups plugin provides an extensive framework to handle memberships, group-based capabilities and access control.
 Read more on the official [Groups](http://www.itthinx.com/plugins/groups/) page and the [Groups documentation](http://www.itthinx.com/documentation/groups/) page.
-
-
