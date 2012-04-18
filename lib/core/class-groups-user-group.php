@@ -231,7 +231,7 @@ class Groups_User_Group {
 	public static function remove_user_from_blog( $user_id, $blog_id ) {
 		
 		if ( is_multisite() ) {
-			switch_to_blog( $blog_id );
+			Groups_Controller::switch_to_blog( $blog_id );
 		}
 		
 		global $wpdb;
@@ -261,7 +261,7 @@ class Groups_User_Group {
 		}
 		
 		if ( is_multisite() ) {
-			restore_current_blog();
+			Groups_Controller::restore_current_blog();
 		}
 	}
 }

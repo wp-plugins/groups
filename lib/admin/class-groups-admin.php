@@ -23,6 +23,7 @@ class Groups_Admin {
 		add_action( 'admin_init', array( __CLASS__, 'admin_init' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
+		add_action( 'network_admin_menu', array( __CLASS__, 'network_admin_menu' ) );
 	}
 	
 	/**
@@ -132,6 +133,31 @@ class Groups_Admin {
 		add_action( 'admin_print_scripts-' . $page, array( __CLASS__, 'admin_print_scripts' ) );
 	
 		do_action( 'groups_admin_menu', $pages );
+	}
+	
+	/**
+	 * Network admin menu.
+	 */
+	public static function network_admin_menu() {
+	
+		include_once( GROUPS_ADMIN_LIB . '/groups-admin-options.php');
+	
+		$pages = array();
+	
+		// main
+		$page = add_menu_page(
+			__( 'Groups', GROUPS_PLUGIN_DOMAIN ),
+			__( 'Groups', GROUPS_PLUGIN_DOMAIN ),
+			GROUPS_ADMINISTER_GROUPS,
+			'groups-network-admin',
+			apply_filters( 'groups_add_menu_page_function', 'groups_network_admin_options' ),
+			GROUPS_PLUGIN_URL . '/images/groups.png'
+		);
+		$pages[] = $page;
+		add_action( 'admin_print_styles-' . $page, array( __CLASS__, 'admin_print_styles' ) );
+		add_action( 'admin_print_scripts-' . $page, array( __CLASS__, 'admin_print_scripts' ) );
+		
+		do_action( 'groups_network_admin_menu', $pages );
 	}
 }
 Groups_Admin::init();

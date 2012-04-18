@@ -21,6 +21,28 @@
 class Groups_Controller {
 	
 	/**
+	 * Cache-safe switching in case any multi-site hiccups might occur.
+	 * Clears the cache after switching to the given blog to avoid using
+	 * another blog's cached values.
+	 * See  wp_cache_reset() in wp-includes/cache.php
+	 * @see wp_cache_reset()
+	 * @link http://core.trac.wordpress.org/ticket/14941
+	 *
+	 * @param int $blog_id
+	 */
+	public static function switch_to_blog( $blog_id ) {
+		switch_to_blog( $blog_id );
+		wp_cache_reset();
+	}
+	
+	/**
+	 * Switch back to previous blog.
+	 */
+	public static function restore_current_blog() {
+		restore_current_blog();
+	}
+	
+	/**
 	 * Boot the plugin.
 	 * @see Groups_Registered::wpmu_new_blog()
 	 */
@@ -44,9 +66,9 @@ class Groups_Controller {
 		if ( is_multisite() ) {
 			$active_sitewide_plugins = get_site_option( 'active_sitewide_plugins', array() );
 			if ( key_exists( 'groups/groups.php', $active_sitewide_plugins ) ) {
-				switch_to_blog( $blog_id );
+				self::switch_to_blog( $blog_id );
 				self::setup();
-				restore_current_blog();
+				self::restore_current_blog();
 			}
 		}
 	}
@@ -61,9 +83,9 @@ class Groups_Controller {
 		if ( is_multisite() ) {
 			$active_sitewide_plugins = get_site_option( 'active_sitewide_plugins', array() );
 			if ( key_exists( 'groups/groups.php', $active_sitewide_plugins ) ) {
-				switch_to_blog( $blog_id );
+				self::switch_to_blog( $blog_id );
 				self::cleanup( $drop );
-				restore_current_blog();
+				self::restore_current_blog();
 			}
 		}
 	}
@@ -82,20 +104,16 @@ class Groups_Controller {
 	 * @param boolean $network_wide
 	 */
 	public static function activate( $network_wide = false ) {
-		
-		$blog_ids = Groups_Utility::get_blogs();
-		foreach ( $blog_ids as $blog_id ) {
-			if ( is_multisite() && $network_wide ) {
-				switch_to_blog( $blog_id );
+		if ( is_multisite() && $network_wide ) {
+			$blog_ids = Groups_Utility::get_blogs();
+			foreach ( $blog_ids as $blog_id ) {
+				self::switch_to_blog( $blog_id );
+				self::setup();
+				self::restore_current_blog();
 			}
-
+		} else {
 			self::setup();
-			
-			if ( is_multisite() && $network_wide ) {
-				restore_current_blog();
-			}
 		}
-		
 	}
 	
 	/**
@@ -207,11 +225,30 @@ class Groups_Controller {
 		$queries = array();
 		switch ( $previous_version ) {
 			case '1.0.0' :
-				// fix hideously big index
 				$capability_table = _groups_get_tablename( 'capability' );
 				if ( $wpdb->get_var( "SHOW TABLES LIKE '$capability_table'" ) == $capability_table ) {
+					// increase column sizes
+					$queries[] = "ALTER TABLE $capability_table MODIFY capability VARCHAR(255) UNIQUE NOT NULL;";
+					$queries[] = "ALTER TABLE $capability_table MODIFY class VARCHAR(255) DEFAULT NULL;";
+					$queries[] = "ALTER TABLE $capability_table MODIFY object VARCHAR(255) DEFAULT NULL;";
+					// correct capabilities
+					$queries[] = "UPDATE $capability_table SET capability='delete_published_pages' WHERE capability='delete_published_pag';";
+					$queries[] = "UPDATE $capability_table SET capability='delete_published_posts' WHERE capability='delete_published_pos';";
+					// fix hideously big index
 					$queries[] = "ALTER TABLE $capability_table DROP INDEX capability_kco;";
 					$queries[] = "ALTER TABLE $capability_table ADD INDEX capability_kco (capability(20),class(20),object(20));";
+				}
+				break;
+			case '1.0.0-beta-3d' :
+				$capability_table = _groups_get_tablename( 'capability' );
+				if ( $wpdb->get_var( "SHOW TABLES LIKE '$capability_table'" ) == $capability_table ) {
+					// increase column sizes
+					$queries[] = "ALTER TABLE $capability_table MODIFY capability VARCHAR(255) UNIQUE NOT NULL;";
+					$queries[] = "ALTER TABLE $capability_table MODIFY class VARCHAR(255) DEFAULT NULL;";
+					$queries[] = "ALTER TABLE $capability_table MODIFY object VARCHAR(255) DEFAULT NULL;";
+					// correct capabilities
+					$queries[] = "UPDATE $capability_table SET capability='delete_published_pages' WHERE capability='delete_published_pag';";
+					$queries[] = "UPDATE $capability_table SET capability='delete_published_posts' WHERE capability='delete_published_pos';";
 				}
 				break;
 			default :
@@ -229,19 +266,18 @@ class Groups_Controller {
 	* This will happen only if the user chooses to delete data upon deactivation.
 	* @param boolean $network_wide
 	*/
-	public static function deactivate( $network_wide ) {
-		
-		$blog_ids = Groups_Utility::get_blogs();
-		foreach ( $blog_ids as $blog_id ) {
-			if ( is_multisite() && $network_wide ) {
-				switch_to_blog( $blog_id );
+	public static function deactivate( $network_wide = false ) {
+		if ( is_multisite() && $network_wide ) {
+			if ( Groups_Options::get_option( 'groups_network_delete_data', false ) ) {
+				$blog_ids = Groups_Utility::get_blogs();
+				foreach ( $blog_ids as $blog_id ) {
+					self::switch_to_blog( $blog_id );
+					self::cleanup( true );
+					self::restore_current_blog();
+				}
 			}
-			
+		} else {
 			self::cleanup();
-			
-			if ( is_multisite() && $network_wide ) {
-				restore_current_blog();
-			}
 		}
 	}
 	

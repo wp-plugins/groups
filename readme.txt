@@ -214,9 +214,7 @@ The documentation is a work in progress, if you don't find anything there yet bu
 
 = I have a question, where do I ask? =
 
-Please contact me at [itthinx.com](http://www.itthinx.com/).
-
-You can also leave a comment at the [Groups plugin page](http://www.itthinx.com/plugins/groups/). 
+You can leave a comment at the [Groups plugin page](http://www.itthinx.com/plugins/groups/).
 
 == Screenshots ==
 
@@ -231,6 +229,12 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 7. Options - you can adjust the plugin's settings here.
 
 == Changelog ==
+
+= 1.1.0 =
+* Added Groups menu to network admin
+* Added option to delete plugin data for all sites on multisite installations; removed option for individual sites
+* Improved activation and deactivation for network installs
+* Increases column sizes on capabilities table and fixes cut-off capabilities delete_published_pages and delete_published_posts
 
 = 1.0.0-beta-3d =
 * Fixed issues caused by an excessively long index for the capability DB table.

@@ -85,7 +85,7 @@ class Groups_Registered {
 	 */
 	public static function wpmu_new_blog( $blog_id, $user_id, $domain = null, $path = null, $site_id = null, $meta = null ) {
 		if ( is_multisite() ) {
-			switch_to_blog( $blog_id );
+			Groups_Controller::switch_to_blog( $blog_id );
 		}
 		if ( !( $group = Groups_Group::read_by_name( self::REGISTERED_GROUP_NAME ) ) ) {
 			$group_id = Groups_Group::create( array( "name" => self::REGISTERED_GROUP_NAME ) );
@@ -99,7 +99,7 @@ class Groups_Registered {
 			}
 		}
 		if ( is_multisite() ) {
-			restore_current_blog();
+			Groups_Controller::restore_current_blog();
 		}
 	}
 	
@@ -135,7 +135,7 @@ class Groups_Registered {
 	function add_user_to_blog( $user_id, $role, $blog_id ) {
 		
 		if ( is_multisite() ) {
-			switch_to_blog( $blog_id );
+			Groups_Controller::switch_to_blog( $blog_id );
 		}
 		
 		global $wpdb;
@@ -166,7 +166,7 @@ class Groups_Registered {
 		}
 		
 		if ( is_multisite() ) {
-			restore_current_blog();
+			Groups_Controller::restore_current_blog();
 		}
 	}
 

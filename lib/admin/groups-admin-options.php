@@ -32,6 +32,13 @@ function groups_admin_options() {
 		wp_die( __( 'Access denied.', GROUPS_PLUGIN_DOMAIN ) );
 	}
 	
+	$is_sitewide_plugin = false;
+	if ( is_multisite() ) {
+		$active_sitewide_plugins = get_site_option( 'active_sitewide_plugins', array() );
+		$active_sitewide_plugins = array_keys( $active_sitewide_plugins );
+		$is_sitewide_plugin = in_array( 'groups/groups.php', $active_sitewide_plugins );
+	}
+	
 	echo
 		'<div>' .
 			'<h2>' .
@@ -83,11 +90,13 @@ function groups_admin_options() {
 			}
 			Groups_Controller::assure_capabilities();
 			
-			// delete data
-			if ( !empty( $_POST['delete-data'] ) ) {
-				Groups_Options::update_option( 'groups_delete_data', true );
-			} else {
-				Groups_Options::update_option( 'groups_delete_data', false );
+			if ( !$is_sitewide_plugin ) {
+				// delete data
+				if ( !empty( $_POST['delete-data'] ) ) {
+					Groups_Options::update_option( 'groups_delete_data', true );
+				} else {
+					Groups_Options::update_option( 'groups_delete_data', false );
+				}
 			}
 		}
 	}
@@ -164,16 +173,18 @@ function groups_admin_options() {
 				__( 'A minimum set of permissions will be preserved.', GROUPS_PLUGIN_DOMAIN ) .
 				'<br/>' .
 				__( 'If you lock yourself out, please ask an administrator to help.', GROUPS_PLUGIN_DOMAIN ) .
-				'</p>';	
-	echo
+				'</p>';
+	if ( !$is_sitewide_plugin ) {
+		echo
 				'<h3>' . __( 'Deactivation and data persistence', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
 				'<p>' .
 					'<input name="delete-data" type="checkbox" ' . ( $delete_data ? 'checked="checked"' : '' ) . '/>' .
-					'<label for="delete-data">' . __( 'Delete all plugin data on deactivation', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
+					'<label for="delete-data">' . __( 'Delete all Groups plugin data on deactivation', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
 				'</p>' .
 				'<p class="description warning">' .
 						__( 'CAUTION: If this option is active while the plugin is deactivated, ALL plugin settings and data will be DELETED. If you are going to use this option, now would be a good time to make a backup. By enabling this option you agree to be solely responsible for any loss of data or any other consequences thereof.', GROUPS_PLUGIN_DOMAIN ) .
 				'</p>';
+	}
 	echo
 				'<p>' .
 					wp_nonce_field( 'admin', GROUPS_ADMIN_OPTIONS_NONCE, true, false ) .
@@ -183,4 +194,51 @@ function groups_admin_options() {
 		'</form>';
 	Groups_Help::footer();
 }
-?>
+
+function groups_network_admin_options() {
+
+	if ( !current_user_can( GROUPS_ADMINISTER_OPTIONS ) ) {
+		wp_die( __( 'Access denied.', GROUPS_PLUGIN_DOMAIN ) );
+	}
+
+	echo
+		'<div>' .
+		'<h2>' .
+		__( 'Groups network options', GROUPS_PLUGIN_DOMAIN ) .
+		'</h2>' .
+		'</div>';
+
+	// handle options form submission
+	if ( isset( $_POST['submit'] ) ) {
+		if ( wp_verify_nonce( $_POST[GROUPS_ADMIN_OPTIONS_NONCE], 'admin' ) ) {
+			// delete data
+			if ( !empty( $_POST['delete-data'] ) ) {
+				Groups_Options::update_option( 'groups_network_delete_data', true );
+			} else {
+				Groups_Options::update_option( 'groups_network_delete_data', false );
+			}
+		}
+	}
+
+	$delete_data = Groups_Options::get_option( 'groups_network_delete_data', false );
+
+	// options form
+	echo
+		'<form action="" name="options" method="post">' .		
+		'<div>' .
+		'<h3>' . __( 'Network deactivation and data persistence', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
+		'<p>' .
+		'<input name="delete-data" type="checkbox" ' . ( $delete_data ? 'checked="checked"' : '' ) . '/>' .
+		'<label for="delete-data">' . __( 'Delete all Groups plugin data for ALL sites on network deactivation', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
+		'</p>' .
+		'<p class="description warning">' .
+		__( 'CAUTION: If this option is active while the plugin is deactivated, ALL plugin settings and data will be DELETED for <strong>all sites</strong>. If you are going to use this option, now would be a good time to make a backup. By enabling this option you agree to be solely responsible for any loss of data or any other consequences thereof.', GROUPS_PLUGIN_DOMAIN ) .
+		'</p>' .
+		'<p>' .
+		wp_nonce_field( 'admin', GROUPS_ADMIN_OPTIONS_NONCE, true, false ) .
+		'<input type="submit" name="submit" value="' . __( 'Save', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
+		'</p>' .
+		'</div>' .
+		'</form>';
+	Groups_Help::footer();
+}
