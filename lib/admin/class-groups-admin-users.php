@@ -42,9 +42,11 @@ class Groups_Admin_Users {
 			add_filter( 'manage_users_custom_column', array( __CLASS__, 'manage_users_custom_column' ), 10, 3 );
 		}
 		if ( current_user_can( GROUPS_ADMINISTER_GROUPS ) ) {
-			add_action( 'admin_head', array( __CLASS__, 'admin_head' ) );
-			// allow to add or remove selected users to groups
-			add_action( 'load-users.php', array( __CLASS__, 'load_users' ) );
+			if ( !is_network_admin() ) {
+				add_action( 'admin_head', array( __CLASS__, 'admin_head' ) );
+				// allow to add or remove selected users to groups
+				add_action( 'load-users.php', array( __CLASS__, 'load_users' ) );
+			}
 		}
 	}
 	

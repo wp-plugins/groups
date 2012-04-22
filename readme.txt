@@ -3,7 +3,7 @@ Contributors: itthinx
 Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, group, groups, member, members, membership, permission, permissions
 Requires at least: 3.0
-Tested up to: 3.3.1
+Tested up to: 3.3.2
 Stable tag: 1.0.0-beta-3d
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
@@ -230,6 +230,20 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.1.4 =
+* Reduced plugin admin footer.
+
+= 1.1.3 =
+* Added safety & warning to test page.
+
+= 1.1.2 =
+* Tested on WP 3.3.2
+
+= 1.1.1 =
+* Multisite: Fixed (removed) conditions that would only make Groups act on public and non-mature sites
+* Multisite: Adding add/remove to group only on sites', not network users admin screen
+* Multisite: Added constraint in user_register hook checking if the user is a member of the blog
+ 
 = 1.1.0 =
 * Added Groups menu to network admin
 * Added option to delete plugin data for all sites on multisite installations; removed option for individual sites

@@ -88,3 +88,13 @@ div.capability.edit label.description-field {
 	background: url(../images/required.png) transparent no-repeat left center;
 	padding-left: 16px ! important;
 }
+div.groups-footer {
+	padding-top: 4px;
+	color: #999;
+}
+div.groups-footer a {
+	color: #777;
+}
+div.groups-footer form {
+	display: inline;
+}

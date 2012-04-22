@@ -117,12 +117,26 @@ class Groups_Registered {
 			$registered_group_id = $registered_group->group_id;
 		}
 		if ( $registered_group_id ) {
-			Groups_User_Group::create(
-				array(
-					'user_id'  => $user_id,
-					'group_id' => $registered_group_id
-				)
-			);
+			// Multisite: If a new user registers with the main blog,
+			// the user is added, but it doesn't appear on the Users admin
+			// screen of the main blog. It doesn't have the Subscriber role
+			// (or any other) for that blog, unless it is explicitly added by the
+			// blog's admin to the site. In other words, a user that has just
+			// registered with the site's main blog can access the profile page
+			// on the back end, but doesn't appear as a user to the site's admin.
+			// Currently, on WP 3.3.2, like it or not, it's like that.
+			// Unless the user actually has a capability (role)
+			// for a blog, it won't appear in the blog's users list. After
+			// registering with the blog, the user does not have a capability.
+			// Thus, we need to check that is_user_member_of_blog( $user_id ) here.
+			if ( !is_multisite() || is_user_member_of_blog( $user_id ) ) {
+				Groups_User_Group::create(
+					array(
+						'user_id'  => $user_id,
+						'group_id' => $registered_group_id
+					)
+				);
+			}
 		}
 	}
 	

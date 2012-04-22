@@ -65,16 +65,14 @@ class Groups_Help {
 	 */
 	public static function footer( $render = true ) {
 		$footer = '<div class="groups-footer">' .
-			'<p>' .
-			__( 'Thank you for using the <a href="http://www.itthinx.com/plugins/groups" target="_blank">Groups</a> plugin by <a href="http://www.itthinx.com" target="_blank">itthinx</a>.', GROUPS_PLUGIN_DOMAIN ) .
-			'</p>' .
-			'<p>' .
-			__( 'If you require <em>consulting services</em>, <em>support</em> or <em>customization</em>, you may <a href="http://www.itthinx.com/" target="_blank">contact me here</a>.', GROUPS_PLUGIN_DOMAIN ) .
-			'</p>' .
-			'<p>' .
-			__( 'If you find this plugin useful, please consider making a donation:', GROUPS_PLUGIN_DOMAIN ) .
+// 			'<p>' .
+			__( 'Thank you for using <a href="http://www.itthinx.com/plugins/groups" target="_blank">Groups</a> by <a href="http://www.itthinx.com" target="_blank">itthinx</a>.', GROUPS_PLUGIN_DOMAIN ) .
+			' ' .
+			__( 'For consulting and development services related to Groups go <a href="http://www.itthinx.com/contact/" target="_blank">here</a>.', GROUPS_PLUGIN_DOMAIN ) .
+			' ' .
+			__( 'You can also support the project:', GROUPS_PLUGIN_DOMAIN ) .
 			self::donate( false ) .
-			'</p>' .
+// 			'</p>' .
 			'</div>';
 		$footer = apply_filters( 'groups_footer', $footer );
 		if ( $render ) {
@@ -91,8 +89,8 @@ class Groups_Help {
 	 * @param boolean $small 
 	 */
 	public static function donate( $render = true, $small = false ) {
-		$donate = '
-			<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+		$donate =
+			'<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 			<input type="hidden" name="cmd" value="_donations">
 			<input type="hidden" name="business" value="itthinx@itthinx.com">
 			<input type="hidden" name="lc" value="US">
@@ -101,10 +99,8 @@ class Groups_Help {
 			<input type="hidden" name="no_note" value="0">
 			<input type="hidden" name="currency_code" value="EUR">
 			<input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_SM.gif:NonHostedGuest">
-			<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_SM.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-			<img alt="" border="0" src="https://www.paypalobjects.com/es_ES/i/scr/pixel.gif" width="1" height="1">
-			</form>			
-			';
+			<input type="submit" name="submit" value="Contribute" style="border:1px solid #ccc;border-radius:4px;cursor:pointer;padding:0;margin:0;color:#999;">
+			</form>';
 		if ( $render ) {
 			echo $donate;
 		} else {

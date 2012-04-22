@@ -47,7 +47,7 @@ class Groups_Utility {
 		$result = array();
 		if ( is_multisite() ) {
 			$blogs = $wpdb->get_results( $wpdb->prepare(
-				"SELECT blog_id FROM $wpdb->blogs WHERE site_id = %d AND public = '1' AND archived = '0' AND mature = '0' AND spam = '0' AND deleted = '0' ORDER BY registered DESC",
+				"SELECT blog_id FROM $wpdb->blogs WHERE site_id = %d AND archived = '0' AND spam = '0' AND deleted = '0' ORDER BY registered DESC",
 				$wpdb->siteid
 			) );
 			if ( is_array( $blogs ) ) {

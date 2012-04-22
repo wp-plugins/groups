@@ -381,9 +381,37 @@ if ( defined( 'ABSPATH' ) ) {
 		if ( !current_user_can( GROUPS_ADMINISTER_GROUPS ) ) {
 			wp_die( __( 'Access denied.', GROUPS_PLUGIN_DOMAIN ) );
 		} else {
-			echo '<h1>Running tests for <i>Groups</i> plugin ...</h1>';
-			groups_tests();
-			echo '<h2>Finished.</h2>';
+			$run = isset( $_POST['run'] ) ? $_POST['run'] : null;
+			switch( $run ) {
+				case 'run' :
+					if ( !isset( $_POST['groups-test-nonce'] ) || !wp_verify_nonce( $_POST['groups-test-nonce'], 'run-tests' ) ) {
+						wp_die( __( 'Access denied.', GROUPS_PLUGIN_DOMAIN ) );
+					}
+					echo '<h1>Running tests for <i>Groups</i> plugin ...</h1>';
+					groups_tests();
+					echo '<h2>Finished.</h2>';
+					break;
+				default :
+					$url = get_bloginfo( 'url' );
+					echo '<p style="color:#f00; font-weight:bold;">';
+					echo 'DO NOT CONTINUE UNLESS YOU KNOW WHAT YOU ARE DOING.';
+					echo '</p>';
+					echo '<ul>';
+					echo '<li>This will run tests for the Groups plugin on this site.</li>';
+					echo '<li>Unless you are a developer who knows what she or he is doing, you do not need to do this and you do not want to proceed.</li>';
+					echo '<li>It may <strong>completely destroy your site</strong>.</li>';
+					echo '<li>Run only at your own risk, do not blame anyone if something goes wrong.</li>';
+					echo '<li>You <strong>agree to be solely responsible for any damage</strong> this may cause to the site.';
+					echo '<li>Make a full backup of your site and database before you continue.</li>';
+					echo '<li>If in doubt, <strong><a href="' . $url . '">do not continue</a></strong>.</li>';
+					echo '</ul>';
+					echo '<form action="" method="post">';
+					echo '<input name="run" value="run" type="hidden" />';
+					echo '<input type="submit" value="Go" />';
+					wp_nonce_field( 'run-tests', 'groups-test-nonce', true, true );
+					echo '</form>'; 
+			}
+			
 		}
 	} else {
 		echo 'The <i>Groups</i> plugin is not active, not running tests.';
