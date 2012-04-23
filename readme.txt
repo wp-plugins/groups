@@ -4,7 +4,7 @@ Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, group, groups, member, members, membership, permission, permissions
 Requires at least: 3.0
 Tested up to: 3.3.2
-Stable tag: 1.0.0-beta-3d
+Stable tag: 1.1.4
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
 
@@ -298,4 +298,5 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 
 The Groups plugin provides an extensive framework to handle memberships, group-based capabilities and access control.
 Read more on the official [Groups](http://www.itthinx.com/plugins/groups/) page and the [Groups documentation](http://www.itthinx.com/documentation/groups/) page.
+
 
