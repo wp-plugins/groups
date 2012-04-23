@@ -275,6 +275,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 
 == Upgrade Notice ==
 
+= 1.1.4 =
+* Several bug fixes and improvements.
+
 = 1.0.0-beta-3d =
 * The capability DB table had a ridiculously long index, this update fixes it.
 
