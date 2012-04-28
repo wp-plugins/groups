@@ -18,6 +18,10 @@
  * @package groups
  * @since groups 1.0.0
  */
+
+/**
+ * Groups admin sections initialization.
+ */
 class Groups_Admin {
 	public static function init() {
 		add_action( 'admin_init', array( __CLASS__, 'admin_init' ) );

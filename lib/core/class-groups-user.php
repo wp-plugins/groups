@@ -22,6 +22,9 @@
 require_once( GROUPS_CORE_LIB . "/interface-i-capable.php" );
 require_once( GROUPS_CORE_LIB . "/class-groups-capability.php" );
 
+/**
+ * User OPM.
+ */
 class Groups_User implements I_Capable {
 	
 	/**

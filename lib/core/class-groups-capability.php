@@ -19,6 +19,9 @@
 * @since groups 1.0.0
 */
 
+/**
+ * Capability OPM
+ */
 class Groups_Capability {
 	
 	/**

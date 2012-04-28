@@ -24,6 +24,9 @@
  */
 define( 'GROUPS_ADMIN_OPTIONS_NONCE', 'groups-admin-nonce' );
 
+/**
+ * Options admin screen.
+ */
 function groups_admin_options() {
 	
 	global $wpdb, $wp_roles;

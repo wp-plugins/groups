@@ -18,6 +18,10 @@
  * @package groups
  * @since groups 1.0.0
  */
+
+/**
+ * "Registered" group automation.
+ */
 class Groups_Registered {
 
 	const REGISTERED_GROUP_NAME = 'Registered';

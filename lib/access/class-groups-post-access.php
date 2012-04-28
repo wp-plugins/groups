@@ -18,6 +18,10 @@
  * @package groups
  * @since groups 1.0.0
  */
+
+/**
+ * Post access restrictions.
+ */
 class Groups_Post_Access {
 	
 	const POSTMETA_PREFIX = 'groups-';

@@ -20,6 +20,9 @@
  */
 require_once( GROUPS_CORE_LIB . "/interface-i-capable.php" );
 
+/**
+ * Group OPM.
+ */
 class Groups_Group implements I_Capable {
 	
 	/**
