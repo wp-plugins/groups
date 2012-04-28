@@ -18,6 +18,10 @@
  * @package groups
  * @since groups 1.0.0
  */
+
+/**
+ * WordPress capabilities integration.
+ */
 class Groups_WordPress {
 	
 	/**

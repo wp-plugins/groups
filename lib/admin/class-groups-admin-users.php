@@ -18,6 +18,10 @@
  * @package groups
  * @since groups 1.0.0
  */
+
+/**
+ * Users admin integration with Groups.
+ */
 class Groups_Admin_Users {
 	
 	const GROUPS = 'groups_user_groups';

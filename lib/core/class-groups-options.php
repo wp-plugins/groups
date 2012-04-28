@@ -20,7 +20,7 @@
  */
 
 /**
- * Groups options
+ * Groups options handler
  */
 class Groups_Options {
 		

@@ -1,7 +1,7 @@
 === Groups ===
 Contributors: itthinx
 Donate link: http://www.itthinx.com/plugins/groups
-Tags: access, access control, capability, capabilities, content, group, groups, member, members, membership, permission, permissions
+Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, permission, permissions
 Requires at least: 3.0
 Tested up to: 3.3.2
 Stable tag: 1.1.4
@@ -13,27 +13,31 @@ Groups provides group-based user membership management, group-based capabilities
 Groups provides group-based user membership management, group-based capabilities and content access control.
 It integrates standard WordPress capabilities and application-specific capabilities along with an extensive API.
 
-#### Features ####
+### Extensions ###
 
-##### User groups #####
+- [Groups File Access](http://www.itthinx.com/plugins/groups-file-access/) Groups File Access is an extension that allows to provide file download links for authorized users. Access to files is restricted to users by their group membership.
+
+### Features ###
+
+#### User groups ####
 
 - Supports an unlimited number of groups
 - Provides a Registered group which is automatically maintained
 - Users can be assigned to any group
 - Users are added automatically to the Registered group
 
-##### Groups hierarchy #####
+#### Groups hierarchy ####
 
 - Supports group hierarchies with capability inheritance
 
-##### Group capabilities #####
+#### Group capabilities ####
 
 - Integrates standard WordPress capabilities which can be assigned to groups and users
 - Supports custom capabilities: allows to define new capabilities for usage in plugins and web applications
 - Users inherit capabilities of the groups they belong to
 - Groups inherit capabilities of their parent groups
 
-##### Access control #####
+#### Access control ####
 
 - Built-in access control that allows to restrict access to posts, pages and custom content types to specific groups and users only
 - control access to content by groups: shortcodes allow to control who can access content on posts, show parts to members of certain groups or to those who are not members
@@ -41,7 +45,7 @@ It integrates standard WordPress capabilities and application-specific capabilit
 - control access to content by capabilities: show (or do not show) content to users who have certain capabilities
   Shortcodes: [groups_can], [groups_can_not]
 
-##### Easy user interface #####
+#### Easy user interface ####
 
 - integrates nicely with the standard WordPress Users menu
 - provides an intuitive Groups menu
@@ -49,34 +53,28 @@ It integrates standard WordPress capabilities and application-specific capabilit
 - quick filters
 - bulk-actions where needed, for example apply capabilities to groups, bulk-add users to groups, bulk-remove users from groups
 
-##### Sensible options #####
+#### Sensible options ####
 
 - administrator overrides can be turned off
 - optional tree view for groups can be shown only when needed
 - provides its own set of permissions
 - cleans up after testing with a "delete all plugin data" option 
 
-##### Access Control #####
+#### Access Control ####
 
 Groups defines some capabilities of its own. The groups_read_post capability
 is used to restrict access to certain posts or pages to groups (and users)
-with that capability  only.
+with that capability  only. 
 
-##### Framework #####
+#### Framework ####
 
 - Solid and sound data-model with a complete API that allows developers to create group-oriented web applications and plugins
 
-##### Multisite #####
+#### Multisite ####
 
 - All features are supported independently for each blog in multisite installations
 
-### Your opinion counts ###
-
-#### You & Groups ####
-
-Beta-testers and developers who need to integrate group-based features in their plugins and web applications: please use it and provide your feedback.
-
-#### Feedback ###
+### Feedback ###
 
 Feedback is welcome!
 
@@ -86,7 +84,7 @@ Please try to solve problems there before you rate this plugin or say it doesn't
 
 #### Twitter ####
 
-[Follow me on Twitter](http://twitter.com/itthinx) for updates on this and other plugins.
+[Follow @itthinx on Twitter](http://twitter.com/itthinx) for updates on this and other plugins.
 
 ### Introduction ###
 
@@ -200,6 +198,22 @@ Examples:
 
 * There [groups_group_info group="1" show="count" single="is one member" plural="are %d members"] in the [groups_group_info group="1" show="name"] group.
 
+#### Show user groups ####
+
+- [groups_user_groups]
+
+This shortcode lists the current user's or a specific user's groups.
+
+For detailed information about this shortcode, please refer to the [Groups plugin page](http://www.itthinx.com/plugins/groups/).
+
+#### Show site groups ####
+
+- [groups_groups]
+
+This shortcode lists the site's groups.
+
+For detailed information about this shortcode, please refer to the [Groups plugin page](http://www.itthinx.com/plugins/groups/).
+
 == Installation ==
 
 1. Upload or extract the `groups` folder to your site's `/wp-content/plugins/` directory. You can also use the *Add new* option found in the *Plugins* menu in WordPress.  
@@ -229,6 +243,11 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 7. Options - you can adjust the plugin's settings here.
 
 == Changelog ==
+
+= 1.1.5 =
+* Added shortcode & API functions [groups_user_group] / [groups_user_groups] that allows to show the list of groups the current user or a specific user belongs to
+* Added shortcode & API functions [groups_groups]to show the site's list of groups
+* Class comments.
 
 = 1.1.4 =
 * Reduced plugin admin footer.
@@ -274,6 +293,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.1.5 =
+...
 
 = 1.1.4 =
 * Several bug fixes and improvements.

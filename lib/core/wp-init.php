@@ -19,6 +19,7 @@
  * @since groups 1.0.0
  */
 
+// startup
 global $groups_version, $groups_admin_messages;
 
 if ( !isset( $groups_admin_messages ) ) {

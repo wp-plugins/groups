@@ -18,6 +18,8 @@
  * @package groups
  * @since groups 1.0.0
  */
+
+// admin defines
 define( 'GROUPS_GROUPS_PER_PAGE', 10 );
 define( 'GROUPS_ADMIN_GROUPS_NONCE_1', 'groups-nonce-1');
 define( 'GROUPS_ADMIN_GROUPS_NONCE_2', 'groups-nonce-2');

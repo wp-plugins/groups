@@ -18,6 +18,10 @@
  * @package groups
  * @since groups 1.0.0
  */
+
+/**
+ * User Capability OPM.
+ */
 class Groups_User_Capability {
 	
 	/**

@@ -18,6 +18,10 @@
  * @package groups
  * @since groups 1.0.0
  */
+
+/**
+ * User Group OPM.
+ */
 class Groups_User_Group {
 	
 	/**

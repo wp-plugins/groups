@@ -18,6 +18,10 @@
  * @package groups
  * @since groups 1.0.0
  */
+
+/**
+ * Shortcode handlers.
+ */
 class Groups_Access_Shortcodes {
 	
 	/**

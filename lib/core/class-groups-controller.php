@@ -18,6 +18,10 @@
  * @package groups
  * @since groups 1.0.0
  */
+
+/**
+ * Plugin controller
+ */
 class Groups_Controller {
 	
 	/**
