@@ -29,6 +29,7 @@ class Groups_Access_Meta_Boxes {
 	const NONCE = 'groups-meta-box-nonce';
 	const SET_CAPABILITY = 'set-capability';
 	const READ_ACCESS = 'read-access';
+	const CAPABILITY = 'capability';
 	
 	/**
 	 * Hooks for capabilities meta box and saving options.
@@ -76,9 +77,11 @@ class Groups_Access_Meta_Boxes {
 	 * @param Object $box
 	 */
 	public static function capability( $object = null, $box = null ) {
-		
+
+		global $wpdb;
+
 		$output = "";
-				
+
 		$post_id = isset( $object->ID ) ? $object->ID : null;
 		$post_type = isset( $object->post_type ) ? $object->post_type : null;
 		$post_singular_name = __( "Post", GROUPS_PLUGIN_DOMAIN );
@@ -91,25 +94,28 @@ class Groups_Access_Meta_Boxes {
 				}
 			}
 		}
-		$read_access = false;
-		if ( $post_id !== null ) {
-			if ( Groups_Post_Access::read( $post_id, Groups_Post_Access::READ_POST_CAPABILITY ) ) {
-				$read_access = true;
+
+		$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
+		$read_caps = get_post_meta( $post_id, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
+		$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
+		$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
+		$output .= '<ul>';
+		foreach( $valid_read_caps as $valid_read_cap ) {
+			if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
+				$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
+				$output .= '<li>';
+				$output .= '<label>';
+				$output .= '<input name="' . self::CAPABILITY . '[]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
+				$output .= wp_filter_nohtml_kses( $capability->capability );
+				$output .= '</label>';
+				$output .= '</li>';
 			}
 		}
-		if ( $read_access ) {
-			$checked = ' checked="checked" ';
-		} else {
-			$checked = '';
-		}
-		
-		$output .= '<input type="checkbox" name="' . self::READ_ACCESS . '" ' . $checked . ' />';
-		$output .= '&nbsp;';
-		$output .=  '<label for="' . self::READ_ACCESS . '">';
-		$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
-		$output .= '</label> ';
+		$output .= '</ul>';
+		$output .= '</div>';
+
 		$output .= '<p class="description">';
-		$output .= sprintf( __( "Only groups or users that have the <b>%s</b> capability are allowed to read this %s.", GROUPS_PLUGIN_DOMAIN ), Groups_Post_Access::READ_POST_CAPABILITY, $post_singular_name );
+		$output .= sprintf( __( "Only groups or users that have one of the selected capabilities are allowed to read this %s.", GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
 		$output .= '</p>';
 		$output .= wp_nonce_field( self::SET_CAPABILITY, self::NONCE, true, false );
 		echo $output;
@@ -128,11 +134,16 @@ class Groups_Access_Meta_Boxes {
 				$post_type = isset( $_POST["post_type"] ) ? $_POST["post_type"] : null;
 				if ( $post_type !== null ) {
 					if ( current_user_can( 'edit_'.$post_type ) ) {
-						$read_access = isset( $_POST[self::READ_ACCESS] ) ? !empty( $_POST[self::READ_ACCESS] ) : false;
-						if ( $read_access ) {
-							Groups_Post_Access::create( array( "post_id" => $post_id ) );
-						} else {
-							Groups_Post_Access::delete( $post_id );
+						Groups_Post_Access::delete( $post_id, null );
+						if ( !empty( $_POST[self::CAPABILITY] ) ) {
+							foreach ( $_POST[self::CAPABILITY] as $capability_id ) {
+								if ( $capability = Groups_Capability::read( $capability_id ) ) {
+									Groups_Post_Access::create( array(
+										'post_id' => $post_id,
+										'capability' => $capability->capability
+									) );
+								}
+							}
 						}
 					}
 				}

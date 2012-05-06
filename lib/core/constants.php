@@ -78,6 +78,11 @@ define( 'GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE', 'groups-admin-override' );
 define( 'GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE_DEFAULT', true );
 
 /**
+ * @var string read post capabilities option
+ */
+define( 'GROUPS_READ_POST_CAPABILITIES', 'groups-read-post-capabilities' );
+
+/**
  * Tree view option
  * @var string
  */

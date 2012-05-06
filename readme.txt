@@ -5,6 +5,7 @@ Tags: access, access control, capability, capabilities, content, download, downl
 Requires at least: 3.0
 Tested up to: 3.3.2
 Stable tag: 1.1.5
+License: GPLv3
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
 
@@ -62,9 +63,17 @@ It integrates standard WordPress capabilities and application-specific capabilit
 
 #### Access Control ####
 
-Groups defines some capabilities of its own. The groups_read_post capability
-is used to restrict access to certain posts or pages to groups (and users)
-with that capability  only. 
+Access to posts and pages can be restricted by capability.
+
+Any capability can be used to restrict access, including new capabilities.
+
+If access to a post is restricted, only users who belong to a group with that
+capability may access the post.
+
+Groups defines the groups_read_post capability by default, which can be
+used to restrict access to certain posts or pages to groups
+with that capability only. Any other capability (including new ones) can be
+used to limit access as well.
 
 #### Framework ####
 
@@ -92,8 +101,8 @@ Please try to solve problems there before you rate this plugin or say it doesn't
 
 ##### Access restrictions on posts ####
 
-On posts an pages (and custom content types) a new meta box titles *Access restrictions* appears.
-By checking *Enforce read access*, you can restrict access to the post to groups and users who have the *groups_read_post* capability.
+On posts an pages (and custom content types) a new meta box titled *Access restrictions* appears.
+By checking a capability under *Enforce read access*, you can restrict access to the post to groups and users who are members of a group with that capability.
 You need to assign this capability to a group and make users members of that group to allow them to see those posts.
 
 #### Content visibility for members and non-members ####
@@ -143,9 +152,10 @@ Capabilities can be assigned to groups and users (1). These capabilities include
 the *standard WordPress capabilities* but you can also define additional
 capabilities for your web-application.
 
-Groups defines some capabilities of its own. The *groups_read_post* capability
-is used to restrict access to certain posts or pages to groups (and users)
-with that capability  only.
+Groups defines the *groups_read_post* capability by default which can be
+used to restrict access to certain posts or pages to groups (and users)
+with that capability only. Additional capabilities can be identified on the
+*Groups > Options* admin screen that may be used to limit access.
 
 (1) Assigning capabilities to users is not integrated in the user interface yet but can be done through API calls.
 
@@ -223,12 +233,38 @@ For detailed information about this shortcode, please refer to the [Groups plugi
 
 = Where is the documentation? =
 
+Most of the features are currently documented at the [Groups plugin page](http://www.itthinx.com/plugins/groups/).
+
 The official Groups documentation root is at the [Groups Documentation](http://www.itthinx.com/documentation/groups/) page.
 The documentation is a work in progress, if you don't find anything there yet but want to know about the API, please look at the code as it provides useful documentation on all functions.
 
 = I have a question, where do I ask? =
 
 You can leave a comment at the [Groups plugin page](http://www.itthinx.com/plugins/groups/).
+
+= I want Advanced and Premium members, where the Premium members can access everything that Advanced members can access. How can I do that? =
+
+Example: Advanced and Premium members
+
+1. Go to *Groups > Capabilities* and define two new capabilities, let's call them *advanced* and *premium*.
+2. Go to *Groups > Groups* and define two new  groups, let's call them *Advanced Members* and *Premium Members* - select *Advanced Members* as the *Parent* for the *Premium Members* group.
+3. Assign the *advanced* capability to the *Advanced Members* group and the *premium* capability to the *Premium Members* group.
+4. Go to *Groups > Options* and tick the checkboxes for *advanced* and *premium* under _Access restrictions_ and hit the *Save* button at the end of the page.
+5. Now create an example post that only members of the *Advanced Members* group should be able to see and tick the *advanced* checkbox under _Access restrictions_.
+6. Create another post for *Premium Members* and tick the *premium* checkbox for that post.
+7. Assign test users to both groups, log in as each user in turn and see which posts will be accessible. 
+
+= How do I limit access to posts so that users in group A can not read the same as those in group B and vice-versa? =
+
+Example: Green and Red members
+
+1. Go to *Groups > Capabilities* and define two new capabilities, call them *green* and *red*.
+2. Go to *Groups > Groups* and define two new  groups, let's call them *Green Members* and *Red Members*
+3. Assign the *green* capability to the *Green Members* group and the *red* capability to the *Red Members* group.
+4. Go to *Groups > Options* and tick the checkboxes for *green* and *red* under _Access restrictions_ and hit the *Save* button at the end of the page.
+5. Now create an example post that only members of the *Green Members* group should be able to see and tick the *green* checkbox under _Access restrictions_.
+6. Create another post for *Red Members* and tick the *red* checkbox for that post.
+7. Assign a test user to any of the above groups, log in as that user and the post will be accessible.
 
 == Screenshots ==
 
@@ -237,12 +273,16 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 1. Groups - this is where you add and remove groups and assign capabilities to groups.
 2. Capabilities - here you get an overview of the capabilities that are defined and you can add and remove capabilities as well.
 3. Users - group membership is managed from the standard Users admin view.
-4. Access restrictions meta box - on pages and posts (or custom content types) you can restrict access to users who are part of a group with the *groups_read_post* capability.
+4. Access restrictions meta box - on pages and posts (or custom content types) you can restrict access to users who are part of a group with capabilities.
 5. Usage of the [groups_member] and [groups_non_member] shortcodes to limit visibility of content to users who are members of a group or users who are not members of a group. Multiple comma-separated groups can be specified.
 6. Usage of the [groups_can] and [groups_can_not] shortcodes. Limits visibility of enclosed content to those users who have the capability or those who do not. Multiple capabilities can be given.
 7. Options - you can adjust the plugin's settings here.
+8. More options.
 
 == Changelog ==
+
+= 1.2.0 =
+* Access control is no longer restricted to the groups_read_post capability: now any capability can be used to limit access to posts so that different groups can be granted access to different sets of posts.
 
 = 1.1.5 =
 * Added shortcode & API functions [groups_user_group] / [groups_user_groups] that allows to show the list of groups the current user or a specific user belongs to
@@ -294,8 +334,11 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 
 == Upgrade Notice ==
 
+= 1.2.0 =
+* New: Different groups can be granted access to different sets of pages or posts: Any capability - including custom capabilities - can be used to limit access.
+
 = 1.1.5 =
-...
+* New shortcodes.
 
 = 1.1.4 =
 * Several bug fixes and improvements.

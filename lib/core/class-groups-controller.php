@@ -128,7 +128,7 @@ class Groups_Controller {
 		
 		// create WP capabilities
 		Groups_Controller::set_default_capabilities();
-		
+
 		$charset_collate = '';
 		if ( ! empty( $wpdb->charset ) ) {
 			$charset_collate = "DEFAULT CHARACTER SET $wpdb->charset";
@@ -256,6 +256,12 @@ class Groups_Controller {
 				}
 				break;
 			default :
+				if ( !empty( $previous_version ) ) {
+					if ( strcmp( $previous_version, '1.1.6' ) < 0 ) {
+						Groups_Options::update_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
+						$wpdb->query( $wpdb->prepare( "UPDATE $wpdb->postmeta SET meta_value = %s WHERE meta_key = %s", Groups_Post_Access::READ_POST_CAPABILITY, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY ) );
+					}
+				}
 		} // switch
 		foreach ( $queries as $query ) {
 			if ( $wpdb->query( $query ) === false ) {

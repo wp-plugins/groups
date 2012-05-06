@@ -44,9 +44,9 @@ function groups_admin_options() {
 	
 	echo
 		'<div>' .
-			'<h2>' .
-				__( 'Groups options', GROUPS_PLUGIN_DOMAIN ) .
-			'</h2>' .
+		'<h2>' .
+		__( 'Groups options', GROUPS_PLUGIN_DOMAIN ) .
+		'</h2>' .
 		'</div>';
 	
 	$caps = array(
@@ -70,6 +70,17 @@ function groups_admin_options() {
 			// Don't move this to the plugin options, access will be faster
 			add_option( GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE, $admin_override ); // WP 3.3.1 : update alone wouldn't create the option when value is false
 			update_option( GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE, $admin_override );
+			
+			$valid_read_caps = array( Groups_Post_Access::READ_POST_CAPABILITY );
+			if ( !empty( $_POST[GROUPS_READ_POST_CAPABILITIES] ) ) {
+				$read_caps = $_POST[GROUPS_READ_POST_CAPABILITIES];
+				foreach( $read_caps as $read_cap ) {
+					if ( !in_array( $read_cap, $valid_read_caps ) && ( $valid_cap = Groups_Capability::read( $read_cap ) ) ) {
+						$valid_read_caps[] = $valid_cap->capability;
+					}
+				}
+			}
+			Groups_Options::update_option( Groups_Post_Access::READ_POST_CAPABILITIES, $valid_read_caps );
 			
 			// tree view
 			if ( !empty( $_POST[GROUPS_SHOW_TREE_VIEW] ) ) {
@@ -155,45 +166,68 @@ function groups_admin_options() {
 	//
 	echo
 		'<form action="" name="options" method="post">' .		
-			'<div>' .
-				'<h3>' . __( 'Administrator Access Override', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
-				'<p>' .
-					'<input name="' . GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE . '" type="checkbox" ' . ( $admin_override ? 'checked="checked"' : '' ) . '/>' .
-					'<label for="' . GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE . '">' . __( 'Administrators override all access permissions derived from Groups capabilities.', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
-				'</p>';
+		'<div>' .
+		'<h3>' . __( 'Administrator Access Override', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
+		'<p>' .
+		'<input name="' . GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE . '" type="checkbox" ' . ( $admin_override ? 'checked="checked"' : '' ) . '/>' .
+		'<label for="' . GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE . '">' . __( 'Administrators override all access permissions derived from Groups capabilities.', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
+		'</p>';
+	
+	echo '<h3>' . __( 'Access restricions', GROUPS_PLUGIN_DOMAIN ) . '</h3>';
+	
+	echo '<p class="description">' .
+		__( 'Include these capabilities to enforce read access on posts. The selected capabilities will be offered to restrict access to posts.', GROUPS_PLUGIN_DOMAIN ) .
+		'</p>';
+
+	$capability_table = _groups_get_tablename( "capability" );
+	$capabilities = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $capability_table ORDER BY capability" ) );
+	$applicable_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
+	foreach( $capabilities as $capability ) {
+		$checked = in_array( $capability->capability, $applicable_read_caps ) ? ' checked="checked" ' : '';
+		if ( $capability->capability == Groups_Post_Access::READ_POST_CAPABILITY ) {
+			$checked .= ' readonly="readonly" disabled="disabled" ';
+		}
+		echo '<label>';
+		echo '<input name="' . GROUPS_READ_POST_CAPABILITIES . '[]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
+		echo  wp_filter_nohtml_kses( $capability->capability );
+		echo '</label>';
+		echo ' ';
+		echo '<span class="description">' . wp_filter_nohtml_kses( $capability->description ) . '</span>';
+		echo '<br/>';
+	}
 	
 	echo
-				'<h3>' . __( 'Tree view', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
-					'<p>' .
-						'<input name="' . GROUPS_SHOW_TREE_VIEW . '" type="checkbox" ' . ( $show_tree_view ? 'checked="checked"' : '' ) . '/>' .
-						'<label for="' . GROUPS_SHOW_TREE_VIEW . '">' . __( 'Show the Groups tree view.', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
-					'</p>';	
+		'<h3>' . __( 'Tree view', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
+		'<p>' .
+		'<input name="' . GROUPS_SHOW_TREE_VIEW . '" type="checkbox" ' . ( $show_tree_view ? 'checked="checked"' : '' ) . '/>' .
+		'<label for="' . GROUPS_SHOW_TREE_VIEW . '">' . __( 'Show the Groups tree view.', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
+		'</p>';	
 	echo
-				'<h3>' . __( 'Permissions', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
-				'<p>' . __( 'These permissions apply to Groups management. They do not apply to access permissions derived from Groups capabilities.', GROUPS_PLUGIN_DOMAIN ) . '</p>' .
-				$caps_table .
-				'<p class="description">' .
-				__( 'A minimum set of permissions will be preserved.', GROUPS_PLUGIN_DOMAIN ) .
-				'<br/>' .
-				__( 'If you lock yourself out, please ask an administrator to help.', GROUPS_PLUGIN_DOMAIN ) .
-				'</p>';
+		'<h3>' . __( 'Permissions', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
+		'<p>' . __( 'These permissions apply to Groups management. They do not apply to access permissions derived from Groups capabilities.', GROUPS_PLUGIN_DOMAIN ) . '</p>' .
+		$caps_table .
+		'<p class="description">' .
+		__( 'A minimum set of permissions will be preserved.', GROUPS_PLUGIN_DOMAIN ) .
+		'<br/>' .
+		__( 'If you lock yourself out, please ask an administrator to help.', GROUPS_PLUGIN_DOMAIN ) .
+		'</p>';
 	if ( !$is_sitewide_plugin ) {
 		echo
-				'<h3>' . __( 'Deactivation and data persistence', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
-				'<p>' .
-					'<input name="delete-data" type="checkbox" ' . ( $delete_data ? 'checked="checked"' : '' ) . '/>' .
-					'<label for="delete-data">' . __( 'Delete all Groups plugin data on deactivation', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
-				'</p>' .
-				'<p class="description warning">' .
-						__( 'CAUTION: If this option is active while the plugin is deactivated, ALL plugin settings and data will be DELETED. If you are going to use this option, now would be a good time to make a backup. By enabling this option you agree to be solely responsible for any loss of data or any other consequences thereof.', GROUPS_PLUGIN_DOMAIN ) .
-				'</p>';
+			'<h3>' . __( 'Deactivation and data persistence', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
+			'<p>' .
+				'<input name="delete-data" type="checkbox" ' . ( $delete_data ? 'checked="checked"' : '' ) . '/>' .
+				'<label for="delete-data">' . __( 'Delete all Groups plugin data on deactivation', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
+			'</p>' .
+			'<p class="description warning">' .
+					__( 'CAUTION: If this option is active while the plugin is deactivated, ALL plugin settings and data will be DELETED. If you are going to use this option, now would be a good time to make a backup. By enabling this option you agree to be solely responsible for any loss of data or any other consequences thereof.', GROUPS_PLUGIN_DOMAIN ) .
+			'</p>';
 	}
 	echo
-				'<p>' .
-					wp_nonce_field( 'admin', GROUPS_ADMIN_OPTIONS_NONCE, true, false ) .
-					'<input type="submit" name="submit" value="' . __( 'Save', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
-				'</p>' .
-			'</div>' .
+		'<p>' .
+			wp_nonce_field( 'admin', GROUPS_ADMIN_OPTIONS_NONCE, true, false ) .
+			'<input type="submit" name="submit" value="' . __( 'Save', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
+		'</p>' .
+		'</div>' .
 		'</form>';
 	Groups_Help::footer();
 }
