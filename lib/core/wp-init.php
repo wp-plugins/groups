@@ -50,11 +50,15 @@ require_once( GROUPS_CORE_LIB . '/class-groups-options.php' );
 require_once( GROUPS_CORE_LIB . '/class-groups-controller.php' );
 
 // admin
-require_once( GROUPS_ADMIN_LIB . '/class-groups-admin.php' );
-require_once( GROUPS_ADMIN_LIB . '/class-groups-admin-users.php' );
+if ( is_admin() ) {
+	require_once( GROUPS_ADMIN_LIB . '/class-groups-admin.php' );
+	require_once( GROUPS_ADMIN_LIB . '/class-groups-admin-users.php' );
+}
 
 // help
-require_once( GROUPS_CORE_LIB . '/class-groups-help.php' );
+if ( is_admin() ) {
+	require_once( GROUPS_CORE_LIB . '/class-groups-help.php' );
+}
 
 require_once( GROUPS_CORE_LIB . '/class-groups-capability.php' );
 require_once( GROUPS_CORE_LIB . '/class-groups-group.php' );

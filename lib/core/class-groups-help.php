@@ -24,42 +24,87 @@
  */
 class Groups_Help {
 	
+	/**
+	 * Help setup.
+	 */
 	public static function init() {
-		add_action( 'contextual_help', array( __CLASS__, 'contextual_help' ), 10, 3 );
+		add_action( 'groups_admin_menu', array( __CLASS__, 'groups_admin_menu' ) );
+		// @todo temporary fix for GFA <= 1.0.11 on localized installations - can be removed when all are updated
+		if ( defined( 'GFA_VIEWS_LIB' ) ) {
+			if ( file_exists( GFA_VIEWS_LIB . '/class-gfa-help.php' ) ) {
+				include_once( GFA_VIEWS_LIB . '/class-gfa-help.php' );
+			}
+		}
 	}
 	
-	public static function contextual_help( $contextual_help, $screen_id, $screen ) {
-
-		$show_groups_help = false;
-		$help = '<h3><a href="http://www.itthinx.com/plugins/groups" target="_blank">Groups</a></h3>';
-		$help .= '<p>';
-		$help .= __( 'The complete documentation is available on the <a href="http://www.itthinx.com/plugins/groups" target="_blank">Groups plugin page</a>', GROUPS_PLUGIN_DOMAIN );
-		$help .= '</p>';
-	
-		switch ( $screen_id ) {
-			case 'toplevel_page_groups-admin' :
-			case 'groups_page_groups-admin-groups':
-				$show_groups_help = true;
-				$help .= '<p>' . __( 'Here you can <strong>add</strong>, <strong>edit</strong> and <strong>remove</strong> groups.', GROUPS_PLUGIN_DOMAIN ) . '</p>';
-				break;
-			case 'groups_page_groups-admin-options' :
-				$show_groups_help = true;
-				break;
-			default:
+	/**
+	 * Adds contextual help to Groups admin screens.
+	 * 
+	 * @param array $pages admin pages
+	 */
+	public static function groups_admin_menu( $pages ) {
+		foreach ( $pages as $page ) {
+			add_action( 'load-' . $page, array( __CLASS__, 'contextual_help' ) );
 		}
+	}
 	
-		$help .= '<p>';
-		$help .= __( 'If you require <em>consulting services</em>, <em>support</em> or <em>customization</em>, you may <a href="http://www.itthinx.com/" target="_blank">contact me here</a>.', GROUPS_PLUGIN_DOMAIN );
-		$help .= '</p>';
-		$help .= '<p>';
-		$help .= __( 'If you find this plugin useful, please consider making a donation:', GROUPS_PLUGIN_DOMAIN );
-		$help .= self::donate( false, true );
-		$help .= '</p>';
-	
-		if ( $show_groups_help ) {
-			return $help;
-		} else {
-			return $contextual_help;
+	/**
+	 * Adds help to an admin screen.
+	 */
+	public static function contextual_help() {
+		if ( $screen = get_current_screen() ) {
+			$show_groups_help = false;
+			$help_title = __( 'Groups', GROUPS_PLUGIN_DOMAIN );
+			$screen_id = $screen->base;
+			// The prefix of the $screen_id is translated, use only the suffix
+			// to identify a screen:
+			$ids = array(
+				'groups-admin' => __( 'Groups', GROUPS_PLUGIN_DOMAIN ),
+				'groups-admin-groups' => __( 'Groups', GROUPS_PLUGIN_DOMAIN ),
+				'groups-admin-options' => __( 'Options', GROUPS_PLUGIN_DOMAIN ),
+				'groups-admin-capabilities' => __( 'Capabilities', GROUPS_PLUGIN_DOMAIN ),
+			);
+			foreach ( $ids as $id => $title ) {
+				$i = strpos( $screen_id, $id );
+				if ( $i !== false ) {
+					if ( $i + strlen( $id ) == strlen( $screen_id ) ) {
+						$screen_id = $id;
+						$show_groups_help = true;
+						$help_title = $title;
+						break;
+					}
+				}
+			}
+			if ( $show_groups_help ) {
+				$help = '<h3><a href="http://www.itthinx.com/plugins/groups" target="_blank">'. $help_title .'</a></h3>';
+				$help .= '<p>';
+				$help .= __( 'The complete documentation is available on the <a href="http://www.itthinx.com/plugins/groups" target="_blank">Groups plugin page</a>', GROUPS_PLUGIN_DOMAIN );
+				$help .= '</p>';
+				switch ( $screen_id ) {
+					case 'groups-admin' :
+					case 'groups-admin-groups':
+						$help .= '<p>' . __( 'Here you can <strong>add</strong>, <strong>edit</strong> and <strong>remove</strong> groups.', GROUPS_PLUGIN_DOMAIN ) . '</p>';
+						break;
+					case 'groups-admin-options' :
+					case 'groups-admin-capabilities' :
+						break;
+				}
+				$help .= '<p>';
+				$help .= __( 'If you require <em>consulting services</em>, <em>support</em> or <em>customization</em>, you may <a href="http://www.itthinx.com/" target="_blank">contact me here</a>.', GROUPS_PLUGIN_DOMAIN );
+				$help .= '</p>';
+				$help .= '<p>';
+				$help .= __( 'If you find this plugin useful, please consider making a donation:', GROUPS_PLUGIN_DOMAIN );
+				$help .= self::donate( false, true );
+				$help .= '</p>';
+
+				$screen->add_help_tab(
+					array(
+						'id'      => $screen_id,
+						'title'   => $help_title,
+						'content' => $help
+					)
+				);
+			}
 		}
 	}
 
