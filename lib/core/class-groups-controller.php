@@ -99,7 +99,7 @@ class Groups_Controller {
 	 * Loads the plugin's translations.
 	 */
 	public static function init() {
-		load_plugin_textdomain( GROUPS_PLUGIN_DOMAIN, null, GROUPS_PLUGIN_DIR );
+		load_plugin_textdomain( GROUPS_PLUGIN_DOMAIN, null, 'groups/languages' );
 		self::version_check();
 	}
 	

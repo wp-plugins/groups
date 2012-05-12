@@ -95,6 +95,11 @@ Please try to solve problems there before you rate this plugin or say it doesn't
 
 [Follow @itthinx on Twitter](http://twitter.com/itthinx) for updates on this and other plugins.
 
+### Translations ###
+
+* Lithuanian translation provided by Vincent G from [Host1Free](http://www.Host1Free.com) - Many thanks for your help!
+
+
 ### Introduction ###
 
 #### Content Access Control ####
@@ -281,6 +286,11 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.2.1 =
+* Reduced files loaded on non-admin pages.
+* Added Lithuanian translation.
+* Changed help to use tabs.
+
 = 1.2.0 =
 * Access control is no longer restricted to the groups_read_post capability: now any capability can be used to limit access to posts so that different groups can be granted access to different sets of posts.
 
@@ -333,6 +343,11 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.2.1 =
+* Added Lithuanian translation.
+* Slight performance improvement.
+* Improved the way help sectiosn are handled.
 
 = 1.2.0 =
 * New: Different groups can be granted access to different sets of pages or posts: Any capability - including custom capabilities - can be used to limit access.
