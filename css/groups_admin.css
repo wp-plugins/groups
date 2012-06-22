@@ -31,6 +31,8 @@
 .manage a.add {
 	text-decoration: none;
 	cursor: pointer;
+	padding-top: 4px;
+	padding-bottom: 6px;
 }
 .manage a.add .icon {
 	vertical-align: middle;
@@ -43,7 +45,9 @@
 div.field {
 	padding-bottom: 0.62em;
 }
-div.field input[type="submit"] {
+div.field input[type="submit"],
+div.group.remove input[type="submit"],
+div.capability.remove input[type="submit"] {
 	margin-right: 1em;
 }
 label.group-id-filter,
@@ -63,12 +67,13 @@ input[name="clear_filters"] {
 	float:right;
 }
 
-div.group.new label.description-field,
-div.group.edit label.description-field,
-div.capability.new label.description-field,
-div.capability.edit label.description-field {
-	vertical-align: top;
+div.group.new label,
+div.group.edit label,
+div.capability.new label,
+div.capability.edit label {
+	display: block;
 }
+
 
 .groups-overview .page-options,
 .capabilities-overview .page-options {

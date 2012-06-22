@@ -225,7 +225,7 @@ function groups_admin_options() {
 	echo
 		'<p>' .
 			wp_nonce_field( 'admin', GROUPS_ADMIN_OPTIONS_NONCE, true, false ) .
-			'<input type="submit" name="submit" value="' . __( 'Save', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
+			'<input class="button" type="submit" name="submit" value="' . __( 'Save', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
 		'</p>' .
 		'</div>' .
 		'</form>';

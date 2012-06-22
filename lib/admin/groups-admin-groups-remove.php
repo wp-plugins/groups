@@ -57,7 +57,7 @@ function groups_admin_groups_remove( $group_id ) {
 		'<li>' . sprintf( __( 'Group Name : %s', GROUPS_PLUGIN_DOMAIN ), wp_filter_nohtml_kses( $group->name ) ) . '</li>' .
 		'</ul> ' .
 		wp_nonce_field( 'groups-remove', GROUPS_ADMIN_GROUPS_NONCE, true, false ) .
-		'<input type="submit" value="' . __( 'Remove', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
+		'<input class="button" type="submit" value="' . __( 'Remove', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
 		'<input type="hidden" value="remove" name="action"/>' .
 		'<a class="cancel" href="' . $current_url . '">' . __( 'Cancel', GROUPS_PLUGIN_DOMAIN ) . '</a>' .
 		'</div>' .
