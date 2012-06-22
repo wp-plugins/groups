@@ -76,7 +76,7 @@ function groups_admin_groups_add() {
 	
 		'<div class="field">' .
 		wp_nonce_field( 'groups-add', GROUPS_ADMIN_GROUPS_NONCE, true, false ) .
-		'<input type="submit" value="' . __( 'Add', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
+		'<input class="button" type="submit" value="' . __( 'Add', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
 		'<input type="hidden" value="add" name="action"/>' .
 		'<a class="cancel" href="' . $current_url . '">' . __( 'Cancel', GROUPS_PLUGIN_DOMAIN ) . '</a>' .
 		'</div>' .

@@ -89,13 +89,6 @@ class Groups_Help {
 					case 'groups-admin-capabilities' :
 						break;
 				}
-				$help .= '<p>';
-				$help .= __( 'If you require <em>consulting services</em>, <em>support</em> or <em>customization</em>, you may <a href="http://www.itthinx.com/" target="_blank">contact me here</a>.', GROUPS_PLUGIN_DOMAIN );
-				$help .= '</p>';
-				$help .= '<p>';
-				$help .= __( 'If you find this plugin useful, please consider making a donation:', GROUPS_PLUGIN_DOMAIN );
-				$help .= self::donate( false, true );
-				$help .= '</p>';
 
 				$screen->add_help_tab(
 					array(

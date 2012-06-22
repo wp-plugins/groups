@@ -2,9 +2,9 @@
 Contributors: itthinx
 Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, permission, permissions
-Requires at least: 3.0
-Tested up to: 3.3.2
-Stable tag: 1.2.1
+Requires at least: 3.3
+Tested up to: 3.4
+Stable tag: 1.2.2
 License: GPLv3
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
@@ -17,6 +17,7 @@ It integrates standard WordPress capabilities and application-specific capabilit
 ### Extensions ###
 
 - [Groups File Access](http://www.itthinx.com/plugins/groups-file-access/) Groups File Access is an extension that allows to provide file download links for authorized users. Access to files is restricted to users by their group membership.
+- [Groups WooCommerce](http://www.woothemes.com/extension/groups-woocommerce/) Groups for WooCommerce is a WordPress plugin that allows you to sell memberships
 
 ### Features ###
 
@@ -286,6 +287,12 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.2.2 =
+* Revised styles
+* WordPress 3.4 compatibility
+* Dropping support for WordPress < 3.3
+* Help uncluttered.
+
 = 1.2.1 =
 * Reduced files loaded on non-admin pages.
 * Added Lithuanian translation.
@@ -343,6 +350,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.2.2 =
+* Revised styles on admin UI.
 
 = 1.2.1 =
 * Added Lithuanian translation.

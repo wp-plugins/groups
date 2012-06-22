@@ -169,7 +169,7 @@ function groups_admin_capabilities() {
 				
 	$output .=
 		'<div class="manage">' .
-		"<a title='" . __( 'Click to add a new capability', GROUPS_PLUGIN_DOMAIN ) . "' class='add' href='" . esc_url( $current_url ) . "&action=add'><img class='icon' alt='" . __( 'Add', GROUPS_PLUGIN_DOMAIN) . "' src='". GROUPS_PLUGIN_URL ."images/add.png'/><span class='label'>" . __( 'New Capability', GROUPS_PLUGIN_DOMAIN) . "</span></a>" .
+		"<a title='" . __( 'Click to add a new capability', GROUPS_PLUGIN_DOMAIN ) . "' class='add button' href='" . esc_url( $current_url ) . "&action=add'><img class='icon' alt='" . __( 'Add', GROUPS_PLUGIN_DOMAIN) . "' src='". GROUPS_PLUGIN_URL ."images/add.png'/><span class='label'>" . __( 'New Capability', GROUPS_PLUGIN_DOMAIN) . "</span></a>" .
 		'</div>';
 
 	$row_count = isset( $_POST['row_count'] ) ? intval( $_POST['row_count'] ) : 0;
@@ -276,8 +276,8 @@ function groups_admin_capabilities() {
 				'</p>' .
 				'<p>' .
 				wp_nonce_field( 'admin', GROUPS_ADMIN_CAPABILITIES_FILTER_NONCE, true, false ) .
-				'<input type="submit" value="' . __( 'Apply', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
-				'<input type="submit" name="clear_filters" value="' . __( 'Clear', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
+				'<input class="button" type="submit" value="' . __( 'Apply', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
+				'<input class="button" type="submit" name="clear_filters" value="' . __( 'Clear', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
 				'<input type="hidden" value="submitted" name="submitted"/>' .
 				'</p>' .
 			'</form>' .
@@ -290,7 +290,7 @@ function groups_admin_capabilities() {
 					<label for="row_count">' . __( 'Results per page', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
 					'<input name="row_count" type="text" size="2" value="' . esc_attr( $row_count ) .'" />
 					' . wp_nonce_field( 'admin', GROUPS_ADMIN_CAPABILITIES_NONCE_1, true, false ) . '
-					<input type="submit" value="' . __( 'Apply', GROUPS_PLUGIN_DOMAIN ) . '"/>
+					<input class="button" type="submit" value="' . __( 'Apply', GROUPS_PLUGIN_DOMAIN ) . '"/>
 				</div>
 			</form>
 		</div>
