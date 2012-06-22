@@ -4,7 +4,7 @@ Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, permission, permissions
 Requires at least: 3.3
 Tested up to: 3.4
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 License: GPLv3
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
