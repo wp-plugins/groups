@@ -241,7 +241,7 @@ This shortcode takes the following attributes to let a user leave a specific gro
 
 Example:
 
-* [group_leave group="Cool"]
+* [groups_leave group="Cool"]
 
 #### Show user groups ####
 
