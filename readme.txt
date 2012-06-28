@@ -3,7 +3,7 @@ Contributors: itthinx
 Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, permission, permissions
 Requires at least: 3.3
-Tested up to: 3.4
+Tested up to: 3.4.1
 Stable tag: 1.2.2
 License: GPLv3
 
@@ -214,6 +214,35 @@ Examples:
 
 * There [groups_group_info group="1" show="count" single="is one member" plural="are %d members"] in the [groups_group_info group="1" show="name"] group.
 
+#### Let a user join a group ####
+
+- [groups_join]
+
+This shortcode takes the following attributes to let a user join a specific group:
+
+- _group_ : (required) the group ID or name
+- _display_message_ : (optional) whether to show a confirmation after joining the group; accepted values: _true_, _false_; defaults to _true_
+- _display_is_member_ : (optional) whether to show that the user is a member of the group; accepted values: _true_, _false_; defaults to _false_
+- _submit_text_ : (optional) specify to change the button text; must contain %s to show the group name
+
+Example:
+
+* [group_join group="Cool"]
+
+#### Let a user leave a group ####
+
+- [groups_leave]
+
+This shortcode takes the following attributes to let a user leave a specific group:
+
+- _group_ : (required) the group ID or name
+- _display_message_ : (optional) whether to show a confirmation after leaving the group; accepted values: _true_, _false_; defaults to _true_
+- _submit_text_ : (optional) specify to change the button text; must contain %s to show the group name
+
+Example:
+
+* [group_leave group="Cool"]
+
 #### Show user groups ####
 
 - [groups_user_groups]
@@ -287,6 +316,10 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.2.3 =
+* New shortcode [groups_join group="..."] lets a user join the given group 
+* New shortcode [groups_leave group="..."] lets a user leave the given group
+
 = 1.2.2 =
 * Revised styles
 * WordPress 3.4 compatibility
@@ -350,6 +383,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.2.3 =
+* This release provides new shortcodes to let users join or leave groups by clicking a button.
 
 = 1.2.2 =
 * Revised styles on admin UI.

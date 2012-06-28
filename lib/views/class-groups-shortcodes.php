@@ -34,6 +34,10 @@ class Groups_Shortcodes {
 		add_shortcode( 'groups_user_groups', array( __CLASS__, 'groups_user_groups' ) );
 		// groups
 		add_shortcode( 'groups_groups',  array( __CLASS__, 'groups_groups' ) );
+		// join a group
+		add_shortcode( 'groups_join',  array( __CLASS__, 'groups_join' ) );
+		// leave a group
+		add_shortcode( 'groups_leave',  array( __CLASS__, 'groups_leave' ) );
 	}
 	
 	/**
@@ -295,6 +299,162 @@ class Groups_Shortcodes {
 					break;
 				default :
 					$output .= '</div>';
+			}
+		}
+		return $output;
+	}
+
+	/**
+	 * Renders a form that lets a user join a group.
+	 * * Attributes:
+	 * - "group" : (required) group name or id
+	 * 
+	 * @param array $atts attributes
+	 * @param string $content not used
+	 */
+	public static function groups_join( $atts, $content = null ) {
+		$nonce_action = 'groups_action';
+		$nonce        = 'nonce_join';
+		$output       = "";
+
+		$options = shortcode_atts(
+			array(
+				'group'             => '',
+				'display_message'   => true,
+				'display_is_member' => false,
+				'submit_text'       => __( 'Join the %s group', GROUPS_PLUGIN_DOMAIN )
+			),
+			$atts
+		);
+		extract( $options );
+
+		if ( $display_message === 'false' ) {
+			$display_message = false;
+		}
+		if ( $display_is_member === 'true' ) {
+			$display_is_member = true;
+		}
+
+		$group = trim( $options['group'] );
+		$current_group = Groups_Group::read( $group );
+		if ( !$current_group ) {
+			$current_group = Groups_Group::read_by_name( $group );
+		}
+		if ( $current_group ) {
+			if ( $user_id = get_current_user_id() ) {
+				$submitted     = false;
+				$invalid_nonce = false;
+				if ( !empty( $_POST['groups_action'] ) && $_POST['groups_action'] == 'join' ) {
+					$submitted = true;
+					if ( !wp_verify_nonce( $_POST[$nonce], $nonce_action ) ) {
+						$invalid_nonce = true;
+					}
+				}
+				if ( $submitted && !$invalid_nonce ) {
+					// add user to group
+					if ( isset( $_POST['group_id'] ) ) {
+						$join_group = Groups_Group::read( $_POST['group_id'] );
+						Groups_User_Group::create(
+							array(
+								'group_id' => $join_group->group_id,
+								'user_id' => $user_id
+							)
+						);
+					}
+				}
+				if ( !Groups_User_Group::read( $user_id, $current_group->group_id ) ) {
+					$submit_text = sprintf( $options['submit_text'], wp_filter_nohtml_kses( $current_group->name ) );
+					$output .= '<div class="groups-join">';
+					$output .= '<form action="#" method="post">';
+					$output .= '<input type="hidden" name="groups_action" value="join" />';
+					$output .= '<input type="hidden" name="group_id" value="' . esc_attr( $current_group->group_id ) . '" />';
+					$output .= '<input type="submit" value="' . $submit_text . '" />';
+					$output .=  wp_nonce_field( $nonce_action, $nonce, true, false );
+					$output .= '</form>';
+					$output .= '</div>';
+				} else if ( $display_message ) {
+					if ( $submitted && !$invalid_nonce && isset( $join_group ) && $join_group->group_id === $current_group->group_id ) {
+						$output .= '<div class="groups-join joined">';
+						$output .= sprintf( __( 'You have joined the %s group.', GROUPS_PLUGIN_DOMAIN ), wp_filter_nohtml_kses( $join_group->name ) );
+						$output .= '</div>';
+					}
+					else if ( $display_is_member && isset( $current_group ) && $current_group !== false ) {
+						$output .= '<div class="groups-join member">';
+						$output .= sprintf( __( 'You are a member of the %s group.', GROUPS_PLUGIN_DOMAIN ), wp_filter_nohtml_kses( $current_group->name ) );
+						$output .= '</div>';
+					}
+				}
+			}
+		}
+		return $output;
+	}
+
+	/**
+	 * Renders a form that lets a user leave a group.
+	 * * Attributes:
+	 * - "group" : (required) group name or id
+	 *
+	 * @param array $atts attributes
+	 * @param string $content not used
+	 */
+	public static function groups_leave( $atts, $content = null ) {
+		$nonce_action = 'groups_action';
+		$nonce        = 'nonce_leave';
+		$output       = "";
+
+		$options = shortcode_atts(
+			array(
+				'group'           => '',
+				'display_message' => true,
+				'submit_text'     => __( 'Leave the %s group', GROUPS_PLUGIN_DOMAIN ),
+			),
+			$atts
+		);
+		extract( $options );
+
+		if ( $display_message === 'false' ) {
+			$display_message = false;
+		}
+
+		$group = trim( $options['group'] );
+		$current_group = Groups_Group::read( $group );
+		if ( !$current_group ) {
+			$current_group = Groups_Group::read_by_name( $group );
+		}
+		if ( $current_group ) {
+			if ( $user_id = get_current_user_id() ) {
+				$submitted     = false;
+				$invalid_nonce = false;
+				if ( !empty( $_POST['groups_action'] ) && $_POST['groups_action'] == 'leave' ) {
+					$submitted = true;
+					if ( !wp_verify_nonce( $_POST[$nonce], $nonce_action ) ) {
+						$invalid_nonce = true;
+					}
+				}
+				if ( $submitted && !$invalid_nonce ) {
+					// remove user from group
+					if ( isset( $_POST['group_id'] ) ) {
+						$leave_group = Groups_Group::read( $_POST['group_id'] );
+						Groups_User_Group::delete( $user_id, $leave_group->group_id );
+					}
+				}
+				if ( Groups_User_Group::read( $user_id, $current_group->group_id ) ) {
+					$submit_text = sprintf( $options['submit_text'], wp_filter_nohtml_kses( $current_group->name ) );
+					$output .= '<div class="groups-join">';
+					$output .= '<form action="#" method="post">';
+					$output .= '<input type="hidden" name="groups_action" value="leave" />';
+					$output .= '<input type="hidden" name="group_id" value="' . esc_attr( $current_group->group_id ) . '" />';
+					$output .= '<input type="submit" value="' . $submit_text . '" />';
+					$output .=  wp_nonce_field( $nonce_action, $nonce, true, false );
+					$output .= '</form>';
+					$output .= '</div>';
+				} else if ( $display_message ) {
+					if ( $submitted && !$invalid_nonce && isset( $leave_group ) && $leave_group->group_id === $current_group->group_id ) {
+						$output .= '<div class="groups-join left">';
+						$output .= sprintf( __( 'You have left the %s group.', GROUPS_PLUGIN_DOMAIN ), wp_filter_nohtml_kses( $leave_group->name ) );
+						$output .= '</div>';
+					}
+				}
 			}
 		}
 		return $output;
