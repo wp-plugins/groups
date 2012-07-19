@@ -4,7 +4,7 @@ Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, permission, permissions
 Requires at least: 3.3
 Tested up to: 3.4.1
-Stable tag: 1.2.3
+Stable tag: 1.2.4
 License: GPLv3
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
@@ -204,7 +204,7 @@ See above for examples and descriptions.
 This shortcode takes the following attributes to show information about a group:
 
 - _group_ : (required) the group ID or name
-- _show_ : (required) what to show, accepted values are: _name_, _description_, _count_
+- _show_ : (required) what to show, accepted values are: _name_, _description_, _count_, _users_
 - _single_ : (optional) used when show="count" and there is 1 member in the group
 - _plural_ : (optional) used when show="count" and there is more than 1 member in the group, must contain %d to show the number of members
  
