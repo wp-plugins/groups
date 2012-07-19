@@ -43,8 +43,11 @@ class Groups_Shortcodes {
 	/**
 	 * Renders information about a group.
 	 * Attributes:
-	 * - "group" : group name or id
-	 * - "show" : what to show, can be "name", "description", "count" 
+	 * - "group"  : group name or id
+	 * - "show"   : what to show, can be "name", "description", "count"
+	 * - "format" :
+	 * - "single" : used with show="count", single form, defaults to '1'
+	 * - "plural" : used with show="count", plural form, defaults to '%d', must contain %d to show number
 	 * 
 	 * @param array $atts attributes
 	 * @param string $content content to render

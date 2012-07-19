@@ -103,3 +103,15 @@ div.groups-footer a {
 div.groups-footer form {
 	display: inline;
 }
+
+.groups-options input[type="checkbox"] {
+	margin-right: 4px;
+}
+.groups-options .groups-permissions thead td {
+	padding: 0 4px;
+	font-weight: bold;
+	margin: 0;
+}
+.groups-options .groups-permissions td.checkbox {
+	text-align: center;
+}

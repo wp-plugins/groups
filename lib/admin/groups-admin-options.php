@@ -41,14 +41,16 @@ function groups_admin_options() {
 		$active_sitewide_plugins = array_keys( $active_sitewide_plugins );
 		$is_sitewide_plugin = in_array( 'groups/groups.php', $active_sitewide_plugins );
 	}
-	
+
+	echo '<div class="groups-options">';
+
 	echo
 		'<div>' .
 		'<h2>' .
 		__( 'Groups options', GROUPS_PLUGIN_DOMAIN ) .
 		'</h2>' .
 		'</div>';
-	
+
 	$caps = array(
 		GROUPS_ACCESS_GROUPS	  => __( 'Access Groups', GROUPS_PLUGIN_DOMAIN ),
 		GROUPS_ADMINISTER_GROUPS  => __( 'Administer Groups', GROUPS_PLUGIN_DOMAIN ),
@@ -169,8 +171,10 @@ function groups_admin_options() {
 		'<div>' .
 		'<h3>' . __( 'Administrator Access Override', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
 		'<p>' .
+		'<label>' .
 		'<input name="' . GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE . '" type="checkbox" ' . ( $admin_override ? 'checked="checked"' : '' ) . '/>' .
-		'<label for="' . GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE . '">' . __( 'Administrators override all access permissions derived from Groups capabilities.', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
+		 __( 'Administrators override all access permissions derived from Groups capabilities.', GROUPS_PLUGIN_DOMAIN ) .
+		 '</label>' .
 		'</p>';
 	
 	echo '<h3>' . __( 'Access restricions', GROUPS_PLUGIN_DOMAIN ) . '</h3>';
@@ -199,8 +203,10 @@ function groups_admin_options() {
 	echo
 		'<h3>' . __( 'Tree view', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
 		'<p>' .
+		'<label>' .
 		'<input name="' . GROUPS_SHOW_TREE_VIEW . '" type="checkbox" ' . ( $show_tree_view ? 'checked="checked"' : '' ) . '/>' .
-		'<label for="' . GROUPS_SHOW_TREE_VIEW . '">' . __( 'Show the Groups tree view.', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
+		__( 'Show the Groups tree view.', GROUPS_PLUGIN_DOMAIN ) .
+		'</label>' .
 		'</p>';	
 	echo
 		'<h3>' . __( 'Permissions', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
@@ -215,20 +221,24 @@ function groups_admin_options() {
 		echo
 			'<h3>' . __( 'Deactivation and data persistence', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
 			'<p>' .
-				'<input name="delete-data" type="checkbox" ' . ( $delete_data ? 'checked="checked"' : '' ) . '/>' .
-				'<label for="delete-data">' . __( 'Delete all Groups plugin data on deactivation', GROUPS_PLUGIN_DOMAIN ) . '</label>' .
+			'<label>' .
+			'<input name="delete-data" type="checkbox" ' . ( $delete_data ? 'checked="checked"' : '' ) . '/>' .
+			__( 'Delete all Groups plugin data on deactivation', GROUPS_PLUGIN_DOMAIN ) .
+			'</label>' .
 			'</p>' .
 			'<p class="description warning">' .
-					__( 'CAUTION: If this option is active while the plugin is deactivated, ALL plugin settings and data will be DELETED. If you are going to use this option, now would be a good time to make a backup. By enabling this option you agree to be solely responsible for any loss of data or any other consequences thereof.', GROUPS_PLUGIN_DOMAIN ) .
+			__( 'CAUTION: If this option is active while the plugin is deactivated, ALL plugin settings and data will be DELETED. If you are going to use this option, now would be a good time to make a backup. By enabling this option you agree to be solely responsible for any loss of data or any other consequences thereof.', GROUPS_PLUGIN_DOMAIN ) .
 			'</p>';
 	}
 	echo
 		'<p>' .
-			wp_nonce_field( 'admin', GROUPS_ADMIN_OPTIONS_NONCE, true, false ) .
-			'<input class="button" type="submit" name="submit" value="' . __( 'Save', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
+		wp_nonce_field( 'admin', GROUPS_ADMIN_OPTIONS_NONCE, true, false ) .
+		'<input class="button" type="submit" name="submit" value="' . __( 'Save', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
 		'</p>' .
 		'</div>' .
 		'</form>';
+	
+	echo '</div>'; // .groups-options
 	Groups_Help::footer();
 }
 

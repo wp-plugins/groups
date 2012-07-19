@@ -316,6 +316,9 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.2.4 =
+* Minor improvements on Options screen
+
 = 1.2.3 =
 * New shortcode [groups_join group="..."] lets a user join the given group 
 * New shortcode [groups_leave group="..."] lets a user leave the given group
@@ -383,6 +386,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.2.4 =
+* Minor improvements on Options screen
 
 = 1.2.3 =
 * This release provides new shortcodes to let users join or leave groups by clicking a button.
