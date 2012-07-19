@@ -318,6 +318,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 = 1.2.4 =
 * Minor improvements on Options screen
+* Added show="users" option to [groups_group_info] shortcode which lists user logins for users in a group - rather experimental as it doesn't offer any sorting, pagination, linking or other options
 
 = 1.2.3 =
 * New shortcode [groups_join group="..."] lets a user join the given group 
@@ -389,6 +390,7 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 
 = 1.2.4 =
 * Minor improvements on Options screen
+* Added show="users" option to [groups_group_info] shortcode
 
 = 1.2.3 =
 * This release provides new shortcodes to let users join or leave groups by clicking a button.

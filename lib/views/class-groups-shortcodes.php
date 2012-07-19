@@ -92,6 +92,22 @@ class Groups_Shortcodes {
 					}
 					$output .= _n( $options['single'], sprintf( $options['plural'], $count ), $count, GROUPS_PLUGIN_DOMAIN );
 					break;
+				// @todo experimental - could use pagination, sorting, link to profile, ...
+				case 'users' :
+					$user_group_table = _groups_get_tablename( "user_group" );
+					$users = $wpdb->get_results( $wpdb->prepare(
+						"SELECT * FROM $wpdb->users LEFT JOIN $user_group_table ON $wpdb->users.ID = $user_group_table.user_id WHERE $user_group_table.group_id = %d",
+						Groups_Utility::id( $current_group->group_id )
+					) );
+					if ( $users ) {
+						$output .= '<ul>';
+						foreach( $users as $user ) {
+							$output .= '<li>' . wp_filter_nohtml_kses( $user->user_login ) . '</li>';
+						}
+						$output .= '</ul>';
+					}
+					
+					break;
 			}
 		}
 		return $output;
