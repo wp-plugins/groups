@@ -134,7 +134,7 @@ class Groups_Help {
 		$donate =
 			'<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
 			<input type="hidden" name="cmd" value="_donations">
-			<input type="hidden" name="business" value="itthinx@itthinx.com">
+			<input type="hidden" name="business" value="paypal@itthinx.com">
 			<input type="hidden" name="lc" value="US">
 			<input type="hidden" name="item_name" value="Support WordPress Plugins from itthinx">
 			<input type="hidden" name="item_number" value="WordPress Plugins">

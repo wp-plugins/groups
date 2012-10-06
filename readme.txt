@@ -3,7 +3,7 @@ Contributors: itthinx
 Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, permission, permissions
 Requires at least: 3.3
-Tested up to: 3.4.1
+Tested up to: 3.4.2
 Stable tag: 1.2.4
 License: GPLv3
 
@@ -98,7 +98,10 @@ Please try to solve problems there before you rate this plugin or say it doesn't
 
 ### Translations ###
 
-* Lithuanian translation provided by Vincent G from [Host1Free](http://www.Host1Free.com) - Many thanks for your help!
+* Lithuanian translation provided by Vincent G from [Host1Free](http://www.Host1Free.com)
+* Spanish translation provided by Juan Amor
+
+Many thanks for your help!
 
 
 ### Introduction ###
@@ -316,6 +319,9 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.2.5 =
+* Added Spanish translation
+
 = 1.2.4 =
 * Minor improvements on Options screen
 * Added show="users" option to [groups_group_info] shortcode which lists user logins for users in a group - rather experimental as it doesn't offer any sorting, pagination, linking or other options
@@ -387,6 +393,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.2.5 =
+* Added Spanish translation
 
 = 1.2.4 =
 * Minor improvements on Options screen
