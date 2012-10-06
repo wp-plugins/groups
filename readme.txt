@@ -99,7 +99,7 @@ Please try to solve problems there before you rate this plugin or say it doesn't
 ### Translations ###
 
 * Lithuanian translation provided by Vincent G from [Host1Free](http://www.Host1Free.com)
-* Spanish translation provided by Juan Amor
+* Spanish translation provided by Juan Amor from [Lama Djinpa](www.lamadjinpa.es)
 
 Many thanks for your help!
 
