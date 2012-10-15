@@ -35,36 +35,45 @@ class Groups_Access_Meta_Boxes {
 	 * Hooks for capabilities meta box and saving options.
 	 */
 	public static function init() {
-		add_action( 'add_meta_boxes', array( __CLASS__, "add_meta_boxes" ) );
+		add_action( 'add_meta_boxes', array( __CLASS__, "add_meta_boxes" ), 10, 2 );
 		add_action( 'save_post', array( __CLASS__, "save_post" ) );
+
+		add_action( 'attachment_fields_to_edit', array( __CLASS__, 'attachment_fields_to_edit' ), 10, 2 );
+		add_action( 'attachment_fields_to_save', array( __CLASS__, 'attachment_fields_to_save' ), 10, 2 );
 	}
-	
+
 	/**
 	 * Triggered by init() to add capability meta box. 
 	 */
-	public static function add_meta_boxes() {
+	public static function add_meta_boxes( $post_type, $post ) {
 		global $wp_version;
-		if ( $wp_version < 3.3 ) {
-			$post_types = get_post_types();
-			foreach ( $post_types as $post_type ) {
-				add_meta_box(
-					"groups-access",
-					__( "Access restrictions", GROUPS_PLUGIN_DOMAIN ),
-					array( __CLASS__, "capability" ),
-					$post_type,
-					"side",
-					"high"
-				);
+		$post_type_object = get_post_type_object( $post_type );
+		if ( $post_type_object ) {
+			$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
+			if ( !isset( $post_types_option[$post_type]['add_meta_box'] ) || $post_types_option[$post_type]['add_meta_box'] ) {
+				if ( $wp_version < 3.3 ) {
+					$post_types = get_post_types();
+					foreach ( $post_types as $post_type ) {
+						add_meta_box(
+							"groups-access",
+							__( "Access restrictions", GROUPS_PLUGIN_DOMAIN ),
+							array( __CLASS__, "capability" ),
+							$post_type,
+							"side",
+							"high"
+						);
+					}
+				} else {
+					add_meta_box(
+						"groups-access",
+						__( "Access restrictions", GROUPS_PLUGIN_DOMAIN ),
+						array( __CLASS__, "capability" ),
+						null,
+						"side",
+						"high"
+					);
+				}
 			}
-		} else {
-			add_meta_box(
-				"groups-access",
-				__( "Access restrictions", GROUPS_PLUGIN_DOMAIN ),
-				array( __CLASS__, "capability" ),
-				null,
-				"side",
-				"high"
-			);
 		}
 	}
 	
@@ -77,8 +86,6 @@ class Groups_Access_Meta_Boxes {
 	 * @param Object $box
 	 */
 	public static function capability( $object = null, $box = null ) {
-
-		global $wpdb;
 
 		$output = "";
 
@@ -118,6 +125,7 @@ class Groups_Access_Meta_Boxes {
 		$output .= sprintf( __( "Only groups or users that have one of the selected capabilities are allowed to read this %s.", GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
 		$output .= '</p>';
 		$output .= wp_nonce_field( self::SET_CAPABILITY, self::NONCE, true, false );
+
 		echo $output;
 	}
 	
@@ -130,18 +138,25 @@ class Groups_Access_Meta_Boxes {
 	public static function save_post( $post_id = null, $post = null ) {
 		if ( ( defined( "DOING_AUTOSAVE" ) && DOING_AUTOSAVE ) ) {
 		} else {
-			if ( isset( $_POST[self::NONCE] ) && wp_verify_nonce( $_POST[self::NONCE], self::SET_CAPABILITY ) ) {
-				$post_type = isset( $_POST["post_type"] ) ? $_POST["post_type"] : null;
-				if ( $post_type !== null ) {
-					if ( current_user_can( 'edit_'.$post_type ) ) {
-						Groups_Post_Access::delete( $post_id, null );
-						if ( !empty( $_POST[self::CAPABILITY] ) ) {
-							foreach ( $_POST[self::CAPABILITY] as $capability_id ) {
-								if ( $capability = Groups_Capability::read( $capability_id ) ) {
-									Groups_Post_Access::create( array(
-										'post_id' => $post_id,
-										'capability' => $capability->capability
-									) );
+			$post_type = get_post_type( $post_id );
+			$post_type_object = get_post_type_object( $post_type );
+			if ( $post_type_object ) {
+				$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
+				if ( !isset( $post_types_option[$post_type]['add_meta_box'] ) || $post_types_option[$post_type]['add_meta_box'] ) {
+					if ( isset( $_POST[self::NONCE] ) && wp_verify_nonce( $_POST[self::NONCE], self::SET_CAPABILITY ) ) {
+						$post_type = isset( $_POST["post_type"] ) ? $_POST["post_type"] : null;
+						if ( $post_type !== null ) {
+							if ( current_user_can( 'edit_'.$post_type ) ) {
+								Groups_Post_Access::delete( $post_id, null );
+								if ( !empty( $_POST[self::CAPABILITY] ) ) {
+									foreach ( $_POST[self::CAPABILITY] as $capability_id ) {
+										if ( $capability = Groups_Capability::read( $capability_id ) ) {
+											Groups_Post_Access::create( array(
+												'post_id' => $post_id,
+												'capability' => $capability->capability
+											) );
+										}
+									}
 								}
 							}
 						}
@@ -151,5 +166,78 @@ class Groups_Access_Meta_Boxes {
 		}
 	}
 	
+	/**
+	 * Render capabilities box for attachment post type (Media).
+	 * @param array $form_fields
+	 * @param object $post
+	 * @return array
+	 */
+	public static function attachment_fields_to_edit( $form_fields, $post ) {
+
+		$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
+		if ( !isset( $post_types_option['attachment']['add_meta_box'] ) || $post_types_option['attachment']['add_meta_box'] ) {
+
+			$output = "";
+			$post_singular_name = __( 'Media', GROUPS_PLUGIN_DOMAIN );
+
+			$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
+			$read_caps = get_post_meta( $post->ID, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
+			$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
+			$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
+			$output .= '<ul>';
+			foreach( $valid_read_caps as $valid_read_cap ) {
+				if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
+					$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
+					$output .= '<li>';
+					$output .= '<label>';
+					$output .= '<input name="attachments[' . $post->ID . '][' . self::CAPABILITY . '][]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
+					$output .= wp_filter_nohtml_kses( $capability->capability );
+					$output .= '</label>';
+					$output .= '</li>';
+				}
+			}
+			$output .= '</ul>';
+			$output .= '</div>';
+			
+			$output .= '<p class="description">';
+			$output .= sprintf( __( "Only groups or users that have one of the selected capabilities are allowed to read this %s.", GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
+			$output .= '</p>';
+
+			$form_fields['groups_access'] = array(
+				'label' => __( 'Access restrictions', GROUPS_PLUGIN_DOMAIN ),
+				'input' => 'html',
+				'html' => $output
+			);
+		}
+		return $form_fields;
+	}
+	
+	/**
+	 * Save capabilities for attachment post type (Media).
+	 * When multiple attachments are saved, this is called once for each.
+	 * @param array $post post data
+	 * @param array $attachment attachment field data
+	 * @return array
+	 */
+	public static function attachment_fields_to_save( $post, $attachment ) {
+		$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
+		if ( !isset( $post_types_option['attachment']['add_meta_box'] ) || $post_types_option['attachment']['add_meta_box'] ) {
+			if ( current_user_can( 'edit_attachment' ) ) {
+				Groups_Post_Access::delete( $post['ID'], null );
+				if ( !empty( $attachment[self::CAPABILITY] ) ) {
+					foreach ( $attachment[self::CAPABILITY] as $capability_id ) {
+						if ( $capability = Groups_Capability::read( $capability_id ) ) {
+							Groups_Post_Access::create( array(
+								'post_id' => $post['ID'],
+								'capability' => $capability->capability
+							) );
+						}
+					}
+				}
+			}
+		}
+		return $post;
+	}
+
 } 
 Groups_Access_Meta_Boxes::init();

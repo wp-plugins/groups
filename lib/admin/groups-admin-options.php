@@ -73,6 +73,13 @@ function groups_admin_options() {
 			add_option( GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE, $admin_override ); // WP 3.3.1 : update alone wouldn't create the option when value is false
 			update_option( GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE, $admin_override );
 			
+			$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
+			$post_types = get_post_types( array( 'public' => true ) );
+			foreach( $post_types as $post_type ) {
+				$post_types_option[$post_type]['add_meta_box'] = in_array( $post_type, $_POST['add_meta_boxes'] );
+			}
+			Groups_Options::update_option( Groups_Post_Access::POST_TYPES, $post_types_option );
+			
 			$valid_read_caps = array( Groups_Post_Access::READ_POST_CAPABILITY );
 			if ( !empty( $_POST[GROUPS_READ_POST_CAPABILITIES] ) ) {
 				$read_caps = $_POST[GROUPS_READ_POST_CAPABILITIES];
@@ -167,7 +174,12 @@ function groups_admin_options() {
 	// print the options form
 	//
 	echo
-		'<form action="" name="options" method="post">' .		
+		'<form action="" name="options" method="post">' .
+
+		'<p>' .
+		'<input class="button" type="submit" name="submit" value="' . __( 'Save', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
+		'</p>' .
+
 		'<div>' .
 		'<h3>' . __( 'Administrator Access Override', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
 		'<p>' .
@@ -179,6 +191,39 @@ function groups_admin_options() {
 	
 	echo '<h3>' . __( 'Access restricions', GROUPS_PLUGIN_DOMAIN ) . '</h3>';
 	
+	echo '<h4>' . __( 'Post types', GROUPS_PLUGIN_DOMAIN ) . '</h4>';
+	
+	echo
+		'<p class="description">' .  __( 'Show access restrictions for these post types.', GROUPS_PLUGIN_DOMAIN ) . '</p>';
+	
+	$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
+	$post_types = get_post_types( array( 'public' => true ) );
+	echo '<ul>';
+	foreach( $post_types as $post_type ) {
+		$post_type_object = get_post_type_object( $post_type );
+		echo '<li>';
+		echo '<label>';
+		$label = $post_type;
+		$labels = isset( $post_type_object->labels ) ? $post_type_object->labels : null;
+		if ( ( $labels !== null ) && isset( $labels->singular_name ) ) {
+			$label = __( $labels->singular_name );
+		}
+		$checked = ( !isset( $post_types_option[$post_type]['add_meta_box'] ) || $post_types_option[$post_type]['add_meta_box'] ) ? ' checked="checked" ' : '';
+		echo '<input name="add_meta_boxes[]" type="checkbox" value="' . esc_attr( $post_type ) . '" ' . $checked . '/>';
+		echo $label;
+		echo '</label>';
+		echo '</li>';
+	}
+	echo '<ul>';
+	echo
+		'<p class="description">' .
+		__( 'This determines for which post types access restriction settings are offered.', GROUPS_PLUGIN_DOMAIN ) . '<br/>' .
+		__( 'Disabling this setting for a post type does not remove existing access restrictions on individual posts of that type.', GROUPS_PLUGIN_DOMAIN ) . '<br/>' .
+		'</p>';
+	
+
+	echo '<h4>' . __( 'Capabilities', GROUPS_PLUGIN_DOMAIN ) . '</h4>';
+
 	echo '<p class="description">' .
 		__( 'Include these capabilities to enforce read access on posts. The selected capabilities will be offered to restrict access to posts.', GROUPS_PLUGIN_DOMAIN ) .
 		'</p>';

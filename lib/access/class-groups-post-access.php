@@ -29,6 +29,7 @@ class Groups_Post_Access {
 	const READ_POST_CAPABILITY = "groups_read_post";
 	const READ_POST_CAPABILITY_NAME = "Read Post";
 	const READ_POST_CAPABILITIES = 'read_post_capabilities';
+	const POST_TYPES = 'post_types';
 	
 	/**
 	 * Create needed capabilities on plugin activation.

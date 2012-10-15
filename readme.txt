@@ -319,6 +319,11 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.0 =
+* Added feature that allows to show access restrictions depending on post type
+* Added support for access restrictions on Media
+* Fixed issue, removed access restrictions offered on Links
+
 = 1.2.5 =
 * Added Spanish translation
 
@@ -393,6 +398,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.3.0 =
+* New access restriction features and fixes, adds support for access restrictions depending on post type and for Media
 
 = 1.2.5 =
 * Added Spanish translation
