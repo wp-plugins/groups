@@ -49,11 +49,14 @@ class Groups_Group implements I_Capable {
 	 * - datetime
 	 * - name
 	 * - description
+	 * - capabilities, returns an array of Groups_Capability
+	 * - users, returns an array of Groups_User
 	 *
 	 * @param string $name property's name
 	 * @return property value, will return null if property does not exist
 	 */
 	public function __get( $name ) {
+		global $wpdb;
 		$result = null;
 		if ( $this->group !== null ) {
 			switch( $name ) {
@@ -78,7 +81,20 @@ class Groups_Group implements I_Capable {
 						}
 					}
 					break;
-		}
+				case 'users' :
+					$user_group_table = _groups_get_tablename( "user_group" );
+					$users = $wpdb->get_results( $wpdb->prepare(
+						"SELECT ID FROM $wpdb->users LEFT JOIN $user_group_table ON $wpdb->users.ID = $user_group_table.user_id WHERE $user_group_table.group_id = %d",
+						Groups_Utility::id( $this->group->group_id )
+					) );
+					if ( $users ) {
+						$result = array();
+						foreach( $users as $user ) {
+							$result[] = new Groups_User( $user->ID );
+						}
+					}
+					break;
+			}
 		}
 		return $result;
 	}

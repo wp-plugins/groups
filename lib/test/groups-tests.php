@@ -169,6 +169,9 @@ if ( defined( 'ABSPATH' ) ) {
 		$sour_group   = new Groups_Group( $sour_group_id );
 		$lemon_group  = new Groups_Group( $lemon_group_id );
 		
+		// retrieve users
+		assert( 'count( $fruits_group->users ) > 0' );
+
 		// all should be able to "dance" : check by capability label ...
 		assert( '$fruits_group->can( "dance" )' );
 		assert( '$sweet_group->can( "dance" )' );

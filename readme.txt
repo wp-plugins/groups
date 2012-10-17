@@ -319,6 +319,11 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.1 =
+* Added users property to Groups_Group
+* Moved tests out of core folder
+* Fixed missing $wpdb in Groups_Group's getter
+
 = 1.3.0 =
 * Added feature that allows to show access restrictions depending on post type
 * Added support for access restrictions on Media
@@ -398,6 +403,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.3.1 =
+* API enhancements, fixes
 
 = 1.3.0 =
 * New access restriction features and fixes, adds support for access restrictions depending on post type and for Media
