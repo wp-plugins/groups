@@ -52,8 +52,39 @@ class Groups_Admin_Users {
 				add_action( 'load-users.php', array( __CLASS__, 'load_users' ) );
 				// filter users by group
 				add_filter( 'views_users', array( __CLASS__, 'views_users' ) );
+				
+				// @todo experimental
+				add_filter( 'pre_user_query', array( __CLASS__, 'pre_user_query' ) );
 			}
 		}
+	}
+	
+	// 
+	/**
+	 * @todo experimental
+	 * 
+	 * @param WP_User_Query $user_query
+	 */
+	public static function pre_user_query( $user_query ) {
+		global $pagenow, $wpdb;
+		if ( ( $pagenow == 'users.php' ) && empty( $_GET['page'] ) ) {
+			if ( isset( $_REQUEST['group'] ) ) {
+				$group_id = $_REQUEST['group'];
+				if ( Groups_Group::read( $group_id ) ) {
+					$group = new Groups_Group( $group_id );
+					$users = $group->users;
+					if ( count( $users ) > 0 ) {
+						$include = array();
+						foreach( $users as $user ) {
+							$include[] = $user->user->ID;
+						}
+						$ids = implode( ',', wp_parse_id_list( $include ) );
+						$user_query->query_where .= " AND $wpdb->users.ID IN ($ids)";
+					}
+				}
+			}
+		}
+		return $user_query;
 	}
 	
 	/**
