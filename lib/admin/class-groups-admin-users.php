@@ -50,6 +50,8 @@ class Groups_Admin_Users {
 				add_action( 'admin_head', array( __CLASS__, 'admin_head' ) );
 				// allow to add or remove selected users to groups
 				add_action( 'load-users.php', array( __CLASS__, 'load_users' ) );
+				// filter users by group
+				add_filter( 'views_users', array( __CLASS__, 'views_users' ) );
 			}
 		}
 	}
@@ -99,7 +101,34 @@ class Groups_Admin_Users {
 			 ';
 			echo '</script>';
 			
+			// added because with views_users() the list can get long
+			echo '<style type="text/css">';
+			echo '.subsubsub { white-space: normal; }';
+			echo '</style>';
 		}
+	}
+	
+	/**
+	 * Hooked on filter in class-wp-list-table.php to add links that
+	 * filter by group.
+	 * @param array $views
+	 */
+	public static function views_users( $views ) {
+		global $pagenow, $wpdb;
+		if ( ( $pagenow == 'users.php' ) && empty( $_GET['page'] ) ) {
+			$group_table = _groups_get_tablename( "group" );
+			$groups = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $group_table ORDER BY name" ) );
+			foreach( $groups as $group ) {
+				$group = new Groups_Group( $group->group_id );
+				$user_count = count( $group->users );
+				$views[] = sprintf(
+					'<a href="%s">%s</a>',
+					esc_url( add_query_arg( 'group', $group->group_id, admin_url( 'users.php' ) ) ),
+					sprintf( '%s <span class="count">(%s)</span>', wp_filter_nohtml_kses( $group->name ), $user_count )
+				);
+			}
+		}
+		return $views;
 	}
 	
 	/**
