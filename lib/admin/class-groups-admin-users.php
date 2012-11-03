@@ -73,14 +73,16 @@ class Groups_Admin_Users {
 				if ( Groups_Group::read( $group_id ) ) {
 					$group = new Groups_Group( $group_id );
 					$users = $group->users;
+					$include = array();
 					if ( count( $users ) > 0 ) {
-						$include = array();
 						foreach( $users as $user ) {
 							$include[] = $user->user->ID;
 						}
-						$ids = implode( ',', wp_parse_id_list( $include ) );
-						$user_query->query_where .= " AND $wpdb->users.ID IN ($ids)";
+					} else { // no results
+						$include[] = 0;
 					}
+					$ids = implode( ',', wp_parse_id_list( $include ) );
+					$user_query->query_where .= " AND $wpdb->users.ID IN ($ids)";
 				}
 			}
 		}
