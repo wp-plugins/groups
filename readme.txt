@@ -323,6 +323,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * Added users property to Groups_Group
 * Moved tests out of core folder
 * Fixed missing $wpdb in Groups_Group's getter
+* Added group filters on users admin section
 
 = 1.3.0 =
 * Added feature that allows to show access restrictions depending on post type
@@ -405,7 +406,7 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 == Upgrade Notice ==
 
 = 1.3.1 =
-* API enhancements, fixes
+* Now you can filter the users section by group. This release also brings API enhancements and fixes.
 
 = 1.3.0 =
 * New access restriction features and fixes, adds support for access restrictions depending on post type and for Media
