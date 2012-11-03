@@ -50,20 +50,19 @@ class Groups_Admin_Users {
 				add_action( 'admin_head', array( __CLASS__, 'admin_head' ) );
 				// allow to add or remove selected users to groups
 				add_action( 'load-users.php', array( __CLASS__, 'load_users' ) );
-				// filter users by group
+				// add links to filter users by group
 				add_filter( 'views_users', array( __CLASS__, 'views_users' ) );
-				
-				// @todo experimental
+				// modify query to filter users by group
 				add_filter( 'pre_user_query', array( __CLASS__, 'pre_user_query' ) );
 			}
 		}
 	}
 	
-	// 
 	/**
-	 * @todo experimental
+	 * Modify query to filter users by group.
 	 * 
 	 * @param WP_User_Query $user_query
+	 * @return WP_User_Query
 	 */
 	public static function pre_user_query( $user_query ) {
 		global $pagenow, $wpdb;
@@ -134,9 +133,11 @@ class Groups_Admin_Users {
 			 ';
 			echo '</script>';
 			
-			// added because with views_users() the list can get long
+			// .subsubsub rule added because with views_users() the list can get long
+			// icon distinguishes from role links
 			echo '<style type="text/css">';
 			echo '.subsubsub { white-space: normal; }';
+			echo 'a.group { background: url(' . GROUPS_PLUGIN_URL . '/images/groups-grey-8x8.png) transparent no-repeat left center; padding-left: 10px;}';
 			echo '</style>';
 		}
 	}
@@ -155,8 +156,9 @@ class Groups_Admin_Users {
 				$group = new Groups_Group( $group->group_id );
 				$user_count = count( $group->users );
 				$views[] = sprintf(
-					'<a href="%s">%s</a>',
+					'<a class="group" href="%s" title="%s">%s</a>',
 					esc_url( add_query_arg( 'group', $group->group_id, admin_url( 'users.php' ) ) ),
+					sprintf( '%s Group', wp_filter_nohtml_kses( $group->name ) ),
 					sprintf( '%s <span class="count">(%s)</span>', wp_filter_nohtml_kses( $group->name ), $user_count )
 				);
 			}
