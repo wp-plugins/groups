@@ -68,15 +68,20 @@ function groups_admin_groups() {
 			case 'groups-action' :
 				if ( wp_verify_nonce( $_POST[GROUPS_ADMIN_GROUPS_ACTION_NONCE], 'admin' ) ) {
 					$group_ids = isset( $_POST['group_ids'] ) ? $_POST['group_ids'] : null;
-					$subaction = isset( $_POST['add'] ) ? $_POST['add'] : ( isset( $_POST['remove'] ) ? $_POST['remove'] : null );
-					$capability_id = isset( $_POST['capability_id'] ) ? $_POST['capability_id'] : null;					
+					$subaction = null;
+					if ( isset( $_POST['add'] ) ) {
+						$subaction = 'add';
+					} else if ( isset( $_POST['remove'] ) ) {
+						$subaction = 'remove';
+					}
+					$capability_id = isset( $_POST['capability_id'] ) ? $_POST['capability_id'] : null;
 					if ( is_array( $group_ids ) && ( $subaction !== null ) && ( $capability_id !== null ) ) {
 						foreach ( $group_ids as $group_id ) {
 							switch ( $subaction ) {
-								case 'Add' :
+								case 'add' :
 									Groups_Group_Capability::create( array( 'group_id' => $group_id, 'capability_id' => $capability_id ) );
 									break;
-								case 'Remove' :
+								case 'remove' :
 									Groups_Group_Capability::delete( $group_id, $capability_id );
 									break;
 							}
