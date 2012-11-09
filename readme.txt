@@ -321,6 +321,9 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.2 =
+* Fixed capabilities cannot be added or removed from groups in localized installations
+
 = 1.3.1 =
 * Added users property to Groups_Group
 * Moved tests out of core folder
@@ -406,6 +409,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.3.2 =
+* Please update if you are or will be using a localized installation (bug fixes).
 
 = 1.3.1 =
 * Now you can filter the users section by group. This release also brings API enhancements and fixes.
