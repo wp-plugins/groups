@@ -97,7 +97,7 @@ class Groups_Admin_Users {
 			
 			$group_table = _groups_get_tablename( "group" );
 			// groups select
-			$groups_select = "<select name='group_id'>";
+			$groups_select = "<select class='groups' style='float:none;' name='group_id'>";
 			$groups = $wpdb->get_results( "SELECT * FROM $group_table ORDER BY name" );
 			foreach( $groups as $group ) {
 				$groups_select .= "<option value='" . esc_attr( $group->group_id ) . "'>" . wp_filter_nohtml_kses( $group->name ) . "</option>";

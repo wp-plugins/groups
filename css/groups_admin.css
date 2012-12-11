@@ -31,8 +31,6 @@
 .manage a.add {
 	text-decoration: none;
 	cursor: pointer;
-	padding-top: 4px;
-	padding-bottom: 6px;
 }
 .manage a.add .icon {
 	vertical-align: middle;
