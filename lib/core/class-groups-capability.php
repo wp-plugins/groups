@@ -116,7 +116,7 @@ class Groups_Capability {
 				}
 				$capability_table = _groups_get_tablename( 'capability' );
 				if ( $wpdb->insert( $capability_table, $data, $formats ) ) {
-					if ( $result = $wpdb->get_var( $wpdb->prepare( "SELECT LAST_INSERT_ID()" ) ) ) {
+					if ( $result = $wpdb->get_var( "SELECT LAST_INSERT_ID()" ) ) {
 						do_action( "groups_created_capability", $result );
 					}
 				}

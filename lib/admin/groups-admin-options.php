@@ -229,7 +229,7 @@ function groups_admin_options() {
 		'</p>';
 
 	$capability_table = _groups_get_tablename( "capability" );
-	$capabilities = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $capability_table ORDER BY capability" ) );
+	$capabilities = $wpdb->get_results( "SELECT * FROM $capability_table ORDER BY capability" );
 	$applicable_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
 	foreach( $capabilities as $capability ) {
 		$checked = in_array( $capability->capability, $applicable_read_caps ) ? ' checked="checked" ' : '';

@@ -323,7 +323,7 @@ function groups_admin_groups() {
 	
 	// capabilities select
 	$capabilities_select = '<select name="capability_id">';
-	$capabilities = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $capability_table ORDER BY capability" ) );
+	$capabilities = $wpdb->get_results( "SELECT * FROM $capability_table ORDER BY capability" );
 	foreach( $capabilities as $capability ) {
 		$capabilities_select .= '<option value="' . esc_attr( $capability->capability_id ) . '">' . wp_filter_nohtml_kses( $capability->capability ) . '</option>';
 	}

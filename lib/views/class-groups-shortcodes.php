@@ -282,9 +282,9 @@ class Groups_Shortcodes {
 				$order = 'ASC';
 		}
 		$group_table = _groups_get_tablename( "group" );
-		if ( $groups = $wpdb->get_results( $wpdb->prepare(
+		if ( $groups = $wpdb->get_results(
 			"SELECT group_id FROM $group_table ORDER BY $order_by $order"
-		) ) ) {
+		) ) {
 			switch( $options['format'] ) {
 				case 'list' :
 				case 'ul' :

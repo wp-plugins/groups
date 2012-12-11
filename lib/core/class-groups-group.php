@@ -134,7 +134,7 @@ class Groups_Group implements I_Capable {
 					$group_ids		   = array( $this->group->group_id );
 					$iterations		  = 0;
 					$old_group_ids_count = 0;
-					$all_groups = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $group_table" ) );
+					$all_groups = $wpdb->get_var( "SELECT COUNT(*) FROM $group_table" );
 					while( ( $iterations < $all_groups ) && ( count( $group_ids ) !== $old_group_ids_count ) ) {
 						$iterations++;
 						$old_group_ids_count = count( $group_ids );
@@ -232,7 +232,7 @@ class Groups_Group implements I_Capable {
 			}
 			if ( !$error ) {
 				if ( $wpdb->insert( $group_table, $data, $formats ) ) {
-					if ( $result = $wpdb->get_var( $wpdb->prepare( "SELECT LAST_INSERT_ID()" ) ) ) {
+					if ( $result = $wpdb->get_var( "SELECT LAST_INSERT_ID()" ) ) {
 						do_action( "groups_created_group", $result );
 					}
 				}
@@ -322,7 +322,7 @@ class Groups_Group implements I_Capable {
 				// It must hold: !( P(g) in S*(g) )
 				
 				// Find all successors of this group
-				$groups = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $group_table" ) );
+				$groups = $wpdb->get_var( "SELECT COUNT(*) FROM $group_table" );
 				if ( $groups !== null ) {
 					$group_ids		   = array();
 					$group_ids[]		 = Groups_Utility::id( $group_id );

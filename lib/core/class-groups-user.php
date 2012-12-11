@@ -148,7 +148,7 @@ class Groups_User implements I_Capable {
 				// ... or because any of the parent groups can
 				if ( !$result ) {
 					// search in parent groups
-					$limit = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $group_table" ) );
+					$limit = $wpdb->get_var( "SELECT COUNT(*) FROM $group_table" );
 					if ( $limit !== null ) {
 						
 						// note that limits by blog_id for multisite are

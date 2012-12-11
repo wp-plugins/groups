@@ -42,7 +42,7 @@ function groups_admin_groups_add() {
 	$group_table = _groups_get_tablename( 'group' );
 	$parent_select = '<select name="parent-id-field">';
 	$parent_select .= '<option value="">--</option>';
-	$groups = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $group_table" ) );
+	$groups = $wpdb->get_results( "SELECT * FROM $group_table" );
 	foreach ( $groups as $group ) {
 		$parent_select .= '<option value="' . esc_attr( $group->group_id ) . '">' . wp_filter_nohtml_kses( $group->name ) . '</option>';
 	}
