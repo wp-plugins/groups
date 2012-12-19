@@ -151,10 +151,16 @@ class Groups_Admin_Users {
 		global $pagenow, $wpdb;
 		if ( ( $pagenow == 'users.php' ) && empty( $_GET['page'] ) ) {
 			$group_table = _groups_get_tablename( "group" );
+			$user_group_table = _groups_get_tablename( "user_group" );
 			$groups = $wpdb->get_results( "SELECT * FROM $group_table ORDER BY name" );
 			foreach( $groups as $group ) {
 				$group = new Groups_Group( $group->group_id );
-				$user_count = count( $group->users );
+				// Do not use $user_count = count( $group->users ); here,
+				// as it creates a lot of unneccessary objects and can lead
+				// to out of memory issues on large user bases.
+				$user_count = $wpdb->get_var( $wpdb->prepare(
+					"SELECT COUNT(user_id) FROM $user_group_table WHERE group_id = %d",
+					Groups_Utility::id( $group->group_id ) ) );
 				$views[] = sprintf(
 					'<a class="group" href="%s" title="%s">%s</a>',
 					esc_url( add_query_arg( 'group', $group->group_id, admin_url( 'users.php' ) ) ),

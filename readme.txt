@@ -322,6 +322,9 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.5 =
+* Fixed out of memory issues with large user bases on Users > All Users page. Thanks to [Jason Glaspey](http://www.asonglaspey.com) who spotted the issue :)
+
 = 1.3.4 =
 * WP 3.5 cosmetics
 
@@ -416,6 +419,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.3.5 =
+* Fixed out of memory issues with large user bases on Users > All Users page.
 
 = 1.3.4 =
 * Please upgrade for WordPress 3.5 compatibility & cosmetics.
