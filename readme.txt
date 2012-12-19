@@ -4,7 +4,7 @@ Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, memberships, paypal, permission, permissions, subscription, subscriptions, woocommerce
 Requires at least: 3.3
 Tested up to: 3.5
-Stable tag: 1.3.4
+Stable tag: 1.3.5
 License: GPLv3
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
@@ -323,7 +323,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 == Changelog ==
 
 = 1.3.5 =
-* Fixed out of memory issues with large user bases on Users > All Users page. Thanks to [Jason Glaspey](http://www.asonglaspey.com) who spotted the issue :)
+* Fixed out of memory issues with large user bases on Users > All Users page. Thanks to [Jason Glaspey](http://www.jasonglaspey.com) who spotted the issue :)
 
 = 1.3.4 =
 * WP 3.5 cosmetics
