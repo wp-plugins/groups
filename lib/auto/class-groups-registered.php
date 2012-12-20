@@ -32,6 +32,8 @@ class Groups_Registered {
 	 */
 	public static function activate() {
 		
+		global $wpdb;
+		
 		// create a group for the blog if it doesn't exist
 		if ( !( $group = Groups_Group::read_by_name( self::REGISTERED_GROUP_NAME ) ) ) {
 			$group_id = Groups_Group::create( array( "name" => self::REGISTERED_GROUP_NAME ) );
@@ -39,7 +41,7 @@ class Groups_Registered {
 			$group_id = $group->group_id;
 		}
 		
-		$users = get_users();
+		$users = $wpdb->get_results( "SELECT ID FROM $wpdb->users" );
 		foreach( $users as $user ) {
 			// add the user to the group
 			if ( $group_id ) {
