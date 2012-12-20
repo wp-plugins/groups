@@ -43,9 +43,9 @@ class Groups_Access_Meta_Boxes {
 	}
 
 	/**
-	 * Triggered by init() to add capability meta box. 
+	 * Triggered by init() to add capability meta box.
 	 */
-	public static function add_meta_boxes( $post_type, $post ) {
+	public static function add_meta_boxes( $post_type, $post = null ) {
 		global $wp_version;
 		$post_type_object = get_post_type_object( $post_type );
 		if ( $post_type_object ) {
