@@ -322,6 +322,10 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.6 =
+* Replaced call to get_users() with query to avoid memory errors on activation with large users bases.
+* Provided a default value for a method in Groups_Access_Meta_Boxes to avoid issues with other plugins or themes.
+
 = 1.3.5 =
 * Fixed out of memory issues with large user bases on Users > All Users page. Thanks to [Jason Glaspey](http://www.jasonglaspey.com) who spotted the issue :)
 
@@ -419,6 +423,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.3.6 =
+* Fixed performance issues with large user bases on plugin activation and improved flexibility with meta boxes.
 
 = 1.3.5 =
 * Fixed out of memory issues with large user bases on Users > All Users page.
