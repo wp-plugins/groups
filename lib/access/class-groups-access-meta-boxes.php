@@ -146,7 +146,11 @@ class Groups_Access_Meta_Boxes {
 					if ( isset( $_POST[self::NONCE] ) && wp_verify_nonce( $_POST[self::NONCE], self::SET_CAPABILITY ) ) {
 						$post_type = isset( $_POST["post_type"] ) ? $_POST["post_type"] : null;
 						if ( $post_type !== null ) {
-							if ( current_user_can( 'edit_'.$post_type ) ) {
+							// See http://codex.wordpress.org/Function_Reference/current_user_can 20130119 WP 3.5
+							// "... Some capability checks (like 'edit_post' or 'delete_page') require this [the post ID] be provided."
+							// If the post ID is not provided, it will throw:
+							// PHP Notice:  Undefined offset: 0 in /var/www/groups-forums/wp-includes/capabilities.php on line 1067 
+							if ( current_user_can( 'edit_'.$post_type, $post_id ) ) {
 								Groups_Post_Access::delete( $post_id, null );
 								if ( !empty( $_POST[self::CAPABILITY] ) ) {
 									foreach ( $_POST[self::CAPABILITY] as $capability_id ) {
