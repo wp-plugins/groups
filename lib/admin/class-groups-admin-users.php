@@ -226,22 +226,18 @@ class Groups_Admin_Users {
 	/**
 	 * Renders custom column content.
 	 * 
-	 * $foo : both filter invocations in class-wp-ms-users-list-table.php and
-	 * class-wp-users-list-table.php pass ''
-	 * 
-	 * @param unknown_type $foo 
+	 * @param string $output 
 	 * @param string $column_name
 	 * @param int $user_id
 	 * @return string custom column content
 	 */
-	public static function manage_users_custom_column( $foo, $column_name, $user_id ) {
-		$output = '';
+	public static function manage_users_custom_column( $output, $column_name, $user_id ) {
 		switch ( $column_name ) {
 			case self::GROUPS :
 				$groups_user = new Groups_User( $user_id );
 				$groups = $groups_user->groups;
 				if ( count( $groups ) > 0 ) {
-					$output .= '<ul>';
+					$output = '<ul>';
 					foreach( $groups as $group ) {
 						$output .= '<li>';
 						$output .= wp_filter_nohtml_kses( $group->name );

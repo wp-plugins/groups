@@ -16,11 +16,11 @@ It integrates standard WordPress capabilities and application-specific capabilit
 
 ### Extensions ###
 
-- [Groups Forums](http://www.itthinx.com/plugins/groups-forums/) A powerful and yet light-weight forum system.
 - [Groups File Access](http://www.itthinx.com/plugins/groups-file-access/) Groups File Access is an extension that allows to provide file download links for authorized users. Access to files is restricted to users by their group membership.
-- [Groups Notifications](http://www.itthinx.com/plugins/groups-notifications/) Adds customizable notifications for events related to Groups. 
-- [Groups PayPal](http://www.itthinx.com/plugins/groups-paypal/) Groups for PayPal allows to sell memberships and subscriptions with Groups.
+- [Groups Forums](http://www.itthinx.com/plugins/groups-forums/) A powerful and yet light-weight forum system.
 - [Groups Jigoshop](http://jigoshop.com/product/subscriptions/) Groups integration for Jigoshop that supports memberships and subscriptions.
+- [Groups Notifications](http://www.itthinx.com/plugins/groups-notifications/) Adds customizable notifications for events related to Groups.
+- [Groups PayPal](http://www.itthinx.com/plugins/groups-paypal/) Groups for PayPal allows to sell memberships and subscriptions with Groups.
 - [Groups WooCommerce](http://www.woothemes.com/extension/groups-woocommerce/) Groups for WooCommerce is a WordPress plugin that allows you to sell memberships.
 - [Groups 404 Redirect](http://wordpress.org/extend/plugins/groups-404-redirect/) Redirects 404's caused by hits on pages that are protected by Groups.
 
@@ -326,7 +326,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 = 1.3.7 =
 * Fix: missing argument for meta box when saving a post
-* Fix: Groups conflicting with other plugins adding columns to the Users screen
+* Fix: Groups conflicting with other plugins adding columns to the Users screen (in the manage_users_custom_column filter) thanks to [Erwin](http://www.transpontine.com) who spotted this :)
 
 = 1.3.6 =
 * Replaced call to get_users() with query to avoid memory errors on activation with large users bases.
@@ -431,7 +431,7 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 == Upgrade Notice ==
 
 = 1.3.7 =
-* Please update, this includes fixes: missing argument for meta box when saving a post; Groups conflicting with other plugins adding columns to the Users screen
+* Please update, this includes fixes: missing argument for meta box when saving a post; Groups conflicting with other plugins adding columns to the Users screen.
 
 = 1.3.6 =
 * Fixed performance issues with large user bases on plugin activation and improved flexibility with meta boxes.
