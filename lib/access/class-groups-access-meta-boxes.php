@@ -102,29 +102,35 @@ class Groups_Access_Meta_Boxes {
 			}
 		}
 
-		$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
-		$read_caps = get_post_meta( $post_id, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
-		$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
-		$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
-		$output .= '<ul>';
-		foreach( $valid_read_caps as $valid_read_cap ) {
-			if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
-				$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
-				$output .= '<li>';
-				$output .= '<label>';
-				$output .= '<input name="' . self::CAPABILITY . '[]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
-				$output .= wp_filter_nohtml_kses( $capability->capability );
-				$output .= '</label>';
-				$output .= '</li>';
+		if ( self::user_can_restrict() ) {
+			$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
+			$read_caps = get_post_meta( $post_id, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
+			$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
+			$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
+			$output .= '<ul>';
+			foreach( $valid_read_caps as $valid_read_cap ) {
+				if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
+					$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
+					$output .= '<li>';
+					$output .= '<label>';
+					$output .= '<input name="' . self::CAPABILITY . '[]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
+					$output .= wp_filter_nohtml_kses( $capability->capability );
+					$output .= '</label>';
+					$output .= '</li>';
+				}
 			}
+			$output .= '</ul>';
+			$output .= '</div>';
+	
+			$output .= '<p class="description">';
+			$output .= sprintf( __( "Only groups or users that have one of the selected capabilities are allowed to read this %s.", GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
+			$output .= '</p>';
+			$output .= wp_nonce_field( self::SET_CAPABILITY, self::NONCE, true, false );
+		} else {
+			$output .= '<p class="description">';
+			$output .= sprintf( __( 'You cannot set any access restrictions.', GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
+			$output .= '</p>';
 		}
-		$output .= '</ul>';
-		$output .= '</div>';
-
-		$output .= '<p class="description">';
-		$output .= sprintf( __( "Only groups or users that have one of the selected capabilities are allowed to read this %s.", GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
-		$output .= '</p>';
-		$output .= wp_nonce_field( self::SET_CAPABILITY, self::NONCE, true, false );
 
 		echo $output;
 	}
@@ -151,14 +157,19 @@ class Groups_Access_Meta_Boxes {
 							// If the post ID is not provided, it will throw:
 							// PHP Notice:  Undefined offset: 0 in /var/www/groups-forums/wp-includes/capabilities.php on line 1067 
 							if ( current_user_can( 'edit_'.$post_type, $post_id ) ) {
-								Groups_Post_Access::delete( $post_id, null );
-								if ( !empty( $_POST[self::CAPABILITY] ) ) {
-									foreach ( $_POST[self::CAPABILITY] as $capability_id ) {
-										if ( $capability = Groups_Capability::read( $capability_id ) ) {
-											Groups_Post_Access::create( array(
-												'post_id' => $post_id,
-												'capability' => $capability->capability
-											) );
+								if ( self::user_can_restrict() ) {
+									Groups_Post_Access::delete( $post_id, null );
+									$user = new Groups_User( get_current_user_id() );
+									if ( !empty( $_POST[self::CAPABILITY] ) ) {
+										foreach ( $_POST[self::CAPABILITY] as $capability_id ) {
+											if ( $capability = Groups_Capability::read( $capability_id ) ) {
+												if ( $user->can( $capability->capability_id ) ) {
+													Groups_Post_Access::create( array(
+														'post_id' => $post_id,
+														'capability' => $capability->capability
+													) );
+												}
+											}
 										}
 									}
 								}
@@ -177,43 +188,42 @@ class Groups_Access_Meta_Boxes {
 	 * @return array
 	 */
 	public static function attachment_fields_to_edit( $form_fields, $post ) {
-
 		$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
 		if ( !isset( $post_types_option['attachment']['add_meta_box'] ) || $post_types_option['attachment']['add_meta_box'] ) {
+			if ( self::user_can_restrict() ) {
+				$output = "";
+				$post_singular_name = __( 'Media', GROUPS_PLUGIN_DOMAIN );
 
-			$output = "";
-			$post_singular_name = __( 'Media', GROUPS_PLUGIN_DOMAIN );
-
-			$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
-			$read_caps = get_post_meta( $post->ID, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
-			$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
-			$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
-			$output .= '<ul>';
-			foreach( $valid_read_caps as $valid_read_cap ) {
-				if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
-					$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
-					$output .= '<li>';
-					$output .= '<label>';
-					$output .= '<input name="attachments[' . $post->ID . '][' . self::CAPABILITY . '][]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
-					$output .= wp_filter_nohtml_kses( $capability->capability );
-					$output .= '</label>';
-					$output .= '</li>';
+				$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
+				$read_caps = get_post_meta( $post->ID, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
+				$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
+				$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
+				$output .= '<ul>';
+				foreach( $valid_read_caps as $valid_read_cap ) {
+					if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
+						$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
+						$output .= '<li>';
+						$output .= '<label>';
+						$output .= '<input name="attachments[' . $post->ID . '][' . self::CAPABILITY . '][]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
+						$output .= wp_filter_nohtml_kses( $capability->capability );
+						$output .= '</label>';
+						$output .= '</li>';
+					}
 				}
+				$output .= '</ul>';
+				$output .= '</div>';
+
+				$output .= '<p class="description">';
+				$output .= sprintf( __( "Only groups or users that have one of the selected capabilities are allowed to read this %s.", GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
+				$output .= '</p>';
+
+				$form_fields['groups_access'] = array(
+					'label' => __( 'Access restrictions', GROUPS_PLUGIN_DOMAIN ),
+					'input' => 'html',
+					'html' => $output
+				);
 			}
-			$output .= '</ul>';
-			$output .= '</div>';
-			
-			$output .= '<p class="description">';
-			$output .= sprintf( __( "Only groups or users that have one of the selected capabilities are allowed to read this %s.", GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
-			$output .= '</p>';
-
-			$form_fields['groups_access'] = array(
-				'label' => __( 'Access restrictions', GROUPS_PLUGIN_DOMAIN ),
-				'input' => 'html',
-				'html' => $output
-			);
 		}
-
 		return $form_fields;
 	}
 
@@ -228,20 +238,42 @@ class Groups_Access_Meta_Boxes {
 		$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
 		if ( !isset( $post_types_option['attachment']['add_meta_box'] ) || $post_types_option['attachment']['add_meta_box'] ) {
 			if ( current_user_can( 'edit_attachment' ) ) {
-				Groups_Post_Access::delete( $post['ID'], null );
-				if ( !empty( $attachment[self::CAPABILITY] ) ) {
-					foreach ( $attachment[self::CAPABILITY] as $capability_id ) {
-						if ( $capability = Groups_Capability::read( $capability_id ) ) {
-							Groups_Post_Access::create( array(
-								'post_id' => $post['ID'],
-								'capability' => $capability->capability
-							) );
+				if ( self::user_can_restrict() ) {
+					Groups_Post_Access::delete( $post['ID'], null );
+					if ( !empty( $attachment[self::CAPABILITY] ) ) {
+						foreach ( $attachment[self::CAPABILITY] as $capability_id ) {
+							if ( $capability = Groups_Capability::read( $capability_id ) ) {
+								Groups_Post_Access::create( array(
+									'post_id' => $post['ID'],
+									'capability' => $capability->capability
+								) );
+							}
 						}
 					}
 				}
 			}
 		}
 		return $post;
+	}
+
+	/**
+	 * Returns true if the current user has at least one of the capabilities
+	 * that can be used to restrict access to posts.
+	 * @return boolean
+	 */
+	private static function user_can_restrict() {
+		$has_read_cap = false;
+		$user = new Groups_User( get_current_user_id() );
+		$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
+		foreach( $valid_read_caps as $valid_read_cap ) {
+			if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
+				if ( $user->can( $capability->capability_id ) ) {
+					$has_read_cap = true;
+					break;
+				}
+			}
+		}
+		return $has_read_cap;
 	}
 
 } 
