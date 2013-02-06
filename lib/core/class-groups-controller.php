@@ -36,7 +36,11 @@ class Groups_Controller {
 	 */
 	public static function switch_to_blog( $blog_id ) {
 		switch_to_blog( $blog_id );
-		wp_cache_reset();
+		if ( function_exists( 'wp_cache_switch_to_blog' ) ) {
+			wp_cache_switch_to_blog( $blog_id ); // introduced in WP 3.5.0
+		} else {
+			wp_cache_reset(); // deprecated in WP 3.5.0
+		}
 	}
 	
 	/**

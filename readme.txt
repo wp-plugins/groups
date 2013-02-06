@@ -3,7 +3,7 @@ Contributors: itthinx
 Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, memberships, paypal, permission, permissions, subscription, subscriptions, woocommerce
 Requires at least: 3.3
-Tested up to: 3.5
+Tested up to: 3.5.1
 Stable tag: 1.3.7
 License: GPLv3
 
@@ -16,6 +16,8 @@ It integrates standard WordPress capabilities and application-specific capabilit
 
 ### Extensions ###
 
+
+- [Groups Blog Protect](http://wordpress.org/extend/plugins/groups-blog-protect/) Protect access to blogs by group membership.
 - [Groups File Access](http://www.itthinx.com/plugins/groups-file-access/) Groups File Access is an extension that allows to provide file download links for authorized users. Access to files is restricted to users by their group membership.
 - [Groups Forums](http://www.itthinx.com/plugins/groups-forums/) A powerful and yet light-weight forum system.
 - [Groups Jigoshop](http://jigoshop.com/product/subscriptions/) Groups integration for Jigoshop that supports memberships and subscriptions.
