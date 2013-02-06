@@ -326,6 +326,10 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.8 =
+* Fix: using substitute wp_cache_switch_to_blog instead of deprecated function wp_cache_reset when available (from 3.5.0)
+* Fix: don't show access restriction meta box on attachments, the option is added with the attachment fields (3.5 uses common post edit screen but save_post isn't triggered on attachments)
+
 = 1.3.7 =
 * Fix: missing argument for meta box when saving a post
 * Fix: Groups conflicting with other plugins adding columns to the Users screen (in the manage_users_custom_column filter) thanks to [Erwin](http://www.transpontine.com) who spotted this :)

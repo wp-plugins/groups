@@ -48,7 +48,7 @@ class Groups_Access_Meta_Boxes {
 	public static function add_meta_boxes( $post_type, $post = null ) {
 		global $wp_version;
 		$post_type_object = get_post_type_object( $post_type );
-		if ( $post_type_object ) {
+		if ( $post_type_object && $post_type != 'attachment' ) {
 			$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
 			if ( !isset( $post_types_option[$post_type]['add_meta_box'] ) || $post_types_option[$post_type]['add_meta_box'] ) {
 				if ( $wp_version < 3.3 ) {
@@ -128,7 +128,7 @@ class Groups_Access_Meta_Boxes {
 
 		echo $output;
 	}
-	
+
 	/**
 	 * Save capability options.
 	 * 
@@ -140,7 +140,7 @@ class Groups_Access_Meta_Boxes {
 		} else {
 			$post_type = get_post_type( $post_id );
 			$post_type_object = get_post_type_object( $post_type );
-			if ( $post_type_object ) {
+			if ( $post_type_object && $post_type != 'attachment' ) {
 				$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
 				if ( !isset( $post_types_option[$post_type]['add_meta_box'] ) || $post_types_option[$post_type]['add_meta_box'] ) {
 					if ( isset( $_POST[self::NONCE] ) && wp_verify_nonce( $_POST[self::NONCE], self::SET_CAPABILITY ) ) {
@@ -169,7 +169,7 @@ class Groups_Access_Meta_Boxes {
 			}
 		}
 	}
-	
+
 	/**
 	 * Render capabilities box for attachment post type (Media).
 	 * @param array $form_fields
@@ -213,9 +213,10 @@ class Groups_Access_Meta_Boxes {
 				'html' => $output
 			);
 		}
+
 		return $form_fields;
 	}
-	
+
 	/**
 	 * Save capabilities for attachment post type (Media).
 	 * When multiple attachments are saved, this is called once for each.
