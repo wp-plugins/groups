@@ -45,7 +45,10 @@ class Groups_Post_Access {
 			__( "Read Post", GROUPS_PLUGIN_DOMAIN );
 		}
 	}
-	
+
+	/**
+	 * Sets up filters to restrict access.
+	 */
 	public static function init() {
 		// post access
 		add_filter( 'get_pages', array( __CLASS__, "get_pages" ), 1 );
@@ -54,12 +57,38 @@ class Groups_Post_Access {
 		// content access
 		add_filter( "get_the_excerpt", array( __CLASS__, "get_the_excerpt" ), 1 );
 		add_filter( "the_content", array( __CLASS__, "the_content" ), 1 );
+		// edit & delete post
+		add_filter( 'map_meta_cap', array( __CLASS__, 'map_meta_cap' ), 10, 4 );
 		// @todo these could be interesting to add later ...
 		// add_filter( "plugin_row_meta", array( __CLASS__, "plugin_row_meta" ), 1 );
 		// add_filter( "posts_join_paged", array( __CLASS__, "posts_join_paged" ), 1 );
 		// add_filter( "posts_where_paged", array( __CLASS__, "posts_where_paged" ), 1 );
+	}
+
+	/**
+	 * Restrict access to edit or delete posts based on the post's access restrictions.
+	 * @param array $caps
+	 * @param string $cap
+	 * @param int $user_id
+	 * @param array $args
+	 * @return array
+	 */
+	public static function map_meta_cap( $caps, $cap, $user_id, $args ) {
+		if ( isset( $args[0] ) ) {
+			if ( strpos( $cap, 'edit_' ) === 0 || strpos( $cap, 'delete_' ) === 0 ) {
+				if ( $post_type = get_post_type( $args[0] ) ) {
+					if ( $cap === "edit_$post_type" || $cap === "delete_$post_type" ) {
+						$post_id = $args[0];
+						if ( !self::user_can_read_post( $post_id, $user_id ) ) {
+							$caps[] = 'do_not_allow';
+						}
+					}
+				}
+			}
 		}
-	
+		return $caps;
+	}
+
 	/**
 	 * Filter pages by access capability.
 	 * 
