@@ -100,7 +100,7 @@ function groups_admin_capabilities() {
 				}
 				break;
 			case 'refresh' :
-				if ( check_admin_referer('refresh' ) ) {
+				if ( check_admin_referer( 'refresh' ) ) {
 					$n = Groups_WordPress::refresh_capabilities();
 					if ( $n > 0 ) {
 						$output .= '<div class="info">' . sprintf( _n( 'One capability has been added.', '%d capabilities have been added.', $n, GROUPS_PLUGIN_DOMAIN ), $n ) . '</div>';

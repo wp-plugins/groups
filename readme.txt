@@ -439,6 +439,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 
 == Upgrade Notice ==
 
+= 1.3.8 =
+* This release includes several fixes and improvements, including more limiting features for access restrictions.
+
 = 1.3.7 =
 * Please update, this includes fixes: missing argument for meta box when saving a post; Groups conflicting with other plugins adding columns to the Users screen.
 
