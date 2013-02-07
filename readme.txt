@@ -331,6 +331,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * Fix: don't show access restriction meta box on attachments, the option is added with the attachment fields (3.5 uses common post edit screen but save_post isn't triggered on attachments)
 * Improvement: limiting choice of access restrictions to those the current user has
 * Fix: restrict access to edit or delete posts based on the post's access restrictions
+* Feature: added option to refresh capabilities
 
 = 1.3.7 =
 * Fix: missing argument for meta box when saving a post

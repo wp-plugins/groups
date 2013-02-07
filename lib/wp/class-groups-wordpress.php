@@ -89,9 +89,17 @@ class Groups_WordPress {
 	 * @see Groups_Controller::activate()
 	 */
 	public static function activate() {
+		self::refresh_capabilities();
+	}
+	
+	/**
+	 * Refreshes Groups capabilities based on WordPress capabilities.
+	 * @return int number of capabilities added
+	 */
+	public static function refresh_capabilities() {
 		global $wp_roles;
 		$capabilities = array();
-		
+		$count = 0;
 		if ( !isset( $wp_roles ) ) {
 			// just trigger initialization
 			get_role( 'administrator' );
@@ -111,8 +119,10 @@ class Groups_WordPress {
 		foreach ( $capabilities as $capability ) {
 			if ( !Groups_Capability::read_by_capability( $capability ) ) {
 				Groups_Capability::create( array( 'capability' => $capability ) );
+				$count++;
 			}
 		}
+		return $count;
 	}
 }
 Groups_WordPress::init();

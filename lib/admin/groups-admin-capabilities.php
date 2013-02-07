@@ -99,6 +99,18 @@ function groups_admin_capabilities() {
 					return groups_admin_capabilities_remove( $_GET['capability_id'] );
 				}
 				break;
+			case 'refresh' :
+				if ( check_admin_referer('refresh' ) ) {
+					$n = Groups_WordPress::refresh_capabilities();
+					if ( $n > 0 ) {
+						$output .= '<div class="info">' . sprintf( _n( 'One capability has been added.', '%d capabilities have been added.', $n, GROUPS_PLUGIN_DOMAIN ), $n ) . '</div>';
+					} else {
+						$output .= '<div class="info">' . __( 'No new capabilities have been found.', GROUPS_PLUGIN_DOMAIN ) .  '</div>';
+					}
+				} else {
+					wp_die( __( 'A Duck!', GROUPS_PLUGIN_DOMAIN ) );
+				}
+				break;
 		}
 	}
 	
@@ -166,10 +178,11 @@ function groups_admin_capabilities() {
 		__( 'Capabilities', GROUPS_PLUGIN_DOMAIN ) .
 		'</h2>' .
 		'</div>';
-				
+	
 	$output .=
 		'<div class="manage">' .
-		"<a title='" . __( 'Click to add a new capability', GROUPS_PLUGIN_DOMAIN ) . "' class='add button' href='" . esc_url( $current_url ) . "&action=add'><img class='icon' alt='" . __( 'Add', GROUPS_PLUGIN_DOMAIN) . "' src='". GROUPS_PLUGIN_URL ."images/add.png'/><span class='label'>" . __( 'New Capability', GROUPS_PLUGIN_DOMAIN) . "</span></a>" .
+		"<a title='" . __( 'Click to add a new capability', GROUPS_PLUGIN_DOMAIN ) . "' class='add button' href='" . esc_url( $current_url ) . "&action=add'><img class='icon' alt='" . __( 'Add', GROUPS_PLUGIN_DOMAIN) . "' src='". GROUPS_PLUGIN_URL . "images/add.png'/><span class='label'>" . __( 'New Capability', GROUPS_PLUGIN_DOMAIN) . "</span></a>" .
+		"<a title='" . __( 'Click to refresh capabilities', GROUPS_PLUGIN_DOMAIN ) . "' class='refresh button' href='" . esc_url( wp_nonce_url( $current_url, 'refresh' ) ) . "&action=refresh'><img class='icon' alt='" . __( 'Refresh', GROUPS_PLUGIN_DOMAIN) . "' src='". GROUPS_PLUGIN_URL . "images/refresh.png'/><span class='label'>" . __( '', GROUPS_PLUGIN_DOMAIN) . "</span></a>" .
 		'</div>';
 
 	$row_count = isset( $_POST['row_count'] ) ? intval( $_POST['row_count'] ) : 0;

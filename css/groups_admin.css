@@ -40,6 +40,18 @@
 	height: 20px;
 	vertical-align: middle;
 }
+.manage a.refresh {
+	text-decoration: none;
+	cursor: pointer;
+	float: right;
+}
+.manage a.refresh .icon {
+	vertical-align: middle;
+}
+.manage a.refresh .label {
+	height: 20px;
+	vertical-align: middle;
+}
 div.field {
 	padding-bottom: 0.62em;
 }
@@ -112,4 +124,11 @@ div.groups-footer form {
 }
 .groups-options .groups-permissions td.checkbox {
 	text-align: center;
+}
+.info {
+	background-color: #eec;
+	border: 1px solid #cca;
+	border-radius: 4px;
+	margin: 1em;
+	padding: 1em;
 }
