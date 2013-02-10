@@ -332,6 +332,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * Improvement: limiting choice of access restrictions to those the current user has
 * Fix: restrict access to edit or delete posts based on the post's access restrictions
 * Feature: added option to refresh capabilities
+* Fix: replaced use of get_user_by() (memory leaks on large user sets) with query & added batch limit when adding users to Registered group on activation
 
 = 1.3.7 =
 * Fix: missing argument for meta box when saving a post
