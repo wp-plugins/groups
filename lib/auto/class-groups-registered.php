@@ -26,27 +26,35 @@ class Groups_Registered {
 
 	const REGISTERED_GROUP_NAME = 'Registered';
 
+	const BATCH_LIMIT = 100;
+
 	/**
 	 * Creates groups for registered users.
 	 * Must be called explicitly or hooked into activation.
 	 */
 	public static function activate() {
-		
+
 		global $wpdb;
-		
+
 		// create a group for the blog if it doesn't exist
 		if ( !( $group = Groups_Group::read_by_name( self::REGISTERED_GROUP_NAME ) ) ) {
 			$group_id = Groups_Group::create( array( "name" => self::REGISTERED_GROUP_NAME ) );
 		} else {
 			$group_id = $group->group_id;
 		}
-		
-		$users = $wpdb->get_results( "SELECT ID FROM $wpdb->users" );
-		foreach( $users as $user ) {
-			// add the user to the group
-			if ( $group_id ) {
-				if ( !Groups_User_Group::read( $user->ID, $group_id ) ) {
-					Groups_User_Group::create( array( "user_id" => $user->ID, "group_id" => $group_id ) );
+		if ( $group_id ) {
+			$n = $wpdb->get_var( "SELECT COUNT(ID) FROM $wpdb->users" );
+			for ( $i = 0; $i < $n; $i += self::BATCH_LIMIT ) {
+				$users = $wpdb->get_results( $wpdb->prepare( "SELECT ID FROM $wpdb->users LIMIT %d, %d", $i, self::BATCH_LIMIT ) );
+				foreach( $users as $user ) {
+					// add the user to the group
+					if ( !Groups_User_Group::read( $user->ID, $group_id ) ) {
+						Groups_User_Group::create( array( "user_id" => $user->ID, "group_id" => $group_id ) );
+					}
+				}
+				unset( $users );
+				if ( function_exists( 'gc_collect_cycles' ) ) {
+					gc_collect_cycles();
 				}
 			}
 		}
