@@ -49,7 +49,7 @@ class Groups_User implements I_Capable {
 	
 	/**
 	 * Retrieve a user property.
-	 * Must be "capabilities" or a property of the WP_User class.
+	 * Must be "capabilities", "groups" or a property of the WP_User class.
 	 * @param string $name property's name
 	 */
 	public function __get( $name ) {
@@ -57,6 +57,10 @@ class Groups_User implements I_Capable {
 		global $wpdb;
 		
 		$result = null;
+		
+		// @todo consider "inherited_capabilities" and "inherited_groups", or "all_capabilities" and "all_groups"
+		//       Note that we must maintain the current semantics of "capabilities" and "groups" as direct properties of the object,
+		//       modifying these is NOT sensible; adding more extensive ones possibly is.
 		
 		if ( $this->user !== null ) {
 			switch ( $name ) {

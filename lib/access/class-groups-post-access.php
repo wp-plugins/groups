@@ -51,6 +51,7 @@ class Groups_Post_Access {
 	 */
 	public static function init() {
 		// post access
+		add_filter( 'posts_where', array( __CLASS__, 'posts_where' ), 10, 2 );
 		add_filter( 'get_pages', array( __CLASS__, "get_pages" ), 1 );
 		add_filter( 'the_posts', array( __CLASS__, "the_posts" ), 1, 2 );
 		add_filter( 'wp_get_nav_menu_items', array( __CLASS__, "wp_get_nav_menu_items" ), 1, 3 );
@@ -90,6 +91,56 @@ class Groups_Post_Access {
 	}
 
 	/**
+	 * Filters out posts that the user should not be able to access.
+	 * 
+	 * @param string $where current where conditions
+	 * @param WP_Query $query current query
+	 * @return string modified $where
+	 */
+	public static function posts_where( $where, &$query ) {
+
+		global $wpdb;
+
+		$user_id = get_current_user_id();
+
+		// this only applies to logged in users
+		if ( $user_id ) {
+			// if administrators can override access, don't filter
+			if ( get_option( GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE, GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE_DEFAULT ) ) {
+				if ( user_can( $user_id, 'administrator' ) ) {
+					return $where;
+				}
+			}
+		}
+
+		// 1. Get all the capabilities that the user has, including those that are inherited:
+		$gncs = self::get_all_user_groups_and_capabilities( $user_id );
+		$caps = array(); // see below, this mustn't be empty so that the SQL IN query doesn't fail
+		if ( isset( $gncs['capability_ids'] ) ) {
+			foreach ( $gncs['capability_ids'] as $capability_id ) {
+				if ( $capability = Groups_Capability::read( $capability_id ) ) {
+					$caps[] = "'". $capability->capability . "'";
+				}
+			}
+		}
+		if ( count( $caps ) > 0 ) {
+			$caps = implode( ',', $caps );
+		} else {
+			$caps = '\'\'';
+		}
+
+		// 2. Filter the posts that require a capability that the user doesn't
+		// have, or in other words: exclude posts that the user must NOT access:
+		$where .= sprintf(
+			" AND {$wpdb->posts}.ID NOT IN (SELECT DISTINCT ID FROM $wpdb->posts LEFT JOIN $wpdb->postmeta on {$wpdb->posts}.ID = {$wpdb->postmeta}.post_id WHERE {$wpdb->postmeta}.meta_key = '%s' AND {$wpdb->postmeta}.meta_value NOT IN (%s) ) ",
+			self::POSTMETA_PREFIX . self::READ_POST_CAPABILITY,
+			$caps
+		);
+
+		return $where;
+	}
+
+	/**
 	 * Filter pages by access capability.
 	 * 
 	 * @param array $pages
@@ -111,7 +162,7 @@ class Groups_Post_Access {
 	 * @param array $posts list of posts
 	 * @param WP_Query $query
 	 */
-	public static function the_posts( $posts, $query ) {
+	public static function the_posts( $posts, &$query ) {
 		$result = array();
 		$user_id = get_current_user_id();
 		foreach ( $posts as $post ) {
@@ -289,6 +340,82 @@ class Groups_Post_Access {
 				}
 			} else {
 				$result = true;
+			}
+		}
+		return $result;
+	}
+
+	/**
+	 * Based on code in Groups_User::can(), this retrieves all groups that a
+	 * user belongs to and the associated capabilities.
+	 * 
+	 * @todo use this until these can be retrieved directly from Groups_User as properties or using a methods - maintain private access level
+	 * 
+	 * @param int $user_id
+	 * @return array or null
+	 * @see Groups_User::can()
+	 */
+	private static function get_all_user_groups_and_capabilities( $user_id ) {
+
+		global $wpdb;
+
+		$result = null;
+
+		$group_table = _groups_get_tablename( "group" );
+		$capability_table = _groups_get_tablename( "capability" );
+		$group_capability_table = _groups_get_tablename( "group_capability" );
+		$user_group_table = _groups_get_tablename( "user_group" );
+
+		// search in parent groups
+		$limit = $wpdb->get_var( "SELECT COUNT(*) FROM $group_table" );
+		if ( $limit !== null ) {
+
+			// note that limits by blog_id for multisite are
+			// enforced when a user is added to a blog
+			$user_groups = $wpdb->get_results( $wpdb->prepare(
+				"SELECT group_id FROM $user_group_table WHERE user_id = %d",
+				Groups_Utility::id( $user_id )
+			) );
+
+			if ( $user_groups ) {
+				$group_ids = array();
+				foreach( $user_groups as $user_group ) {
+					$group_ids[] = Groups_Utility::id( $user_group->group_id );
+				}
+				if ( count( $group_ids ) > 0 ) {
+					$iterations          = 0;
+					$old_group_ids_count = 0;
+					while( ( $iterations < $limit ) && ( count( $group_ids ) !== $old_group_ids_count ) ) {
+						$iterations++;
+						$old_group_ids_count = count( $group_ids );
+						$id_list = implode( ",", $group_ids );
+						$parent_group_ids = $wpdb->get_results(
+							"SELECT parent_id FROM $group_table WHERE parent_id IS NOT NULL AND group_id IN ($id_list)"
+						);
+						if ( $parent_group_ids ) {
+							foreach( $parent_group_ids as $parent_group_id ) {
+								$parent_group_id = Groups_Utility::id( $parent_group_id->parent_id );
+								if ( !in_array( $parent_group_id, $group_ids ) ) {
+									$group_ids[] = $parent_group_id;
+								}
+							}
+						}
+					}
+					$capability_ids = array();
+					$id_list = implode( ",", $group_ids );
+					$rows = $wpdb->get_results(
+						"SELECT capability_id FROM $group_capability_table WHERE group_id IN ($id_list)"
+					);
+					if ( count( $rows ) > 0 ) {
+						foreach ( $rows as $row ) {
+							$capability_ids[] = $row->capability_id;
+						}
+					}
+					$result = array(
+						'group_ids' => $group_ids,
+						'capability_ids' => $capability_ids
+					);
+				}
 			}
 		}
 		return $result;

@@ -326,6 +326,10 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.9 =
+* Fix: added filter hooked on posts_where motivated by pagination issues - the posts must be filtered before the totals are calculated in WP_Query::get_posts().
+* Improvement: modified the signature of the the_posts filter method in Groups_Post_Access to receive the $query by reference
+
 = 1.3.8 =
 * Fix: using substitute wp_cache_switch_to_blog instead of deprecated function wp_cache_reset when available (from 3.5.0)
 * Fix: don't show access restriction meta box on attachments, the option is added with the attachment fields (3.5 uses common post edit screen but save_post isn't triggered on attachments)
@@ -439,6 +443,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.3.9 =
+* Fixes pagination issues due to post filters.
 
 = 1.3.8 =
 * This release includes several fixes and improvements, including more limiting features for access restrictions.
