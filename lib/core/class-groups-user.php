@@ -26,14 +26,65 @@ require_once( GROUPS_CORE_LIB . "/class-groups-capability.php" );
  * User OPM.
  */
 class Groups_User implements I_Capable {
-	
+
+	const CACHE_GROUP    = 'groups';
+	const CAPABILITIES   = 'capabilities';
+	const CAPABILITY_IDS = 'capability_ids';
+	const GROUP_IDS      = 'group_ids';
+
 	/**
 	 * User object.
 	 * 
 	 * @var WP_User
 	 */
 	var $user = null;
-		
+
+	/**
+	 * Hook cache clearers to actions that can modify the capabilities.
+	 */
+	public static function init() {
+		add_action( 'groups_created_user_group', array( __CLASS__, 'clear_cache' ) );
+		add_action( 'groups_updated_user_group', array( __CLASS__, 'clear_cache' ) );
+		add_action( 'groups_deleted_user_group', array( __CLASS__, 'clear_cache' ) );
+		add_action( 'groups_created_user_capability', array( __CLASS__, 'clear_cache' ) );
+		add_action( 'groups_updated_user_capability', array( __CLASS__, 'clear_cache' ) );
+		add_action( 'groups_deleted_user_capability', array( __CLASS__, 'clear_cache' ) );
+		add_action( 'groups_created_group_capability', array( __CLASS__, 'clear_cache_for_group' ) );
+		add_action( 'groups_updated_group_capability', array( __CLASS__, 'clear_cache_for_group' ) );
+		add_action( 'groups_deleted_group_capability', array( __CLASS__, 'clear_cache_for_group' ) );
+	}
+
+	/**
+	 * Clear cache objects for the user.
+	 * @param int $user_id
+	 */
+	public static function clear_cache( $user_id ) {
+		// be lazy, clear the entries so they are rebuilt when requested
+		wp_cache_delete( self::CAPABILITIES . $user_id, self::CACHE_GROUP );
+		wp_cache_delete( self::CAPABILITY_IDS . $user_id, self::CACHE_GROUP );
+		wp_cache_delete( self::GROUP_IDS . $user_id, self::CACHE_GROUP );
+	}
+
+	/**
+	 * Clear cache objects for all users in the group.
+	 * @param unknown_type $group_id
+	 */
+	public static function clear_cache_for_group( $group_id ) {
+		if ( $group = Groups_Group::read( $group_id ) ) {
+			// not using $group->users, as we don't need a lot of user objects created here
+			$user_group_table = _groups_get_tablename( "user_group" );
+			$users = $wpdb->get_results( $wpdb->prepare(
+				"SELECT ID FROM $wpdb->users LEFT JOIN $user_group_table ON $wpdb->users.ID = $user_group_table.user_id WHERE $user_group_table.group_id = %d",
+				Groups_Utility::id( $group_id )
+			) );
+			if ( $users ) {
+				foreach( $users as $user ) {
+					self::clear_cache( $user->ID );
+				}
+			}
+		}
+	}
+
 	/**
 	 * Create, if $user_id = 0 an anonymous user is assumed.
 	 *
@@ -46,24 +97,73 @@ class Groups_User implements I_Capable {
 			$this->user = new WP_User( 0 );
 		}
 	}
-	
+
 	/**
 	 * Retrieve a user property.
 	 * Must be "capabilities", "groups" or a property of the WP_User class.
 	 * @param string $name property's name
 	 */
 	public function __get( $name ) {
-		
+
 		global $wpdb;
-		
 		$result = null;
-		
-		// @todo consider "inherited_capabilities" and "inherited_groups", or "all_capabilities" and "all_groups"
-		//       Note that we must maintain the current semantics of "capabilities" and "groups" as direct properties of the object,
-		//       modifying these is NOT sensible; adding more extensive ones possibly is.
-		
+
+		// @todo Do we need to maintain the current semantics of "capabilities" and "groups" as direct properties of the object?
+
 		if ( $this->user !== null ) {
+
 			switch ( $name ) {
+
+				case 'capability_ids' :
+					$user_capability_table = _groups_get_tablename( "user_capability" );
+					$rows = $wpdb->get_results( $wpdb->prepare(
+						"SELECT capability_id FROM $user_capability_table WHERE user_id = %d",
+						Groups_Utility::id( $this->user->ID )
+					) );
+					if ( $rows ) {
+						$result = array();
+						foreach ( $rows as $row ) {
+							$result[] = $row->capability_id;
+						}
+					}
+					break;
+
+				case 'capability_ids_deep' :
+					if ( $this->user !== null ) {
+						$capability_ids = wp_cache_get( self::CAPABILITY_IDS . $this->user->ID, self::CACHE_GROUP );
+						if ( $capability_ids === false ) {
+							$this->init_cache();
+							$capability_ids = wp_cache_get( self::CAPABILITY_IDS . $this->user->ID, self::CACHE_GROUP );
+						}
+						$result = $capability_ids;
+					}
+					break;
+
+				case 'group_ids' :
+					$user_group_table = _groups_get_tablename( "user_group" );
+					$rows = $wpdb->get_results( $wpdb->prepare(
+							"SELECT group_id FROM $user_group_table WHERE user_id = %d",
+							Groups_Utility::id( $this->user->ID )
+					) );
+					if ( $rows ) {
+						$result = array();
+						foreach( $rows as $row ) {
+							$result[] = $row->group_id;
+						}
+					}
+					break;
+
+				case 'group_ids_deep' :
+					if ( $this->user !== null ) {
+						$groups_ids = wp_cache_get( self::GROUP_IDS . $this->user->ID, self::CACHE_GROUP );
+						if ( $group_ids === false ) {
+							$this->init_cache();
+							$group_ids = wp_cache_get( self::GROUP_IDS . $this->user->ID, self::CACHE_GROUP );
+						}
+						$result = $group_ids;
+					}
+					break;
+
 				case "capabilities" :
 					$user_capability_table = _groups_get_tablename( "user_capability" );
 					$rows = $wpdb->get_results( $wpdb->prepare(
@@ -77,6 +177,18 @@ class Groups_User implements I_Capable {
 						}
 					}
 					break;
+
+				case 'capabilities_deep' :
+					if ( $this->user !== null ) {
+						$capabilities = wp_cache_get( self::CAPABILITIES . $this->user->ID, self::CACHE_GROUP );
+						if ( $capabilities === false ) {
+							$this->init_cache();
+							$capabilities = wp_cache_get( self::CAPABILITIES . $this->user->ID, self::CACHE_GROUP );
+						}
+						$result = $capabilities;
+					}
+					break;
+
 				case "groups" :
 					$user_group_table = _groups_get_tablename( "user_group" );
 					$rows = $wpdb->get_results( $wpdb->prepare(
@@ -90,117 +202,124 @@ class Groups_User implements I_Capable {
 						}
 					}
 					break;
+
 				default:
 					$result = $this->user->$name;
 			}
 		}
 		return $result;
 	}
-	
+
 	/**
 	 * (non-PHPdoc)
 	 * @see I_Capable::can()
 	 */
 	public function can( $capability ) {
-		
+
 		global $wpdb;
 		$result = false;
-		
-		
-		
+
 		if ( $this->user !== null ) {
-			
-			// if administrators can override access, let them
-			if ( get_option( GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE, GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE_DEFAULT ) ) {
-				if ( user_can( $this->user->ID, 'administrator' ) ) { // just using $this->user would raise a warning on 3.2.1
-					return true;
-				}
-			}
-			
-			$group_table = _groups_get_tablename( "group" );
-			$capability_table = _groups_get_tablename( "capability" );
-			$group_capability_table = _groups_get_tablename( "group_capability" );
-			$user_group_table = _groups_get_tablename( "user_group" );
-			
-			// determine capability id
-			$capability_id = null;
-			if ( is_numeric( $capability ) ) {
-				$capability_id = Groups_Utility::id( $capability );
-			} else if ( is_string( $capability ) ) {
-				$capability_id = $wpdb->get_var( $wpdb->prepare(
-					"SELECT capability_id FROM $capability_table WHERE capability = %s",
-					$capability
-				) );
-			}
-			
-			if ( $capability_id !== null ) {
-				// either the user can ...
-				$result = ( Groups_User_Capability::read( $this->user->ID, $capability_id ) !== false );
-				// ... or the user can because a group the user belongs to can
-				if ( !$result ) {
-					// Important: before making any changes check
-					// INDEX usage on modified query!
-					$rows = $wpdb->get_results( $wpdb->prepare(
-						"SELECT capability_id FROM $group_capability_table WHERE capability_id = %d AND group_id IN (SELECT group_id FROM $user_group_table WHERE user_id = %d)",
-						Groups_Utility::id( $capability_id ),
-						Groups_Utility::id( $this->user->ID )
-					) );
-					if ( count( $rows ) > 0 ) {
-						$result = true;
+			if (
+				get_option( GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE, GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE_DEFAULT ) &&
+				user_can( $this->user->ID, 'administrator' ) // just using $this->user would raise a warning on 3.2.1
+			) {
+				$result = true;
+			} else {
+				// determine capability id
+				$capability_id = null;
+				if ( is_numeric( $capability ) ) {
+					$capability_id = Groups_Utility::id( $capability );
+					$capability_ids = wp_cache_get( self::CAPABILITY_IDS . $this->user->ID, self::CACHE_GROUP );
+					if ( $capability_ids === false ) {
+						$this->init_cache();
+						$capability_ids = wp_cache_get( self::CAPABILITY_IDS . $this->user->ID, self::CACHE_GROUP );
 					}
-				}
-				// ... or because any of the parent groups can
-				if ( !$result ) {
-					// search in parent groups
-					$limit = $wpdb->get_var( "SELECT COUNT(*) FROM $group_table" );
-					if ( $limit !== null ) {
-						
-						// note that limits by blog_id for multisite are
-						// enforced when a user is added to a blog
-						$user_groups = $wpdb->get_results( $wpdb->prepare(
-							"SELECT group_id FROM $user_group_table WHERE user_id = %d",
-							Groups_Utility::id( $this->user->ID )
-						) );
-						
-						if ( $user_groups ) {
-							$group_ids = array();
-							foreach( $user_groups as $user_group ) {
-								$group_ids[] = Groups_Utility::id( $user_group->group_id );
-							}
-							if ( count( $group_ids ) > 0 ) {
-								$iterations          = 0;
-								$old_group_ids_count = 0;
-								while( ( $iterations < $limit ) && ( count( $group_ids ) !== $old_group_ids_count ) ) {
-									$iterations++;
-									$old_group_ids_count = count( $group_ids );
-									$id_list = implode( ",", $group_ids );
-									$parent_group_ids = $wpdb->get_results(
-										"SELECT parent_id FROM $group_table WHERE parent_id IS NOT NULL AND group_id IN ($id_list)"
-									);
-									if ( $parent_group_ids ) {
-										foreach( $parent_group_ids as $parent_group_id ) {
-											$parent_group_id = Groups_Utility::id( $parent_group_id->parent_id );
-											if ( !in_array( $parent_group_id, $group_ids ) ) {
-												$group_ids[] = $parent_group_id;
-											}
-										}
-									}
-								}
-								$id_list = implode( ",", $group_ids );
-								$rows = $wpdb->get_results( $wpdb->prepare(
-									"SELECT capability_id FROM $group_capability_table WHERE capability_id = %d AND group_id IN ($id_list)",
-									Groups_Utility::id( $capability_id )
-								) );
-								if ( count( $rows ) > 0 ) {
-									$result = true;
-								}
-							}
-						}
+					$result = in_array( $capability_id, $capability_ids );
+				} else if ( is_string( $capability ) ) {
+					$capabilities = wp_cache_get( self::CAPABILITIES . $this->user->ID, self::CACHE_GROUP );
+					if ( $capabilities === false ) {
+						$this->init_cache();
+						$capabilities = wp_cache_get( self::CAPABILITIES . $this->user->ID, self::CACHE_GROUP );
 					}
+					$result = in_array( $capability, $capabilities );
 				}
 			}
 		}
-		$result = apply_filters_ref_array( "groups_user_can", array( $result, &$this, $capability ) );
 		return $result;
 	}
+
+	/**
+	 * Builds the cache entries for user groups and capabilities if needed.
+	 * The cache entries are built only if they do not already exist.
+	 * If you want them rebuilt, delete them before calling.
+	 */
+	private function init_cache() {
+
+		global $wpdb;
+
+		if ( ( $this->user !== null ) && ( wp_cache_get( self::GROUP_IDS . $this->user->ID, self::CACHE_GROUP ) === false ) ) {
+			$group_table            = _groups_get_tablename( "group" );
+			$capability_table       = _groups_get_tablename( "capability" );
+			$group_capability_table = _groups_get_tablename( "group_capability" );
+			$user_group_table       = _groups_get_tablename( "user_group" );
+			$limit = $wpdb->get_var( "SELECT COUNT(*) FROM $group_table" );
+			if ( $limit !== null ) {
+				// note that limits by blog_id for multisite are
+				// enforced when a user is added to a blog
+				$user_groups = $wpdb->get_results( $wpdb->prepare(
+					"SELECT group_id FROM $user_group_table WHERE user_id = %d",
+					Groups_Utility::id( $this->user->ID )
+				) );
+				// Get all groups the user belongs to directly or through
+				// inheritance along with their capabilities.
+				$capabilities   = array();
+				$capability_ids = array();
+				$group_ids      = array();
+				if ( $user_groups ) {
+					foreach( $user_groups as $user_group ) {
+						$group_ids[] = Groups_Utility::id( $user_group->group_id );
+					}
+					if ( count( $group_ids ) > 0 ) {
+						$iterations          = 0;
+						$old_group_ids_count = 0;
+						while( ( $iterations < $limit ) && ( count( $group_ids ) !== $old_group_ids_count ) ) {
+							$iterations++;
+							$old_group_ids_count = count( $group_ids );
+							$id_list = implode( ",", $group_ids );
+							$parent_group_ids = $wpdb->get_results(
+								"SELECT parent_id FROM $group_table WHERE parent_id IS NOT NULL AND group_id IN ($id_list)"
+							);
+							if ( $parent_group_ids ) {
+								foreach( $parent_group_ids as $parent_group_id ) {
+									$parent_group_id = Groups_Utility::id( $parent_group_id->parent_id );
+									if ( !in_array( $parent_group_id, $group_ids ) ) {
+										$group_ids[] = $parent_group_id;
+									}
+								}
+							}
+						}
+						$id_list = implode( ",", $group_ids );
+						$rows = $wpdb->get_results(
+							"SELECT $group_capability_table.capability_id, $capability_table.capability FROM $group_capability_table LEFT JOIN $capability_table ON $group_capability_table.capability_id = $capability_table.capability_id WHERE group_id IN ($id_list)"
+						);
+						if ( count( $rows ) > 0 ) {
+							foreach ( $rows as $row ) {
+								if ( !in_array( $row->capability_id, $capability_ids ) ) {
+									$capabilities[]   = $row->capability;
+									$capability_ids[] = $row->capability_id;
+								}
+							}
+						}
+						
+					}
+				}
+				wp_cache_set( self::CAPABILITIES . $this->user->ID, $capabilities, self::CACHE_GROUP );
+				wp_cache_set( self::CAPABILITY_IDS . $this->user->ID, $capability_ids, self::CACHE_GROUP );
+				wp_cache_set( self::GROUP_IDS . $this->user->ID, $group_ids, self::CACHE_GROUP );
+			}
+		}
+	}
+
 }
+Groups_User::init();
