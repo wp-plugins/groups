@@ -70,6 +70,7 @@ class Groups_User implements I_Capable {
 	 * @param unknown_type $group_id
 	 */
 	public static function clear_cache_for_group( $group_id ) {
+		global $wpdb;
 		if ( $group = Groups_Group::read( $group_id ) ) {
 			// not using $group->users, as we don't need a lot of user objects created here
 			$user_group_table = _groups_get_tablename( "user_group" );
