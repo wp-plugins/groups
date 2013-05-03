@@ -330,6 +330,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * Fix: added filter hooked on posts_where motivated by pagination issues - the posts must be filtered before the totals are calculated in WP_Query::get_posts().
 * Improvement: modified the signature of the the_posts filter method in Groups_Post_Access to receive the $query by reference
 * Improvement: a substantial improvement on overall performance is achieved by caching user capabilities and groups
+* Fix: capability used to allow to set access restrictions on media wasn't working, using upload_files now
 
 = 1.3.8 =
 * Fix: using substitute wp_cache_switch_to_blog instead of deprecated function wp_cache_reset when available (from 3.5.0)
