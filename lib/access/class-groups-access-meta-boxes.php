@@ -237,16 +237,24 @@ class Groups_Access_Meta_Boxes {
 	public static function attachment_fields_to_save( $post, $attachment ) {
 		$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
 		if ( !isset( $post_types_option['attachment']['add_meta_box'] ) || $post_types_option['attachment']['add_meta_box'] ) {
-			if ( current_user_can( 'edit_attachment' ) ) {
+			if ( current_user_can( 'upload_files' ) ) { // was edit_attachment which doesn't work o_O
 				if ( self::user_can_restrict() ) {
-					Groups_Post_Access::delete( $post['ID'], null );
-					if ( !empty( $attachment[self::CAPABILITY] ) ) {
-						foreach ( $attachment[self::CAPABILITY] as $capability_id ) {
-							if ( $capability = Groups_Capability::read( $capability_id ) ) {
-								Groups_Post_Access::create( array(
-									'post_id' => $post['ID'],
-									'capability' => $capability->capability
-								) );
+					$post_id = null;
+					if ( isset( $post['ID'] ) ) {
+						$post_id = $post['ID'];
+					} else if ( isset( $post['post_ID'] ) ) {
+						$post_id = $post['post_ID'];
+					}
+					if ( $post_id !== null ) {
+						Groups_Post_Access::delete( $post_id, null );
+						if ( !empty( $attachment[self::CAPABILITY] ) ) {
+							foreach ( $attachment[self::CAPABILITY] as $capability_id ) {
+								if ( $capability = Groups_Capability::read( $capability_id ) ) {
+									Groups_Post_Access::create( array(
+										'post_id' => $post_id,
+										'capability' => $capability->capability
+									) );
+								}
 							}
 						}
 					}
