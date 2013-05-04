@@ -161,23 +161,6 @@ class Groups_Access_Meta_Boxes {
 							// PHP Notice:  Undefined offset: 0 in /var/www/groups-forums/wp-includes/capabilities.php on line 1067 
 							if ( current_user_can( 'edit_'.$post_type, $post_id ) ) {
 								if ( self::user_can_restrict() ) {
-
-									// this would delete all caps including those that the user shouldn't be able to modify:
-// 									Groups_Post_Access::delete( $post_id, null );
-// 									$user = new Groups_User( get_current_user_id() );
-// 									if ( !empty( $_POST[self::CAPABILITY] ) ) {
-// 										foreach ( $_POST[self::CAPABILITY] as $capability_id ) {
-// 											if ( $capability = Groups_Capability::read( $capability_id ) ) {
-// 												if ( $user->can( $capability->capability_id ) ) {
-// 													Groups_Post_Access::create( array(
-// 														'post_id' => $post_id,
-// 														'capability' => $capability->capability
-// 													) );
-// 												}
-// 											}
-// 										}
-// 									}
-
 									$valid_read_caps = self::get_valid_read_caps_for_user();
 									foreach( $valid_read_caps as $valid_read_cap ) {
 										if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
@@ -216,21 +199,18 @@ class Groups_Access_Meta_Boxes {
 
 				$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
 				$read_caps = get_post_meta( $post->ID, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
-// 				$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
 				$valid_read_caps = self::get_valid_read_caps_for_user();
 				$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
 				$output .= '<ul>';
 				foreach( $valid_read_caps as $valid_read_cap ) {
 					if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
-// 						if ( $user->can( $capability->capability ) ) {
-							$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
-							$output .= '<li>';
-							$output .= '<label>';
-							$output .= '<input name="attachments[' . $post->ID . '][' . self::CAPABILITY . '][]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
-							$output .= wp_filter_nohtml_kses( $capability->capability );
-							$output .= '</label>';
-							$output .= '</li>';
-// 						}
+						$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
+						$output .= '<li>';
+						$output .= '<label>';
+						$output .= '<input name="attachments[' . $post->ID . '][' . self::CAPABILITY . '][]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
+						$output .= wp_filter_nohtml_kses( $capability->capability );
+						$output .= '</label>';
+						$output .= '</li>';
 					}
 				}
 				$output .= '</ul>';
@@ -270,22 +250,6 @@ class Groups_Access_Meta_Boxes {
 					$post_id = $post['post_ID'];
 				}
 				if ( $post_id !== null ) {
-					// this would remove all capabilities, even those that
-					// the current user shouldn't be able to modify
-// 					Groups_Post_Access::delete( $post_id, null );
-// 					$user = new Groups_User( get_current_user_id() );
-// 					if ( !empty( $attachment[self::CAPABILITY] ) ) {
-// 						foreach ( $attachment[self::CAPABILITY] as $capability_id ) {
-// 							if ( $capability = Groups_Capability::read( $capability_id ) ) {
-// 								if ( $user->can( $capability->capability_id ) ) {
-// 									Groups_Post_Access::create( array(
-// 										'post_id' => $post_id,
-// 										'capability' => $capability->capability
-// 									) );
-// 								}
-// 							}
-// 						}
-// 					}
 					$valid_read_caps = self::get_valid_read_caps_for_user();
 					foreach( $valid_read_caps as $valid_read_cap ) {
 						if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
