@@ -265,6 +265,7 @@ class Groups_User implements I_Capable {
 			$capability_table       = _groups_get_tablename( "capability" );
 			$group_capability_table = _groups_get_tablename( "group_capability" );
 			$user_group_table       = _groups_get_tablename( "user_group" );
+			$user_capability_table  = _groups_get_tablename( "user_capability" );
 			$limit = $wpdb->get_var( "SELECT COUNT(*) FROM $group_table" );
 			if ( $limit !== null ) {
 				// note that limits by blog_id for multisite are
@@ -273,10 +274,22 @@ class Groups_User implements I_Capable {
 					"SELECT group_id FROM $user_group_table WHERE user_id = %d",
 					Groups_Utility::id( $this->user->ID )
 				) );
-				// Get all groups the user belongs to directly or through
-				// inheritance along with their capabilities.
+				// get all capabilities directly assigned (those granted through
+				// groups are added below
 				$capabilities   = array();
 				$capability_ids = array();
+				$user_capabilities = $wpdb->get_results( $wpdb->prepare(
+					"SELECT c.capability_id, c.capability FROM $user_capability_table uc LEFT JOIN $capability_table c ON c.capability_id = uc.capability_id WHERE user_id = %d",
+					Groups_Utility::id( $this->user->ID )
+				) );
+				if ( $user_capabilities ) {
+					foreach( $user_capabilities as $user_capability ) {
+						$capabilities[]   = $user_capability->capability;
+						$capability_ids[] = $user_capability->capability_id;
+					}
+				}
+				// Get all groups the user belongs to directly or through
+				// inheritance along with their capabilities.
 				$group_ids      = array();
 				if ( $user_groups ) {
 					foreach( $user_groups as $user_group ) {

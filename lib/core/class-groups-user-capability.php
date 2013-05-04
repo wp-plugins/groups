@@ -35,6 +35,8 @@ class Groups_User_Capability {
 		// when a user is deleted, user-capabilities must be removed
 		// triggered by wp_delete_user()
 		add_action( "deleted_user", array( __CLASS__, "deleted_user" ) );
+		// when a capability is deleted the relationship must also be resolved
+		add_action( 'groups_deleted_capability', array( __CLASS__, 'groups_deleted_capability' ) );
 	}
 	
 	/**
@@ -173,6 +175,27 @@ class Groups_User_Capability {
 			foreach( $rows as $row ) {
 				// don't optimize that in preference of a standard deletion
 				// process (trigger actions ...)
+				self::delete( $row->user_id, $row->capability_id );
+			}
+		}
+	}
+	
+	/**
+	 * Hooks into groups_deleted_capability to resolve all existing relations
+	 * between users and the deleted capability.
+	 * @param int $capability_id
+	 */
+	public static function groups_deleted_capability( $capability_id ) {
+		global $wpdb;
+
+		$user_capability_table = _groups_get_tablename( "user_capability" );
+		$rows = $wpdb->get_results( $wpdb->prepare(
+			"SELECT * FROM $user_capability_table WHERE capability_id = %d",
+			Groups_Utility::id( $capability_id )
+		) );
+		if ( $rows ) {
+			foreach( $rows as $row ) {
+				// do NOT 'optimize' (must trigger actions ... same as above)
 				self::delete( $row->user_id, $row->capability_id );
 			}
 		}
