@@ -21,6 +21,12 @@
 
 /**
  * Post access restrictions.
+ * 
+ * @todo when wp_count_posts() provides reasonable filters, use them so that
+ * the post counts displayed on top are in line with the actual posts that
+ * are displayed in the table; same for wp_count_attachments()
+ * @see http://core.trac.wordpress.org/ticket/16603
+ * 
  */
 class Groups_Post_Access {
 	
