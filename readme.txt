@@ -23,6 +23,7 @@ It integrates standard WordPress capabilities and application-specific capabilit
 - [Groups Jigoshop](http://jigoshop.com/product/subscriptions/) Groups integration for Jigoshop that supports memberships and subscriptions.
 - [Groups Notifications](http://www.itthinx.com/plugins/groups-notifications/) Adds customizable notifications for events related to Groups.
 - [Groups PayPal](http://www.itthinx.com/plugins/groups-paypal/) Groups for PayPal allows to sell memberships and subscriptions with Groups.
+- [Groups Subscriptions](http://www.itthinx.com/plugins/groups-subscriptions/) A subscription framework for Groups used by other extensions.
 - [Groups WooCommerce](http://www.woothemes.com/extension/groups-woocommerce/) Groups for WooCommerce is a WordPress plugin that allows you to sell memberships.
 - [Groups 404 Redirect](http://wordpress.org/extend/plugins/groups-404-redirect/) Redirects 404's caused by hits on pages that are protected by Groups.
 
