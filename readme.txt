@@ -4,7 +4,7 @@ Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, memberships, paypal, permission, permissions, subscription, subscriptions, woocommerce
 Requires at least: 3.3
 Tested up to: 3.5.1
-Stable tag: 1.3.8
+Stable tag: 1.3.9
 License: GPLv3
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
@@ -23,6 +23,7 @@ It integrates standard WordPress capabilities and application-specific capabilit
 - [Groups Jigoshop](http://jigoshop.com/product/subscriptions/) Groups integration for Jigoshop that supports memberships and subscriptions.
 - [Groups Notifications](http://www.itthinx.com/plugins/groups-notifications/) Adds customizable notifications for events related to Groups.
 - [Groups PayPal](http://www.itthinx.com/plugins/groups-paypal/) Groups for PayPal allows to sell memberships and subscriptions with Groups.
+- [Groups Subscriptions](http://www.itthinx.com/plugins/groups-subscriptions/) A subscription framework for Groups used by other extensions.
 - [Groups WooCommerce](http://www.woothemes.com/extension/groups-woocommerce/) Groups for WooCommerce is a WordPress plugin that allows you to sell memberships.
 - [Groups 404 Redirect](http://wordpress.org/extend/plugins/groups-404-redirect/) Redirects 404's caused by hits on pages that are protected by Groups.
 
