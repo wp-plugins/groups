@@ -233,15 +233,13 @@ class Groups_User implements I_Capable {
 					$capability_id = Groups_Utility::id( $capability );
 					$capability_ids = wp_cache_get( self::CAPABILITY_IDS . $this->user->ID, self::CACHE_GROUP );
 					if ( $capability_ids === false ) {
-						$this->init_cache();
-						$capability_ids = wp_cache_get( self::CAPABILITY_IDS . $this->user->ID, self::CACHE_GROUP );
+						$this->init_cache( $capability_ids );
 					}
 					$result = in_array( $capability_id, $capability_ids );
 				} else if ( is_string( $capability ) ) {
 					$capabilities = wp_cache_get( self::CAPABILITIES . $this->user->ID, self::CACHE_GROUP );
 					if ( $capabilities === false ) {
-						$this->init_cache();
-						$capabilities = wp_cache_get( self::CAPABILITIES . $this->user->ID, self::CACHE_GROUP );
+						$this->init_cache( $capability_ids, $capabilities );
 					}
 					$result = in_array( $capability, $capabilities );
 				}
@@ -255,10 +253,18 @@ class Groups_User implements I_Capable {
 	 * Builds the cache entries for user groups and capabilities if needed.
 	 * The cache entries are built only if they do not already exist.
 	 * If you want them rebuilt, delete them before calling.
+	 * 
+	 * @param array $capability_ids carries the capability ids for the user on return, but only if cache entries have been built; will provide an empty array by default
+	 * @param array $capabilities carries the capabilities for the user on return, but only if cache entries have been built; will provide an empty array by default
+	 * @param array $group_ids carries the group ids for the user on return, but only if cache entries have been built; will provide an empty array by default
 	 */
-	private function init_cache() {
+	private function init_cache( &$capability_ids = null, &$capabilities = null, &$group_ids = null ) {
 
 		global $wpdb;
+
+		$capabilities   = array();
+		$capability_ids = array();
+		$group_ids      = array();
 
 		if ( ( $this->user !== null ) && ( wp_cache_get( self::GROUP_IDS . $this->user->ID, self::CACHE_GROUP ) === false ) ) {
 			$group_table            = _groups_get_tablename( "group" );
@@ -266,10 +272,6 @@ class Groups_User implements I_Capable {
 			$group_capability_table = _groups_get_tablename( "group_capability" );
 			$user_group_table       = _groups_get_tablename( "user_group" );
 			$user_capability_table  = _groups_get_tablename( "user_capability" );
-
-			$capabilities   = array();
-			$capability_ids = array();
-			$group_ids      = array();
 
 			$limit = $wpdb->get_var( "SELECT COUNT(*) FROM $group_table" );
 			if ( $limit === null ) {
