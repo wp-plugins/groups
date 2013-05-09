@@ -245,7 +245,7 @@ class Groups_Admin_Users {
 					}
 					$output .= '</ul>';
 				} else {
-					$output .= __( '--' );
+					$output .= __( '--', GROUPS_PLUGIN_DOMAIN );
 				}
 				break;
 		}
