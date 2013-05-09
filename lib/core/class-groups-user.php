@@ -266,6 +266,11 @@ class Groups_User implements I_Capable {
 			$group_capability_table = _groups_get_tablename( "group_capability" );
 			$user_group_table       = _groups_get_tablename( "user_group" );
 			$user_capability_table  = _groups_get_tablename( "user_capability" );
+
+			$capabilities   = array();
+			$capability_ids = array();
+			$group_ids      = array();
+
 			$limit = $wpdb->get_var( "SELECT COUNT(*) FROM $group_table" );
 			if ( $limit !== null ) {
 				// note that limits by blog_id for multisite are
@@ -276,8 +281,6 @@ class Groups_User implements I_Capable {
 				) );
 				// get all capabilities directly assigned (those granted through
 				// groups are added below
-				$capabilities   = array();
-				$capability_ids = array();
 				$user_capabilities = $wpdb->get_results( $wpdb->prepare(
 					"SELECT c.capability_id, c.capability FROM $user_capability_table uc LEFT JOIN $capability_table c ON c.capability_id = uc.capability_id WHERE user_id = %d",
 					Groups_Utility::id( $this->user->ID )
@@ -290,7 +293,7 @@ class Groups_User implements I_Capable {
 				}
 				// Get all groups the user belongs to directly or through
 				// inheritance along with their capabilities.
-				$group_ids      = array();
+				
 				if ( $user_groups ) {
 					foreach( $user_groups as $user_group ) {
 						$group_ids[] = Groups_Utility::id( $user_group->group_id );
@@ -329,10 +332,10 @@ class Groups_User implements I_Capable {
 						
 					}
 				}
-				wp_cache_set( self::CAPABILITIES . $this->user->ID, $capabilities, self::CACHE_GROUP );
-				wp_cache_set( self::CAPABILITY_IDS . $this->user->ID, $capability_ids, self::CACHE_GROUP );
-				wp_cache_set( self::GROUP_IDS . $this->user->ID, $group_ids, self::CACHE_GROUP );
 			}
+			wp_cache_set( self::CAPABILITIES . $this->user->ID, $capabilities, self::CACHE_GROUP );
+			wp_cache_set( self::CAPABILITY_IDS . $this->user->ID, $capability_ids, self::CACHE_GROUP );
+			wp_cache_set( self::GROUP_IDS . $this->user->ID, $group_ids, self::CACHE_GROUP );
 		}
 	}
 
