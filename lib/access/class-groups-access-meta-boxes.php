@@ -132,6 +132,15 @@ class Groups_Access_Meta_Boxes {
 		} else {
 			$output .= '<p class="description">';
 			$output .= sprintf( __( 'You cannot set any access restrictions.', GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
+			$style = 'cursor:help;vertical-align:middle;';
+			if ( current_user_can( GROUPS_ADMINISTER_OPTIONS ) ) {
+				$style = 'cursor:pointer;vertical-align:middle;';
+				$output .= sprintf( '<a href="%s">', esc_url( admin_url( 'admin.php?page=groups-admin-options' ) ) );
+			}
+			$output .= sprintf( '<img style="%s" alt="?" title="%s" src="%s" />', $style, esc_attr( __( 'You must be in a group that has at least one capability enabled to enforce read access.', GROUPS_PLUGIN_DOMAIN ) ), esc_attr( GROUPS_PLUGIN_URL . 'images/help.png' ) );
+			if ( current_user_can( GROUPS_ADMINISTER_OPTIONS ) ) {
+				$output .= '</a>';
+			}
 			$output .= '</p>';
 		}
 

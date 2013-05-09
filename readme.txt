@@ -331,6 +331,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * Fix: Under certain conditions with caching involved, capabilities were not correctly retrieved. Thanks to Jason Kadlec who [reported the issue](http://wordpress.org/support/topic/nasty-error-with-latest-version).
 * Improvement: Related to the above fix, improved the way how *_deep properties are retrieved on cache misses, resulting in slightly better performance.
 * Fix: Added a missing text domain.
+* Improvement: Added help icon when user has no access restriction capabilities.
 
 = 1.3.9 =
 * Fix: added filter hooked on posts_where motivated by pagination issues - the posts must be filtered before the totals are calculated in WP_Query::get_posts().
