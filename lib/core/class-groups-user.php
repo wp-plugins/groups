@@ -133,8 +133,7 @@ class Groups_User implements I_Capable {
 					if ( $this->user !== null ) {
 						$capability_ids = wp_cache_get( self::CAPABILITY_IDS . $this->user->ID, self::CACHE_GROUP );
 						if ( $capability_ids === false ) {
-							$this->init_cache();
-							$capability_ids = wp_cache_get( self::CAPABILITY_IDS . $this->user->ID, self::CACHE_GROUP );
+							$this->init_cache( $capability_ids );
 						}
 						$result = $capability_ids;
 					}
@@ -158,8 +157,7 @@ class Groups_User implements I_Capable {
 					if ( $this->user !== null ) {
 						$groups_ids = wp_cache_get( self::GROUP_IDS . $this->user->ID, self::CACHE_GROUP );
 						if ( $group_ids === false ) {
-							$this->init_cache();
-							$group_ids = wp_cache_get( self::GROUP_IDS . $this->user->ID, self::CACHE_GROUP );
+							$this->init_cache( $capability_ids, $capabilities, $group_ids );
 						}
 						$result = $group_ids;
 					}
@@ -183,8 +181,7 @@ class Groups_User implements I_Capable {
 					if ( $this->user !== null ) {
 						$capabilities = wp_cache_get( self::CAPABILITIES . $this->user->ID, self::CACHE_GROUP );
 						if ( $capabilities === false ) {
-							$this->init_cache();
-							$capabilities = wp_cache_get( self::CAPABILITIES . $this->user->ID, self::CACHE_GROUP );
+							$this->init_cache( $capability_ids, $capabilities );
 						}
 						$result = $capabilities;
 					}
