@@ -272,65 +272,67 @@ class Groups_User implements I_Capable {
 			$group_ids      = array();
 
 			$limit = $wpdb->get_var( "SELECT COUNT(*) FROM $group_table" );
-			if ( $limit !== null ) {
-				// note that limits by blog_id for multisite are
-				// enforced when a user is added to a blog
-				$user_groups = $wpdb->get_results( $wpdb->prepare(
-					"SELECT group_id FROM $user_group_table WHERE user_id = %d",
-					Groups_Utility::id( $this->user->ID )
-				) );
-				// get all capabilities directly assigned (those granted through
-				// groups are added below
-				$user_capabilities = $wpdb->get_results( $wpdb->prepare(
-					"SELECT c.capability_id, c.capability FROM $user_capability_table uc LEFT JOIN $capability_table c ON c.capability_id = uc.capability_id WHERE user_id = %d",
-					Groups_Utility::id( $this->user->ID )
-				) );
-				if ( $user_capabilities ) {
-					foreach( $user_capabilities as $user_capability ) {
-						$capabilities[]   = $user_capability->capability;
-						$capability_ids[] = $user_capability->capability_id;
-					}
+			if ( $limit === null ) {
+				$limit = 1;
+			}
+
+			// note that limits by blog_id for multisite are
+			// enforced when a user is added to a blog
+			$user_groups = $wpdb->get_results( $wpdb->prepare(
+				"SELECT group_id FROM $user_group_table WHERE user_id = %d",
+				Groups_Utility::id( $this->user->ID )
+			) );
+			// get all capabilities directly assigned (those granted through
+			// groups are added below
+			$user_capabilities = $wpdb->get_results( $wpdb->prepare(
+				"SELECT c.capability_id, c.capability FROM $user_capability_table uc LEFT JOIN $capability_table c ON c.capability_id = uc.capability_id WHERE user_id = %d",
+				Groups_Utility::id( $this->user->ID )
+			) );
+			if ( $user_capabilities ) {
+				foreach( $user_capabilities as $user_capability ) {
+					$capabilities[]   = $user_capability->capability;
+					$capability_ids[] = $user_capability->capability_id;
 				}
-				// Get all groups the user belongs to directly or through
-				// inheritance along with their capabilities.
-				
-				if ( $user_groups ) {
-					foreach( $user_groups as $user_group ) {
-						$group_ids[] = Groups_Utility::id( $user_group->group_id );
-					}
-					if ( count( $group_ids ) > 0 ) {
-						$iterations          = 0;
-						$old_group_ids_count = 0;
-						while( ( $iterations < $limit ) && ( count( $group_ids ) !== $old_group_ids_count ) ) {
-							$iterations++;
-							$old_group_ids_count = count( $group_ids );
-							$id_list = implode( ",", $group_ids );
-							$parent_group_ids = $wpdb->get_results(
-								"SELECT parent_id FROM $group_table WHERE parent_id IS NOT NULL AND group_id IN ($id_list)"
-							);
-							if ( $parent_group_ids ) {
-								foreach( $parent_group_ids as $parent_group_id ) {
-									$parent_group_id = Groups_Utility::id( $parent_group_id->parent_id );
-									if ( !in_array( $parent_group_id, $group_ids ) ) {
-										$group_ids[] = $parent_group_id;
-									}
-								}
-							}
-						}
+			}
+			// Get all groups the user belongs to directly or through
+			// inheritance along with their capabilities.
+			
+			if ( $user_groups ) {
+				foreach( $user_groups as $user_group ) {
+					$group_ids[] = Groups_Utility::id( $user_group->group_id );
+				}
+				if ( count( $group_ids ) > 0 ) {
+					$iterations          = 0;
+					$old_group_ids_count = 0;
+					while( ( $iterations < $limit ) && ( count( $group_ids ) !== $old_group_ids_count ) ) {
+						$iterations++;
+						$old_group_ids_count = count( $group_ids );
 						$id_list = implode( ",", $group_ids );
-						$rows = $wpdb->get_results(
-							"SELECT $group_capability_table.capability_id, $capability_table.capability FROM $group_capability_table LEFT JOIN $capability_table ON $group_capability_table.capability_id = $capability_table.capability_id WHERE group_id IN ($id_list)"
+						$parent_group_ids = $wpdb->get_results(
+							"SELECT parent_id FROM $group_table WHERE parent_id IS NOT NULL AND group_id IN ($id_list)"
 						);
-						if ( count( $rows ) > 0 ) {
-							foreach ( $rows as $row ) {
-								if ( !in_array( $row->capability_id, $capability_ids ) ) {
-									$capabilities[]   = $row->capability;
-									$capability_ids[] = $row->capability_id;
+						if ( $parent_group_ids ) {
+							foreach( $parent_group_ids as $parent_group_id ) {
+								$parent_group_id = Groups_Utility::id( $parent_group_id->parent_id );
+								if ( !in_array( $parent_group_id, $group_ids ) ) {
+									$group_ids[] = $parent_group_id;
 								}
 							}
 						}
-						
 					}
+					$id_list = implode( ",", $group_ids );
+					$rows = $wpdb->get_results(
+						"SELECT $group_capability_table.capability_id, $capability_table.capability FROM $group_capability_table LEFT JOIN $capability_table ON $group_capability_table.capability_id = $capability_table.capability_id WHERE group_id IN ($id_list)"
+					);
+					if ( count( $rows ) > 0 ) {
+						foreach ( $rows as $row ) {
+							if ( !in_array( $row->capability_id, $capability_ids ) ) {
+								$capabilities[]   = $row->capability;
+								$capability_ids[] = $row->capability_id;
+							}
+						}
+					}
+					
 				}
 			}
 			wp_cache_set( self::CAPABILITIES . $this->user->ID, $capabilities, self::CACHE_GROUP );
