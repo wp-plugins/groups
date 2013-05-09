@@ -332,6 +332,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * Improvement: Related to the above fix, improved the way how *_deep properties are retrieved on cache misses, resulting in slightly better performance.
 * Fix: Added a missing text domain.
 * Improvement: Added help icon when user has no access restriction capabilities.
+* Fix: Redirecting after group action in users screen to end up with a clean admin URL.
 
 = 1.3.9 =
 * Fix: added filter hooked on posts_where motivated by pagination issues - the posts must be filtered before the totals are calculated in WP_Query::get_posts().
