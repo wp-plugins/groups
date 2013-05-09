@@ -327,6 +327,11 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.10 =
+* Fix: Under certain conditions with caching involved, capabilities were not correctly retrieved. Thanks to Jason Kadlec who [reported the issue](http://wordpress.org/support/topic/nasty-error-with-latest-version).
+* Improvement: Related to the above fix, improved the way how *_deep properties are retrieved on cache misses, resulting in slightly better performance.
+* Fix: Added a missing text domain.
+
 = 1.3.9 =
 * Fix: added filter hooked on posts_where motivated by pagination issues - the posts must be filtered before the totals are calculated in WP_Query::get_posts().
 * Improvement: modified the signature of the the_posts filter method in Groups_Post_Access to receive the $query by reference
@@ -447,6 +452,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.3.10 =
+* Improves performance slightly more and fixes potential issues with caching.
 
 = 1.3.9 =
 * Brings a substantial performance improvement and solves pagination issues due to post filters among other fixes.
