@@ -206,6 +206,12 @@ class Groups_Admin_Users {
 								break;
 						}
 					}
+					$referer = wp_get_referer();
+					if ( $referer ) {
+						$redirect_to = remove_query_arg( array( 'action', 'action2', 'add-to-group', 'bulk-user-group-nonce', 'group_id', 'new_role', 'remove-from-group', 'users' ), $referer );
+						wp_redirect( $redirect_to );
+						exit;
+					}
 				}
 			}
 		}
