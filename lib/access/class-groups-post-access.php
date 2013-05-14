@@ -152,7 +152,7 @@ class Groups_Post_Access {
 			" AND {$wpdb->posts}.ID IN " .
 			" ( " .
 			"   SELECT ID FROM $wpdb->posts WHERE ID NOT IN ( SELECT post_id FROM $wpdb->postmeta WHERE {$wpdb->postmeta}.meta_key = '%s' ) " . // posts without access restriction
-			"   UNION ALL " .
+			"   UNION ALL " . // we don't care about duplicates here, just make it quick
 			"   SELECT post_id AS ID FROM $wpdb->postmeta WHERE {$wpdb->postmeta}.meta_key = '%s' AND {$wpdb->postmeta}.meta_value IN (%s) " . // posts that require any capability the user has
 			" ) ",
 			self::POSTMETA_PREFIX . self::READ_POST_CAPABILITY,
