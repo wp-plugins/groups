@@ -151,6 +151,12 @@ You can see this only if you have the edit_posts capability.
 Users - group membership is managed from the standard Users admin view.
 Users are automatically added to the _Registered_ group. You can add multiple users to other groups here and also remove them.
 
+### Integration in user profiles: ###
+
+Group memberships can be shown on the user profile page and edited by users who can *Administer groups*.
+
+This option is disabled by default and can be enabled under *Groups > Options > User profiles*.
+
 ### Sections in the 'Groups' menu: ###
 
 #### Groups ####
@@ -169,10 +175,12 @@ Capabilities can be assigned to groups and users (1). These capabilities include
 the *standard WordPress capabilities* but you can also define additional
 capabilities for your web-application.
 
-Groups defines the *groups_read_post* capability by default which can be
+Groups defines the `groups_read_post` capability by default which can be
 used to restrict access to certain posts or pages to groups (and users)
 with that capability only. Additional capabilities can be identified on the
 *Groups > Options* admin screen that may be used to limit access.
+
+A user *must* be a member of a group that has the desired capability to restrict access. For example, in order to apply the `groups_read_post` capability, the user must belong to a group which has that capability assigned.
 
 (1) Assigning capabilities to users is not integrated in the user interface yet but can be done through API calls.
 
@@ -181,6 +189,21 @@ with that capability only. Additional capabilities can be identified on the
 ##### Administrator override #####
 
 Administrator overrides can be turned off.
+
+##### Access restrictions #####
+
+Post types : Access restrictions can be enabled or disabled for standard (Post, Page and Media) and custom post types.
+Capabilities : Here specific capabilities can be enabled or disabled to restrict access to posts. The standard `groups_read_post` capability is enabled by default.
+
+Note that to apply an access restriction on a post, the user must belong to a group which has that capability.
+
+##### User profiles #####
+
+Groups can be shown in user profiles, users who can *Administer groups* can edit group memberships on a user's profile page.
+
+##### Tree view #####
+
+The tree view adds a menu item to the Groups menu which shows the group hierarchy.
 
 ##### Permissions #####
 
@@ -311,6 +334,14 @@ Example: Green and Red members
 5. Now create an example post that only members of the *Green Members* group should be able to see and tick the *green* checkbox under _Access restrictions_.
 6. Create another post for *Red Members* and tick the *red* checkbox for that post.
 7. Assign a test user to any of the above groups, log in as that user and the post will be accessible.
+
+= Are access restrictions for Custom Post Types supported? =
+
+Yes. Access restrictions can be turned on or off for specific CPTs on the *Groups > Options* page.
+
+= How can I show groups that users belong to on their profile page in the admin section? =
+
+Go to *Groups > Options* and enable the option under *User profiles*.
 
 == Screenshots ==
 
