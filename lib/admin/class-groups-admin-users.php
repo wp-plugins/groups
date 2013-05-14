@@ -243,6 +243,7 @@ class Groups_Admin_Users {
 				$groups_user = new Groups_User( $user_id );
 				$groups = $groups_user->groups;
 				if ( count( $groups ) > 0 ) {
+					usort( $groups, array( __CLASS__, 'by_group_name' ) );
 					$output = '<ul>';
 					foreach( $groups as $group ) {
 						$output .= '<li>';
@@ -258,5 +259,14 @@ class Groups_Admin_Users {
 		return $output;
 	}
 	
+	/**
+	 * usort helper
+	 * @param Groups_Group $o1
+	 * @param Groups_Group $o2
+	 * @return int strcmp result for group names
+	 */
+	public static function by_group_name( $o1, $o2 ) {
+		return strcmp( $o1->name, $o2->name );
+	}
 }
 Groups_Admin_Users::init();

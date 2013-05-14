@@ -329,6 +329,8 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 = 1.3.11 =
 * Fix: Access restriction capabilities must be disjunctive.
+* Added: List of groups can be shown in user profiles on the back end and group assignments can be edited by group admins.
+* Improvement: Groups shown for users on the Users screen are sorted by name.
 
 = 1.3.10 =
 * Fix: Under certain conditions with caching involved, capabilities were not correctly retrieved. Thanks to Jason Kadlec who [reported the issue](http://wordpress.org/support/topic/nasty-error-with-latest-version).
@@ -459,7 +461,7 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 == Upgrade Notice ==
 
 = 1.3.11 =
-* Fixes too restrictive access: the capabilities used to restrict access to posts should be disjunctive.
+* Fixes too restrictive access: the capabilities used to restrict access to posts should be disjunctive. Adds the option to show and edit group memberships in user profiles. 
 
 = 1.3.10 =
 * Improves performance slightly more and fixes potential issues with caching.

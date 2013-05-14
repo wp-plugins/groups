@@ -93,3 +93,15 @@ define( 'GROUPS_SHOW_TREE_VIEW', 'groups-show-tree-view' );
 * @var boolean
 */
 define( 'GROUPS_SHOW_TREE_VIEW_DEFAULT', false );
+
+/**
+ * Option to show groups info in the user profile.
+ * @var string
+ */
+define( 'GROUPS_SHOW_IN_USER_PROFILE', 'groups-show-in-user-profile' );
+
+/**
+ * Default for showing groups in user profiles.
+ * @var boolean
+ */
+define( 'GROUPS_SHOW_IN_USER_PROFILE_DEFAULT', false );

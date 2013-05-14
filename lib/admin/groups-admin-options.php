@@ -98,6 +98,9 @@ function groups_admin_options() {
 				Groups_Options::update_option( GROUPS_SHOW_TREE_VIEW, false );
 			}
 			
+			// show in user profiles
+			Groups_Options::update_option( GROUPS_SHOW_IN_USER_PROFILE, !empty( $_POST[GROUPS_SHOW_IN_USER_PROFILE] ) );
+			
 			// roles & capabilities
 			$rolenames = $wp_roles->get_names();
 			foreach ( $rolenames as $rolekey => $rolename ) {
@@ -127,6 +130,7 @@ function groups_admin_options() {
 	$admin_override = get_option( GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE, GROUPS_ADMINISTRATOR_ACCESS_OVERRIDE_DEFAULT );
 	
 	$show_tree_view = Groups_Options::get_option( GROUPS_SHOW_TREE_VIEW, GROUPS_SHOW_TREE_VIEW_DEFAULT );
+	$show_in_user_profile = Groups_Options::get_option( GROUPS_SHOW_IN_USER_PROFILE, GROUPS_SHOW_IN_USER_PROFILE_DEFAULT );
 	
 	$rolenames = $wp_roles->get_names();
 	$caps_table = '<table class="groups-permissions">';
@@ -246,13 +250,23 @@ function groups_admin_options() {
 	}
 	
 	echo
+		'<h3>' . __( 'User profiles', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
+		'<p>' .
+		'<label>' .
+		'<input name="' . GROUPS_SHOW_IN_USER_PROFILE . '" type="checkbox" ' . ( $show_in_user_profile ? 'checked="checked"' : '' ) . '/>' .
+		__( 'Show groups in user profiles.', GROUPS_PLUGIN_DOMAIN ) .
+		'</label>' .
+		'</p>';
+	
+	echo
 		'<h3>' . __( 'Tree view', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
 		'<p>' .
 		'<label>' .
 		'<input name="' . GROUPS_SHOW_TREE_VIEW . '" type="checkbox" ' . ( $show_tree_view ? 'checked="checked"' : '' ) . '/>' .
 		__( 'Show the Groups tree view.', GROUPS_PLUGIN_DOMAIN ) .
 		'</label>' .
-		'</p>';	
+		'</p>';
+		
 	echo
 		'<h3>' . __( 'Permissions', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
 		'<p>' . __( 'These permissions apply to Groups management. They do not apply to access permissions derived from Groups capabilities.', GROUPS_PLUGIN_DOMAIN ) . '</p>' .
