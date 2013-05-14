@@ -74,10 +74,9 @@ class Groups_Admin_User_Profile {
 				$output .= '<ul>';
 				foreach( $groups as $group ) {
 					$is_member = Groups_User_Group::read( $user->ID, $group->group_id ) ? true : false;
-					$disabled = $group->name === Groups_Registered::REGISTERED_GROUP_NAME;
 					$output .= '<li>';
 					$output .= '<label>';
-					$output .= sprintf( '<input type="checkbox" name="group_ids[]" value="%d" %s %s />', Groups_Utility::id( $group->group_id ), $is_member ? ' checked="checked" ' : '', $disabled ? ' disabled="disabled" ' : '' );
+					$output .= sprintf( '<input type="checkbox" name="group_ids[]" value="%d" %s />', Groups_Utility::id( $group->group_id ), $is_member ? ' checked="checked" ' : '' );
 					$output .= ' ';
 					$output .= wp_filter_nohtml_kses( $group->name );
 					$output .= '</label>';
@@ -120,10 +119,8 @@ class Groups_Admin_User_Profile {
 							Groups_User_Group::create( array( 'user_id' => $user_id, 'group_id' => $group->group_id ) );
 						}
 					} else {
-						if ( $group->name !== Groups_Registered::REGISTERED_GROUP_NAME ) {
-							if ( Groups_User_Group::read( $user_id, $group->group_id ) ) {
-								Groups_User_Group::delete( $user_id, $group->group_id );
-							}
+						if ( Groups_User_Group::read( $user_id, $group->group_id ) ) {
+							Groups_User_Group::delete( $user_id, $group->group_id );
 						}
 					}
 				}
