@@ -138,8 +138,24 @@ class Groups_Post_Access {
 
 		// 2. Filter the posts that require a capability that the user doesn't
 		// have, or in other words: exclude posts that the user must NOT access:
+		
+		// The following is not correct in that it requires the user to have ALL capabilities:
+// 		$where .= sprintf(
+// 			" AND {$wpdb->posts}.ID NOT IN (SELECT DISTINCT ID FROM $wpdb->posts LEFT JOIN $wpdb->postmeta on {$wpdb->posts}.ID = {$wpdb->postmeta}.post_id WHERE {$wpdb->postmeta}.meta_key = '%s' AND {$wpdb->postmeta}.meta_value NOT IN (%s) ) ",
+// 			self::POSTMETA_PREFIX . self::READ_POST_CAPABILITY,
+// 			$caps
+// 		);
+
+		// This allows the user to access posts where the posts are not restricted or where
+		// the user has ANY of the capabilities:
 		$where .= sprintf(
-			" AND {$wpdb->posts}.ID NOT IN (SELECT DISTINCT ID FROM $wpdb->posts LEFT JOIN $wpdb->postmeta on {$wpdb->posts}.ID = {$wpdb->postmeta}.post_id WHERE {$wpdb->postmeta}.meta_key = '%s' AND {$wpdb->postmeta}.meta_value NOT IN (%s) ) ",
+			" AND {$wpdb->posts}.ID IN " .
+			" ( " .
+			"   SELECT ID FROM $wpdb->posts WHERE ID NOT IN ( SELECT post_id FROM $wpdb->postmeta WHERE {$wpdb->postmeta}.meta_key = '%s' ) " . // posts without access restriction
+			"   UNION " . // @todo use UNION ALL
+			"   SELECT post_id AS ID FROM $wpdb->postmeta WHERE {$wpdb->postmeta}.meta_key = '%s' AND {$wpdb->postmeta}.meta_value IN (%s) " . // posts that require any capability the user has
+			" ) ",
+			self::POSTMETA_PREFIX . self::READ_POST_CAPABILITY,
 			self::POSTMETA_PREFIX . self::READ_POST_CAPABILITY,
 			$caps
 		);

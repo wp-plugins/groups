@@ -327,6 +327,9 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.11 =
+* Fix: Access restriction capabilities must be disjunctive.
+
 = 1.3.10 =
 * Fix: Under certain conditions with caching involved, capabilities were not correctly retrieved. Thanks to Jason Kadlec who [reported the issue](http://wordpress.org/support/topic/nasty-error-with-latest-version).
 * Improvement: Related to the above fix, improved the way how *_deep properties are retrieved on cache misses, resulting in slightly better performance.
@@ -454,6 +457,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.3.11 =
+* Fixes too restrictive access: the capabilities used to restrict access to posts should be disjunctive.
 
 = 1.3.10 =
 * Improves performance slightly more and fixes potential issues with caching.
