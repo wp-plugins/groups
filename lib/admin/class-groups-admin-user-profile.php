@@ -30,6 +30,7 @@ class Groups_Admin_User_Profile {
 	public static function init() {
 		add_action( 'show_user_profile', array( __CLASS__, 'show_user_profile' ) );
 		add_action( 'edit_user_profile', array( __CLASS__, 'edit_user_profile' ) );
+		add_action( 'personal_options_update', array( __CLASS__, 'personal_options_update' ) );
 		add_action( 'edit_user_profile_update', array( __CLASS__, 'edit_user_profile_update' ) );
 	}
 
@@ -86,6 +87,21 @@ class Groups_Admin_User_Profile {
 			}
 		}
 		echo $output;
+	}
+	
+	/**
+	 * Updates the group membership when a user's own profile is saved - but
+	 * for group admins on their own profile page only.
+	 * 
+	 * @param int $user_id
+	 * @see Groups_Admin_User_Profile::edit_user_profile_update()
+	 */
+	public static function personal_options_update( $user_id ) {
+		// We're using the same method as for editing another user's profile,
+		// but let's check for group admin here as well. 
+		if ( current_user_can( GROUPS_ADMINISTER_GROUPS ) ) {
+			self::edit_user_profile_update( $user_id );
+		}
 	}
 	
 	/**
