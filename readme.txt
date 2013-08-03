@@ -21,10 +21,12 @@ It integrates standard WordPress capabilities and application-specific capabilit
 - [Groups File Access](http://www.itthinx.com/plugins/groups-file-access/) Groups File Access is an extension that allows to provide file download links for authorized users. Access to files is restricted to users by their group membership.
 - [Groups Forums](http://www.itthinx.com/plugins/groups-forums/) A powerful and yet light-weight forum system.
 - [Groups Jigoshop](http://jigoshop.com/product/subscriptions/) Groups integration for Jigoshop that supports memberships and subscriptions.
+- [Groups Newsletters](http://www.itthinx.com/plugins/groups-newsletters/) Newsletter Campaigns for Subscribers and Groups.
 - [Groups Notifications](http://www.itthinx.com/plugins/groups-notifications/) Adds customizable notifications for events related to Groups.
 - [Groups PayPal](http://www.itthinx.com/plugins/groups-paypal/) Groups for PayPal allows to sell memberships and subscriptions with Groups.
 - [Groups Subscriptions](http://www.itthinx.com/plugins/groups-subscriptions/) A subscription framework for Groups used by other extensions.
 - [Groups WooCommerce](http://www.woothemes.com/extension/groups-woocommerce/) Groups for WooCommerce is a WordPress plugin that allows you to sell memberships.
+- [Groups 2 MailChimp](http://eggemplo.com/plugins/groups2mailchimp/) Synchronizes groups with MailChimp lists.
 - [Groups 404 Redirect](http://wordpress.org/extend/plugins/groups-404-redirect/) Redirects 404's caused by hits on pages that are protected by Groups.
 
 ### Features ###
@@ -359,7 +361,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 == Changelog ==
 
 = 1.3.12 =
-* WordPress 3.6 compatibility checked and minor fixes.
+* WordPress 3.6 compatibility checked.
 * Fixed table appearance for capabilities and groups admin sections when there are no results.
 
 = 1.3.11 =
