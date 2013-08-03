@@ -409,7 +409,7 @@ function groups_admin_capabilities() {
 			$output .= '</tr>';
 		}
 	} else {
-		$output .= '<tr><td colspan="10">' . __( 'There are no results.', GROUPS_PLUGIN_DOMAIN ) . '</td></tr>';
+		$output .= '<tr><td colspan="6">' . __( 'There are no results.', GROUPS_PLUGIN_DOMAIN ) . '</td></tr>';
 	}
 		
 	$output .= '</tbody>';

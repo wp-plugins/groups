@@ -3,7 +3,7 @@ Contributors: itthinx
 Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, memberships, paypal, permission, permissions, subscription, subscriptions, woocommerce
 Requires at least: 3.3
-Tested up to: 3.5.1
+Tested up to: 3.6
 Stable tag: 1.3.11
 License: GPLv3
 
@@ -358,6 +358,10 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.12 =
+* WordPress 3.6 compatibility checked and minor fixes.
+* Fixed table appearance for capabilities and groups admin sections when there are no results.
+
 = 1.3.11 =
 * Fix: Access restriction capabilities must be disjunctive.
 * Added: List of groups can be shown in user profiles on the back end and group assignments can be edited by group admins.
@@ -490,6 +494,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.3.12 =
+* WordPress 3.6 compatibility checked and minor fixes.
 
 = 1.3.11 =
 * Fixes too restrictive access: the capabilities used to restrict access to posts should be disjunctive. Adds the option to show and edit group memberships in user profiles. 

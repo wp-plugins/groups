@@ -420,7 +420,7 @@ function groups_admin_groups() {
 			$output .= '</tr>';
 		}
 	} else {
-		$output .= '<tr><td colspan="10">' . __( 'There are no results.', GROUPS_PLUGIN_DOMAIN ) . '</td></tr>';
+		$output .= '<tr><td colspan="7">' . __( 'There are no results.', GROUPS_PLUGIN_DOMAIN ) . '</td></tr>';
 	}
 		
 	$output .= '</tbody>';
