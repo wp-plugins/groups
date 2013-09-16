@@ -115,8 +115,9 @@ class Groups_Access_Shortcodes {
 	}
 	
 	/**
-	 * Takes one attribute "capability" that must be a valid capability label.
-	 * The content is shown if the current user has the capability.
+	 * Takes one attribute "capability" that must be a valid capability label
+	 * or a list of capabilities separated by comma.
+	 * The content is shown if the current user has one of the capabilities.
 	 * 
 	 * @param array $atts attributes
 	 * @param string $content content to render
@@ -127,7 +128,15 @@ class Groups_Access_Shortcodes {
 		if ( $content !== null ) {
 			$groups_user = new Groups_User( get_current_user_id() );
 			$capability = $options['capability'];
-			if ( $groups_user->can( $capability ) ) {
+			$capabilities = array_map( 'trim', explode( ',', $capability ) );
+			$show_content = false;
+			foreach( $capabilities as $capability ) {
+				if ( $groups_user->can( $capability ) ) {
+					$show_content = true;
+					break;
+				}
+			}
+			if ( $show_content ) {
 				remove_shortcode( 'groups_can' );
 				$content = do_shortcode( $content );
 				add_shortcode( 'groups_can', array( __CLASS__, 'groups_can' ) );
@@ -138,8 +147,9 @@ class Groups_Access_Shortcodes {
 	}
 	
 	/**
-	 * Takes one attribute "capability" that must be a valid capability label.
-	 * The content is shown if the current user does NOT have the capability.
+	 * Takes one attribute "capability" that must be a valid capability label,
+	 * or a comma-separaed list of those.
+	 * The content is shown if the current user has none of the capabilities.
 	 *
 	 * @param array $atts attributes
 	 * @param string $content content to render
@@ -150,7 +160,15 @@ class Groups_Access_Shortcodes {
 		if ( $content !== null ) {
 			$groups_user = new Groups_User( get_current_user_id() );
 			$capability = $options['capability'];
-			if ( !$groups_user->can( $capability ) ) {
+			$capabilities = array_map( 'trim', explode( ',', $capability ) );
+			$show_content = true;
+			foreach( $capabilities as $capability ) {
+				if ( $groups_user->can( $capability ) ) {
+					$show_content = false;
+					break;
+				}
+			}
+			if ( $show_content ) {
 				remove_shortcode( 'groups_can_not' );
 				$content = do_shortcode( $content );
 				add_shortcode( 'groups_can_not', array( __CLASS__, 'groups_can_not' ) );

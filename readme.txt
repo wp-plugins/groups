@@ -362,6 +362,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 = 1.3.13 =
 * Fixed duplicate postmeta creaed when saving access restriction capabilities for a post.
+* [groups_can] and [groups_can_not] now accept multiple capabilities separated by comma.
 * WordPress 3.6.1 compatibility checked.
 
 = 1.3.12 =
