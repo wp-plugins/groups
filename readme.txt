@@ -360,6 +360,10 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.13 =
+* Fixed duplicate postmeta creaed when saving access restriction capabilities for a post.
+* WordPress 3.6.1 compatibility checked.
+
 = 1.3.12 =
 * WordPress 3.6 compatibility checked.
 * Fixed table appearance for capabilities and groups admin sections when there are no results.
@@ -496,6 +500,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.3.13 =
+* Minor fixes (also tested WordPress 3.6.1 compatibility).
 
 = 1.3.12 =
 * WordPress 3.6 compatibility checked and minor fixes.

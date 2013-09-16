@@ -255,10 +255,17 @@ class Groups_Post_Access {
 	/**
 	 * Adds an access capability requirement.
 	 * 
-	 * $map must contain 'post_id'
+	 * $map must contain 'post_id' (*)
 	 * 
 	 * For now this only should be used to add the READ_POST_CAPABILITY which
 	 * it does automatically. Nothing else is checked for granting access.
+	 * 
+	 * (*) Revisions : As of Groups 1.3.13 and at WordPress 3.6.1, as
+	 * add_post_meta stores postmeta for the revision's parent, we retrieve
+	 * the parent's post ID if it applies and check against that to see if
+	 * that capability is already present. This is to avoid duplicating
+	 * the already existing postmeta entry (which ocurred in previous
+	 * versions).
 	 * 
 	 * @param array $map
 	 * @return true if the capability could be added to the post, otherwis false
@@ -273,6 +280,9 @@ class Groups_Post_Access {
 
 		if ( !empty( $post_id ) && !empty( $capability) ) {
 			if ( Groups_Capability::read_by_capability( $capability ) ) {
+				if ( $revision_parent_id = wp_is_post_revision( $post_id ) ) {
+					$post_id = $revision_parent_id;
+				}
 				if ( !in_array( $capability, get_post_meta( $post_id, self::POSTMETA_PREFIX . self::READ_POST_CAPABILITY ) ) ) {
 					$result = add_post_meta( $post_id, self::POSTMETA_PREFIX . self::READ_POST_CAPABILITY, $capability );
 				}
