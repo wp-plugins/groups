@@ -3,8 +3,8 @@ Contributors: itthinx
 Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, memberships, paypal, permission, permissions, subscription, subscriptions, woocommerce
 Requires at least: 3.3
-Tested up to: 3.6
-Stable tag: 1.3.12
+Tested up to: 3.6.1
+Stable tag: 1.3.13
 License: GPLv3
 
 Groups provides group-based user membership management, group-based capabilities and content access control.
