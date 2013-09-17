@@ -102,6 +102,8 @@ class Groups_Access_Meta_Boxes {
 			}
 		}
 
+		$output .= wp_nonce_field( self::SET_CAPABILITY, self::NONCE, true, false );
+
 		if ( self::user_can_restrict() ) {
 			$user = new Groups_User( get_current_user_id() );
 			$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
@@ -128,7 +130,6 @@ class Groups_Access_Meta_Boxes {
 			$output .= '<p class="description">';
 			$output .= sprintf( __( "Only groups or users that have one of the selected capabilities are allowed to read this %s.", GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
 			$output .= '</p>';
-			$output .= wp_nonce_field( self::SET_CAPABILITY, self::NONCE, true, false );
 		} else {
 			$output .= '<p class="description">';
 			$output .= sprintf( __( 'You cannot set any access restrictions.', GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
@@ -142,6 +143,22 @@ class Groups_Access_Meta_Boxes {
 				$output .= '</a>';
 			}
 			$output .= '</p>';
+		}
+
+		// quick-create
+		if ( current_user_can( GROUPS_ADMINISTER_GROUPS ) ) {
+			$style = 'cursor:help;vertical-align:middle;';
+			$output .= '<div class="quick-create-group-capability" style="margin:4px 0">';
+			$output .= '<label>';
+			$output .= sprintf( '<input style="width:100%%;margin-right:-20px;" id="quick-group-capability" name="quick-group-capability" class="quick-group-capability" type="text" value="" placeholder="%s"/>', __( 'Quick-create group &amp; capability', GROUPS_PLUGIN_DOMAIN ) );
+			$output .= sprintf(
+				'<img style="%s" alt="?" title="%s" src="%s" />',
+				$style,
+				esc_attr( __( 'You can create a new group and capability here. The capability will be assigned to the group and enabled to enforce read access. The name of the capability is based on the name of the group. If the group already exists, a new capability is created and assigned to the existing group. If the capability already exists, it will be assigned to the group. If both already exist, the capability is enabled to enforce read access. Your user account will be assigned to the group.', GROUPS_PLUGIN_DOMAIN ) ),
+				esc_attr( GROUPS_PLUGIN_URL . 'images/help.png' )
+			);
+			$output .= '</label>';
+			$output .= '</div>';
 		}
 
 		echo $output;
@@ -169,6 +186,64 @@ class Groups_Access_Meta_Boxes {
 							// If the post ID is not provided, it will throw:
 							// PHP Notice:  Undefined offset: 0 in /var/www/groups-forums/wp-includes/capabilities.php on line 1067 
 							if ( current_user_can( 'edit_'.$post_type, $post_id ) ) {
+								
+								// quick-create ?
+								if ( current_user_can( GROUPS_ADMINISTER_GROUPS ) ) {
+									if ( !empty( $_POST['quick-group-capability'] ) ) {
+										$creator_id = get_current_user_id();
+										$datetime	= date( 'Y-m-d H:i:s', time() );
+										$name		= trim( $_POST['quick-group-capability'] );
+										if ( strlen( $name ) > 0 ) {
+											// create or obtain the group
+											if ( $group = Groups_Group::read_by_name( $name ) ) {
+											} else {
+												if ( $group_id = Groups_Group::create( compact( 'creator_id', 'datetime', 'name' ) ) ) {
+													$group = Groups_Group::read( $group_id );
+												}
+											}
+											// create or obtain the capability
+											$name = strtolower( $name );
+											if ( $capability = Groups_Capability::read_by_capability( $name ) ) {
+											} else {
+												if ( $capability_id = Groups_Capability::create( array( 'capability' => $name ) ) ) {
+													$capability = Groups_Capability::read( $capability_id );
+												}
+											}
+											if ( $group && $capability ) {
+												// add the capability to the group
+												if ( !Groups_Group_Capability::read( $group->group_id, $capability->capability_id ) ) {
+													Groups_Group_Capability::create(
+														array(
+															'group_id' => $group->group_id,
+															'capability_id' => $capability->capability_id
+														)
+													);
+												}
+												// enable the capability for access restriction
+												$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
+												if ( !in_array( $capability->capability, $valid_read_caps ) ) {
+													$valid_read_caps[] = $capability->capability;
+												}
+												Groups_Options::update_option( Groups_Post_Access::READ_POST_CAPABILITIES, $valid_read_caps );
+												// add the current user to the group
+												Groups_User_Group::create(
+													array(
+														'user_id' => get_current_user_id(),
+														'group_id' => $group->group_id
+													)
+												);
+												// put the capability ID in $_POST[self::CAPABILITY] so it is treated below
+												if ( empty( $_POST[self::CAPABILITY] ) ) {
+													$_POST[self::CAPABILITY] = array();
+												}
+												if ( !in_array( $capability->capability_id, $_POST[self::CAPABILITY] ) ) {
+													$_POST[self::CAPABILITY][] = $capability->capability_id;
+												}
+											}
+										}
+									}
+								}
+								//
 								if ( self::user_can_restrict() ) {
 									$valid_read_caps = self::get_valid_read_caps_for_user();
 									foreach( $valid_read_caps as $valid_read_cap ) {

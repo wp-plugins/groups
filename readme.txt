@@ -360,6 +360,9 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.3.14 =
+* Added the option to quick-create group and capability within the access restriction meta-box.
+ 
 = 1.3.13 =
 * Fixed duplicate postmeta creaed when saving access restriction capabilities for a post.
 * [groups_can] and [groups_can_not] now accept multiple capabilities separated by comma.
@@ -501,6 +504,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.3.14 =
+* New useful feature: quick-create group and capability directly on posts (access restriction).
 
 = 1.3.13 =
 * Minor fixes (also tested WordPress 3.6.1 compatibility).
