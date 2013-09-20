@@ -49,10 +49,15 @@ class Groups_Capability {
 	 * - name
 	 * - description
 	 * 
+	 * - group_ids groups that have the capability
+	 * 
 	 * @param string $name property's name
 	 * @return property value, will return null if property does not exist
 	 */
 	public function __get( $name ) {
+
+		global $wpdb;
+
 		$result = null;
 		if ( $this->capability !== null ) {
 			switch( $name ) {
@@ -63,6 +68,32 @@ class Groups_Capability {
 				case "name" :
 				case "description" :
 					$result = $this->capability->$name;
+					break;
+				case 'group_ids' :
+					$group_capability_table = _groups_get_tablename( "group_capability" );
+					$rows = $wpdb->get_results( $wpdb->prepare(
+						"SELECT group_id FROM $group_capability_table WHERE capability_id = %d",
+						Groups_Utility::id( $this->capability->capability_id )
+					) );
+					if ( $rows ) {
+						$result = array();
+						foreach( $rows as $row ) {
+							$result[] = $row->group_id;
+						}
+					}
+					break;
+				case 'groups' :
+					$group_capability_table = _groups_get_tablename( "group_capability" );
+					$rows = $wpdb->get_results( $wpdb->prepare(
+						"SELECT group_id FROM $group_capability_table WHERE capability_id = %d",
+						Groups_Utility::id( $this->capability->capability_id )
+					) );
+					if ( $rows ) {
+						$result = array();
+						foreach( $rows as $row ) {
+							$result[] = new Groups_Group( $row->group_id );
+						}
+					}
 					break;
 			}
 		}

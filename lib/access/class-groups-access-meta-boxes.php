@@ -30,7 +30,8 @@ class Groups_Access_Meta_Boxes {
 	const SET_CAPABILITY = 'set-capability';
 	const READ_ACCESS = 'read-access';
 	const CAPABILITY = 'capability';
-	
+	const SHOW_GROUPS = 'access-meta-box-show-groups';
+
 	/**
 	 * Hooks for capabilities meta box and saving options.
 	 */
@@ -89,6 +90,8 @@ class Groups_Access_Meta_Boxes {
 
 		$output = "";
 
+		$show_groups = Groups_Options::get_user_option( self::SHOW_GROUPS, true );
+
 		$post_id = isset( $object->ID ) ? $object->ID : null;
 		$post_type = isset( $object->post_type ) ? $object->post_type : null;
 		$post_singular_name = __( "Post", GROUPS_PLUGIN_DOMAIN );
@@ -107,6 +110,7 @@ class Groups_Access_Meta_Boxes {
 		if ( self::user_can_restrict() ) {
 			$user = new Groups_User( get_current_user_id() );
 			$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
+
 			$read_caps = get_post_meta( $post_id, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
 			$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
 			$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
@@ -114,11 +118,39 @@ class Groups_Access_Meta_Boxes {
 			foreach( $valid_read_caps as $valid_read_cap ) {
 				if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
 					if ( $user->can( $capability->capability ) ) {
+						$c = new Groups_Capability( $capability->capability_id );
+						$groups = $c->groups;
+						$group_names = array();
+						if ( !empty( $groups ) ) {
+							foreach( $groups as $group ) {
+								$group_names[] = $group->name;
+							}
+						}
+						if ( count( $group_names ) > 0 ) {
+							$label_title = sprintf(
+								_n(
+									'Members of the %1$s group can access this %2$s through this capability.',
+									'Members of the %1$s groups can access this %2$s through this capability.',
+									count( $group_names ),
+									GROUPS_PLUGIN_DOMAIN
+								),
+								wp_filter_nohtml_kses( implode( ',', $group_names ) ),
+								$post_singular_name
+							);
+						} else {
+							$label_title = __( 'No groups grant access through this capability. To grant access to group members using this capability, you should assign it to a group and enable the capability for access restriction.', GROUPS_PLUGIN_DOMAIN );
+						}
 						$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
 						$output .= '<li>';
-						$output .= '<label>';
+						$output .= sprintf( '<label title="%s">', $label_title );
 						$output .= '<input name="' . self::CAPABILITY . '[]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
 						$output .= wp_filter_nohtml_kses( $capability->capability );
+						if ( count( $group_names ) > 0 ) {
+							$output .= ' ';
+							$output .= '<span class="groups description">';
+							$output .= wp_filter_nohtml_kses( implode( ',', $group_names ) );
+							$output .= '</span>';
+						}
 						$output .= '</label>';
 						$output .= '</li>';
 					}
@@ -126,10 +158,26 @@ class Groups_Access_Meta_Boxes {
 			}
 			$output .= '</ul>';
 			$output .= '</div>';
-	
+
 			$output .= '<p class="description">';
 			$output .= sprintf( __( "Only groups or users that have one of the selected capabilities are allowed to read this %s.", GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
 			$output .= '</p>';
+
+			$output .= '<p class="description">';
+			$output .= sprintf( '<label title="%s">', __( 'Click to toggle the display of groups that grant the capabilities.', GROUPS_PLUGIN_DOMAIN ) );
+			$output .= sprintf( '<input id="access-show-groups" type="checkbox" name="%s" %s />', esc_attr( self::SHOW_GROUPS ), $show_groups ? ' checked="checked" ' : '' );
+			$output .= ' ';
+			$output .= __( 'Show groups', GROUPS_PLUGIN_DOMAIN );
+			$output .= '</label>';
+			$output .= '</p>';
+			$output .= '<script type="text/javascript">';
+			$output .= 'if (typeof jQuery !== "undefined"){';
+			$output .= !$show_groups ? 'jQuery("span.groups.description").hide();' : '';
+			$output .= 'jQuery("#access-show-groups").click(function(){';
+			$output .= 'jQuery("span.groups.description").toggle();';
+			$output .= '});';
+			$output .= '}';
+			$output .= '</script>';
 		} else {
 			$output .= '<p class="description">';
 			$output .= sprintf( __( 'You cannot set any access restrictions.', GROUPS_PLUGIN_DOMAIN ), $post_singular_name );
@@ -243,7 +291,7 @@ class Groups_Access_Meta_Boxes {
 										}
 									}
 								}
-								//
+								// set
 								if ( self::user_can_restrict() ) {
 									$valid_read_caps = self::get_valid_read_caps_for_user();
 									foreach( $valid_read_caps as $valid_read_cap ) {
@@ -259,6 +307,8 @@ class Groups_Access_Meta_Boxes {
 										}
 									}
 								}
+								// show groups
+								Groups_Options::update_user_option( self::SHOW_GROUPS, !empty( $_POST[self::SHOW_GROUPS] ) );
 							}
 						}
 					}
