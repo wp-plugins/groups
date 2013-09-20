@@ -373,7 +373,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * Added the option to show groups granting access per capability in the access restriction meta-box.
  
 = 1.3.13 =
-* Fixed duplicate postmeta creaed when saving access restriction capabilities for a post.
+* Fixed duplicate postmeta created when saving access restriction capabilities for a post.
 * [groups_can] and [groups_can_not] now accept multiple capabilities separated by comma.
 * WordPress 3.6.1 compatibility checked.
 
