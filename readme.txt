@@ -345,6 +345,14 @@ Yes. Access restrictions can be turned on or off for specific CPTs on the *Group
 
 Go to *Groups > Options* and enable the option under *User profiles*.
 
+= Developers aka What about Groups' API? =
+
+The Groups plugin provides an extensive framework to handle memberships, group-based capabilities and access control.
+
+The API documentation is available here: [Groups API](http://api.itthinx.com/groups).
+
+Also refer to the official [Groups](http://www.itthinx.com/plugins/groups/) plugin page and the [Groups documentation](http://www.itthinx.com/documentation/groups/) pages.
+
 == Screenshots ==
 
 See also [Groups](http://www.itthinx.com/plugins/groups/)
@@ -362,6 +370,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 = 1.3.14 =
 * Added the option to quick-create group and capability within the access restriction meta-box.
+* Added the option to show groups granting access per capability in the access restriction meta-box.
  
 = 1.3.13 =
 * Fixed duplicate postmeta creaed when saving access restriction capabilities for a post.
@@ -506,7 +515,7 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 == Upgrade Notice ==
 
 = 1.3.14 =
-* New useful feature: quick-create group and capability directly on posts (access restriction).
+* New useful features: quick-create group and capability directly on posts (access restriction); groups are shown along with access restriction capabilities (can be toggled).
 
 = 1.3.13 =
 * Minor fixes (also tested WordPress 3.6.1 compatibility).
@@ -595,10 +604,3 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 
 = 1.0.0-beta-1 =
 * This is the first public beta release.
-
-== API ==
-
-The Groups plugin provides an extensive framework to handle memberships, group-based capabilities and access control.
-Read more on the official [Groups](http://www.itthinx.com/plugins/groups/) page and the [Groups documentation](http://www.itthinx.com/documentation/groups/) page.
-
-
