@@ -74,7 +74,7 @@ class Groups_Access_Meta_Boxes {
 						"high"
 					);
 				}
-				// @todo testing - remove or accept
+
 				if ( !wp_script_is( 'chosen' ) ) {
 					wp_enqueue_script( 'chosen', GROUPS_PLUGIN_URL . 'js/chosen/chosen.jquery.min.js', array( 'jquery' ), $groups_version, false );
 				}
@@ -169,56 +169,6 @@ class Groups_Access_Meta_Boxes {
 			$user = new Groups_User( get_current_user_id() );
 			$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
 
-			// @todo testing - uncomment or remove
-// 			$read_caps = get_post_meta( $post_id, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
-// 			$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
-// 			$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
-// 			$output .= '<ul>';
-// 			foreach( $valid_read_caps as $valid_read_cap ) {
-// 				if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
-// 					if ( $user->can( $capability->capability ) ) {
-// 						$c = new Groups_Capability( $capability->capability_id );
-// 						$groups = $c->groups;
-// 						$group_names = array();
-// 						if ( !empty( $groups ) ) {
-// 							foreach( $groups as $group ) {
-// 								$group_names[] = $group->name;
-// 							}
-// 						}
-// 						if ( count( $group_names ) > 0 ) {
-// 							$label_title = sprintf(
-// 								_n(
-// 									'Members of the %1$s group can access this %2$s through this capability.',
-// 									'Members of the %1$s groups can access this %2$s through this capability.',
-// 									count( $group_names ),
-// 									GROUPS_PLUGIN_DOMAIN
-// 								),
-// 								wp_filter_nohtml_kses( implode( ',', $group_names ) ),
-// 								$post_singular_name
-// 							);
-// 						} else {
-// 							$label_title = __( 'No groups grant access through this capability. To grant access to group members using this capability, you should assign it to a group and enable the capability for access restriction.', GROUPS_PLUGIN_DOMAIN );
-// 						}
-// 						$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
-// 						$output .= '<li>';
-// 						$output .= sprintf( '<label title="%s">', $label_title );
-// 						$output .= '<input name="' . self::CAPABILITY . '[]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
-// 						$output .= wp_filter_nohtml_kses( $capability->capability );
-// 						if ( count( $group_names ) > 0 ) {
-// 							$output .= ' ';
-// 							$output .= '<span class="groups description">';
-// 							$output .= wp_filter_nohtml_kses( implode( ',', $group_names ) );
-// 							$output .= '</span>';
-// 						}
-// 						$output .= '</label>';
-// 						$output .= '</li>';
-// 					}
-// 				}
-// 			}
-// 			$output .= '</ul>';
-// 			$output .= '</div>';
-
-			// @todo testing chosen
 			$read_caps = get_post_meta( $post_id, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
 			$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
 			$output .= '<div class="chosen-capability-container">';

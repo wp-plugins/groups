@@ -235,20 +235,26 @@ function groups_admin_options() {
 	$capability_table = _groups_get_tablename( "capability" );
 	$capabilities = $wpdb->get_results( "SELECT * FROM $capability_table ORDER BY capability" );
 	$applicable_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
+	echo '<div class="chosen-capability-container">';
+	printf( '<select class="chosen capability" name="%s" multiple="multiple">', GROUPS_READ_POST_CAPABILITIES . '[]' );
 	foreach( $capabilities as $capability ) {
-		$checked = in_array( $capability->capability, $applicable_read_caps ) ? ' checked="checked" ' : '';
+		$selected = in_array( $capability->capability, $applicable_read_caps ) ? ' selected="selected" ' : '';
 		if ( $capability->capability == Groups_Post_Access::READ_POST_CAPABILITY ) {
-			$checked .= ' readonly="readonly" disabled="disabled" ';
+			$selected .= ' readonly="readonly" disabled="disabled" ';
 		}
-		echo '<label>';
-		echo '<input name="' . GROUPS_READ_POST_CAPABILITIES . '[]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
-		echo  wp_filter_nohtml_kses( $capability->capability );
-		echo '</label>';
-		echo ' ';
-		echo '<span class="description">' . wp_filter_nohtml_kses( $capability->description ) . '</span>';
-		echo '<br/>';
+		printf( '<option value="%s" %s>%s</option>', esc_attr( $capability->capability_id ), $selected, wp_filter_nohtml_kses( $capability->capability ) );
 	}
-	
+	echo '</select>';
+	echo '</div>';
+	echo '<script type="text/javascript">';
+	echo 'if (typeof jQuery !== "undefined"){';
+	echo 'jQuery(".chosen.capability").chosen({width: "62%",search_contains:true});';
+	echo '}';
+	echo '</script>';
+	echo '<style type="text/css">';
+	echo '.chosen-capability-container input[type="text"] { min-height: 2em; }';
+	echo '</style>';
+
 	echo
 		'<h3>' . __( 'User profiles', GROUPS_PLUGIN_DOMAIN ) . '</h3>' .
 		'<p>' .

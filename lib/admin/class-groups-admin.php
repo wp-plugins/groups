@@ -39,6 +39,9 @@ class Groups_Admin {
 	public static function admin_init() {
 		global $groups_version;
 		wp_register_style( 'groups_admin', GROUPS_PLUGIN_URL . 'css/groups_admin.css', array(), $groups_version );
+		if ( !wp_style_is( 'chosen' ) ) {
+			wp_enqueue_style( 'chosen', GROUPS_PLUGIN_URL . 'css/chosen/chosen.min.css', array(), $groups_version );
+		}
 	}
 	
 	/**
@@ -56,6 +59,9 @@ class Groups_Admin {
 	public static function admin_print_scripts() {
 		global $groups_version;
 		wp_enqueue_script( 'groups', GROUPS_PLUGIN_URL . 'js/groups_admin.js', array( ), $groups_version );
+		if ( !wp_script_is( 'chosen' ) ) {
+			wp_enqueue_script( 'chosen', GROUPS_PLUGIN_URL . 'js/chosen/chosen.jquery.min.js', array( 'jquery' ), $groups_version, false );
+		}
 	}
 	
 	/**
