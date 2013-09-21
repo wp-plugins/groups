@@ -47,7 +47,7 @@ class Groups_Access_Meta_Boxes {
 	 * Triggered by init() to add capability meta box.
 	 */
 	public static function add_meta_boxes( $post_type, $post = null ) {
-		global $wp_version;
+		global $wp_version, $groups_version;
 		$post_type_object = get_post_type_object( $post_type );
 		if ( $post_type_object && $post_type != 'attachment' ) {
 			$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
@@ -74,10 +74,68 @@ class Groups_Access_Meta_Boxes {
 						"high"
 					);
 				}
+				// @todo testing - remove or accept
+				if ( !wp_script_is( 'chosen' ) ) {
+					wp_enqueue_script( 'chosen', GROUPS_PLUGIN_URL . 'js/chosen/chosen.jquery.min.js', array( 'jquery' ), $groups_version, false );
+				}
+				if ( !wp_style_is( 'chosen' ) ) {
+					wp_enqueue_style( 'chosen', GROUPS_PLUGIN_URL . 'css/chosen/chosen.min.css', array(), $groups_version );
+				}
+				if ( $screen = get_current_screen() ) {
+					$screen->add_help_tab( array(
+						'id'      => 'groups-access',
+						'title'   => __( 'Access restrictions', GROUPS_PLUGIN_DOMAIN ),
+						'content' =>
+							'<p>' .
+							'<strong>' . __( 'Access restrictions', GROUPS_PLUGIN_DOMAIN ) . '</strong>' .
+							'</p>' .
+							'<p>' .
+							__( 'Use the <em>Access restrictions</em> box to limit the visibility of posts, pages and other post types.', GROUPS_PLUGIN_DOMAIN ) .
+							'</p>' .
+							'<p>' .
+							__( 'You can select one or more capabilities that enabled for access restriction.', GROUPS_PLUGIN_DOMAIN ) .
+							' ' .
+							__( 'Note that you must be a member of a group that has such a capability assigned.', GROUPS_PLUGIN_DOMAIN ) .
+							'</p>' .
+							'<p>' .
+							'<strong>' . __( 'Example:', GROUPS_PLUGIN_DOMAIN ) . '</strong>' . 
+							'</p>' .
+							__( 'Let\'s assume that you want to limit the visibility of a post to members of the <em>Premium</em> group.', GROUPS_PLUGIN_DOMAIN ) .
+							'<p>' .
+							'<strong>' . __( 'The quick way:', GROUPS_PLUGIN_DOMAIN ) . '</strong>' .
+							' ' .
+							__( 'Using the quick-create field', GROUPS_PLUGIN_DOMAIN ) .
+							'</p>' .
+							__( 'Enter <em>Premium</em> in the quick-create field located in the Access restrictions panel and save or update the post (or hit Enter).', GROUPS_PLUGIN_DOMAIN ) .
+							'<p>' .
+							'<p>' .
+							__( 'Using the quick-create field, you can create a new group and capability. The capability will be assigned to the group and enabled to enforce read access. Group names are case-sensitive, the name of the capability is the lower-case version of the name of the group. If the group already exists, a new capability is created and assigned to the existing group. If the capability already exists, it will be assigned to the group. If both already exist, the capability is enabled to enforce read access. In order to be able to use the capability, your user account will be assigned to the group.', GROUPS_PLUGIN_DOMAIN ) .
+							'</p>' .
+							'<em>' . __( 'The manual way:', GROUPS_PLUGIN_DOMAIN ) . '</em>' .
+							' ' .
+							__( 'Adding the group and capability manually and enabling it for access restriction', GROUPS_PLUGIN_DOMAIN ) .
+							'</p>' .
+							'<p>' .
+							__( 'Try the quick-create field first. Unless you need a more complex setup, there is no reason to go this way instead.', GROUPS_PLUGIN_DOMAIN ) .
+							'</p>' .
+							'<ol>' .
+							'<li>' . __( 'Go to <strong>Groups > Groups</strong> and add the <em>Premium</em> group.', GROUPS_PLUGIN_DOMAIN ) . '</li>' .
+							'<li>' . __( 'Go to <strong>Groups > Capabilities</strong> and add the <em>premium</em> capability.', GROUPS_PLUGIN_DOMAIN ) . '</li>' .
+							'<li>' . __( 'Go to <strong>Groups > Groups</strong> and assign the <em>premium</em> capability to the <em>Premium</em> group.', GROUPS_PLUGIN_DOMAIN ) . '</li>' .
+							'<li>' . __( 'Go to <strong>Groups > Options</strong> and enable the <em>premium</em> capability to restrict access.', GROUPS_PLUGIN_DOMAIN ) . '</li>' .
+							'<li>' . __( 'Become a member of the <em>Premium</em> group - this is required so you can choose the <em>premium</em> capability to restrict access to a post.', GROUPS_PLUGIN_DOMAIN ) . '</li>' .
+							'<li>' . __( 'Edit the post for which you want to restrict access and choose<sup>*</sup> the <em>premium</em> capability.', GROUPS_PLUGIN_DOMAIN ) . '</li>' . 
+							'</ol>' .
+							'<p>' .
+							__( '<sup>*</sup> For each capability, the groups that have the capability assigned are shown within parenthesis. You can choose a capability by typing part of the group\'s or the capability\'s name.', GROUPS_PLUGIN_DOMAIN ) .
+							'</p>'
+					) );
+				}
+
 			}
 		}
 	}
-	
+
 	/**
 	 * Render meta box for capabilities.
 	 * 
@@ -111,10 +169,66 @@ class Groups_Access_Meta_Boxes {
 			$user = new Groups_User( get_current_user_id() );
 			$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
 
+			// @todo testing - uncomment or remove
+// 			$read_caps = get_post_meta( $post_id, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
+// 			$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
+// 			$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
+// 			$output .= '<ul>';
+// 			foreach( $valid_read_caps as $valid_read_cap ) {
+// 				if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
+// 					if ( $user->can( $capability->capability ) ) {
+// 						$c = new Groups_Capability( $capability->capability_id );
+// 						$groups = $c->groups;
+// 						$group_names = array();
+// 						if ( !empty( $groups ) ) {
+// 							foreach( $groups as $group ) {
+// 								$group_names[] = $group->name;
+// 							}
+// 						}
+// 						if ( count( $group_names ) > 0 ) {
+// 							$label_title = sprintf(
+// 								_n(
+// 									'Members of the %1$s group can access this %2$s through this capability.',
+// 									'Members of the %1$s groups can access this %2$s through this capability.',
+// 									count( $group_names ),
+// 									GROUPS_PLUGIN_DOMAIN
+// 								),
+// 								wp_filter_nohtml_kses( implode( ',', $group_names ) ),
+// 								$post_singular_name
+// 							);
+// 						} else {
+// 							$label_title = __( 'No groups grant access through this capability. To grant access to group members using this capability, you should assign it to a group and enable the capability for access restriction.', GROUPS_PLUGIN_DOMAIN );
+// 						}
+// 						$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
+// 						$output .= '<li>';
+// 						$output .= sprintf( '<label title="%s">', $label_title );
+// 						$output .= '<input name="' . self::CAPABILITY . '[]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
+// 						$output .= wp_filter_nohtml_kses( $capability->capability );
+// 						if ( count( $group_names ) > 0 ) {
+// 							$output .= ' ';
+// 							$output .= '<span class="groups description">';
+// 							$output .= wp_filter_nohtml_kses( implode( ',', $group_names ) );
+// 							$output .= '</span>';
+// 						}
+// 						$output .= '</label>';
+// 						$output .= '</li>';
+// 					}
+// 				}
+// 			}
+// 			$output .= '</ul>';
+// 			$output .= '</div>';
+
+			// @todo testing chosen
 			$read_caps = get_post_meta( $post_id, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
 			$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
-			$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
-			$output .= '<ul>';
+			$output .= '<div class="chosen-capability-container">';
+			$output .= sprintf(
+				'<select class="chosen capability" name="%s" multiple="multiple" data-placeholder="%s" title="%s">',
+				self::CAPABILITY . '[]',
+				__( 'Type and choose &hellip;', GROUPS_PLUGIN_DOMAIN),
+				__( 'Choose one or more capabilities to restrict access. Groups that grant access through the capabilities are shown in parenthesis. If no capabilities are available yet, you can use the quick-create box to create a group and capability enabled for access restriction on the fly.', GROUPS_PLUGIN_DOMAIN )
+			);
+			$output .= '<option value=""></option>';
 			foreach( $valid_read_caps as $valid_read_cap ) {
 				if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
 					if ( $user->can( $capability->capability ) ) {
@@ -141,22 +255,27 @@ class Groups_Access_Meta_Boxes {
 							$label_title = __( 'No groups grant access through this capability. To grant access to group members using this capability, you should assign it to a group and enable the capability for access restriction.', GROUPS_PLUGIN_DOMAIN );
 						}
 						$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
-						$output .= '<li>';
-						$output .= sprintf( '<label title="%s">', $label_title );
-						$output .= '<input name="' . self::CAPABILITY . '[]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
+						$output .= sprintf( '<option value="%s" %s>', esc_attr( $capability->capability_id ), in_array( $capability->capability, $read_caps ) ? ' selected="selected" ' : '' );
 						$output .= wp_filter_nohtml_kses( $capability->capability );
-						if ( count( $group_names ) > 0 ) {
-							$output .= ' ';
-							$output .= '<span class="groups description">';
-							$output .= wp_filter_nohtml_kses( implode( ',', $group_names ) );
-							$output .= '</span>';
+						if ( $show_groups ) {
+							if ( count( $group_names ) > 0 ) {
+								$output .= ' ';
+								$output .= '(' . wp_filter_nohtml_kses( implode( ', ', $group_names ) ) . ')';
+							}
 						}
-						$output .= '</label>';
-						$output .= '</li>';
+						$output .= '</option>';
 					}
 				}
 			}
-			$output .= '</ul>';
+			$output .= '</select>';
+			$output .= '<script type="text/javascript">';
+			$output .= 'if (typeof jQuery !== "undefined"){';
+			$output .= 'jQuery(".chosen.capability").chosen({width: "100%",search_contains:true});';
+			$output .= '}';
+			$output .= '</script>';
+			$output .= '<style type="text/css">';
+			$output .= '.chosen-capability-container input[type="text"] { min-height: 2em; }';
+			$output .= '</style>';
 			$output .= '</div>';
 
 			$output .= '<p class="description">';
@@ -200,13 +319,20 @@ class Groups_Access_Meta_Boxes {
 			$output .= '<label>';
 			$output .= sprintf( '<input style="width:100%%;margin-right:-20px;" id="quick-group-capability" name="quick-group-capability" class="quick-group-capability" type="text" value="" placeholder="%s"/>', __( 'Quick-create group &amp; capability', GROUPS_PLUGIN_DOMAIN ) );
 			$output .= sprintf(
-				'<img style="%s" alt="?" title="%s" src="%s" />',
+				'<img id="quick-create-help-icon" style="%s" alt="?" title="%s" src="%s" />',
 				$style,
-				esc_attr( __( 'You can create a new group and capability here. The capability will be assigned to the group and enabled to enforce read access. The name of the capability is based on the name of the group. If the group already exists, a new capability is created and assigned to the existing group. If the capability already exists, it will be assigned to the group. If both already exist, the capability is enabled to enforce read access. Your user account will be assigned to the group.', GROUPS_PLUGIN_DOMAIN ) ),
+				esc_attr( __( 'You can create a new group and capability here. The capability will be assigned to the group and enabled to enforce read access. Group names are case-sensitive, the name of the capability is the lower-case version of the name of the group. If the group already exists, a new capability is created and assigned to the existing group. If the capability already exists, it will be assigned to the group. If both already exist, the capability is enabled to enforce read access. In order to be able to use the capability, your user account will be assigned to the group.', GROUPS_PLUGIN_DOMAIN ) ),
 				esc_attr( GROUPS_PLUGIN_URL . 'images/help.png' )
 			);
 			$output .= '</label>';
 			$output .= '</div>';
+			$output .= '<script type="text/javascript">';
+			$output .= 'if (typeof jQuery !== "undefined"){';
+			$output .= 'jQuery("#quick-create-help-icon").click(function(){';
+			$output .= 'jQuery("#contextual-help-link").click();';
+			$output .= '});';
+			$output .= '}';
+			$output .= '</script>';
 		}
 
 		echo $output;
