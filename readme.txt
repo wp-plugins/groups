@@ -371,6 +371,8 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 = 1.3.14 =
 * Added the option to quick-create group and capability within the access restriction meta-box.
 * Added the option to show groups granting access per capability in the access restriction meta-box.
+* Added the quick-create field to the access restrictions meta-box which allows to create group & capability on the fly.
+* Added [Chosen](http://harvesthq.github.io/chosen/) and using it in the access restrictions meta-box instead of checkboxes.
  
 = 1.3.13 =
 * Fixed duplicate postmeta created when saving access restriction capabilities for a post.
@@ -515,7 +517,7 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 == Upgrade Notice ==
 
 = 1.3.14 =
-* New useful features: quick-create group and capability directly on posts (access restriction); groups are shown along with access restriction capabilities (can be toggled).
+* New useful features, UI and workflow improvements. Quick-create group and capability directly on posts (access restriction); groups are shown along with access restriction capabilities (can be toggled).
 
 = 1.3.13 =
 * Minor fixes (also tested WordPress 3.6.1 compatibility).
