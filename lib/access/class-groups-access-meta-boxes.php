@@ -25,12 +25,12 @@
  * @link http://codex.wordpress.org/Function_Reference/add_meta_box
  */
 class Groups_Access_Meta_Boxes {
-	
-	const NONCE = 'groups-meta-box-nonce';
+
+	const NONCE          = 'groups-meta-box-nonce';
 	const SET_CAPABILITY = 'set-capability';
-	const READ_ACCESS = 'read-access';
-	const CAPABILITY = 'capability';
-	const SHOW_GROUPS = 'access-meta-box-show-groups';
+	const READ_ACCESS    = 'read-access';
+	const CAPABILITY     = 'capability';
+	const SHOW_GROUPS    = 'access-meta-box-show-groups';
 
 	/**
 	 * Hooks for capabilities meta box and saving options.
@@ -42,13 +42,14 @@ class Groups_Access_Meta_Boxes {
 
 		add_action( 'attachment_fields_to_edit', array( __CLASS__, 'attachment_fields_to_edit' ), 10, 2 );
 		add_action( 'attachment_fields_to_save', array( __CLASS__, 'attachment_fields_to_save' ), 10, 2 );
+
 	}
 
 	/**
 	 * Triggered by init() to add capability meta box.
 	 */
 	public static function add_meta_boxes( $post_type, $post = null ) {
-		global $wp_version, $groups_version;
+		global $wp_version;
 		$post_type_object = get_post_type_object( $post_type );
 		if ( $post_type_object && $post_type != 'attachment' ) {
 			$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
@@ -76,12 +77,8 @@ class Groups_Access_Meta_Boxes {
 					);
 				}
 
-				if ( !wp_script_is( 'chosen' ) ) {
-					wp_enqueue_script( 'chosen', GROUPS_PLUGIN_URL . 'js/chosen/chosen.jquery.min.js', array( 'jquery' ), $groups_version, false );
-				}
-				if ( !wp_style_is( 'chosen' ) ) {
-					wp_enqueue_style( 'chosen', GROUPS_PLUGIN_URL . 'css/chosen/chosen.min.css', array(), $groups_version );
-				}
+				self::enqueue();
+
 				if ( current_user_can( GROUPS_ADMINISTER_GROUPS ) ) {
 					if ( $screen = get_current_screen() ) {
 						$screen->add_help_tab( array(
@@ -173,10 +170,11 @@ class Groups_Access_Meta_Boxes {
 
 			$read_caps = get_post_meta( $post_id, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
 			$valid_read_caps = Groups_Options::get_option( Groups_Post_Access::READ_POST_CAPABILITIES, array( Groups_Post_Access::READ_POST_CAPABILITY ) );
-			$output .= '<div class="chosen-capability-container">';
+			$output .= '<div class="select-capability-container">';
 			$output .= sprintf(
-				'<select class="chosen capability" name="%s" multiple="multiple" data-placeholder="%s" title="%s">',
+				'<select class="select capability" name="%s" multiple="multiple" placeholder="%s" data-placeholder="%s" title="%s">',
 				self::CAPABILITY . '[]',
+				__( 'Type and choose &hellip;', GROUPS_PLUGIN_DOMAIN),
 				__( 'Type and choose &hellip;', GROUPS_PLUGIN_DOMAIN),
 				__( 'Choose one or more capabilities to restrict access. Groups that grant access through the capabilities are shown in parenthesis. If no capabilities are available yet, you can use the quick-create box to create a group and capability enabled for access restriction on the fly.', GROUPS_PLUGIN_DOMAIN )
 			);
@@ -222,11 +220,11 @@ class Groups_Access_Meta_Boxes {
 			$output .= '</select>';
 			$output .= '<script type="text/javascript">';
 			$output .= 'if (typeof jQuery !== "undefined"){';
-			$output .= 'jQuery(".chosen.capability").chosen({width: "100%",search_contains:true});';
+			$output .= 'jQuery(".select.capability").selectize({plugins: ["remove_button"]});';
 			$output .= '}';
 			$output .= '</script>';
 			$output .= '<style type="text/css">';
-			$output .= '.chosen-capability-container input[type="text"] { min-height: 2em; }';
+			$output .= '.select-capability-container input[type="text"] { min-height: 2em; }';
 			$output .= '</style>';
 			$output .= '</div>';
 
@@ -422,12 +420,34 @@ class Groups_Access_Meta_Boxes {
 	}
 
 	/**
+	 * Enqueue scripts and styles.
+	 */
+	private static function enqueue() {
+		global $groups_version;
+		if ( !wp_script_is( 'chosen' ) ) {
+			wp_enqueue_script( 'chosen', GROUPS_PLUGIN_URL . 'js/chosen/chosen.jquery.min.js', array( 'jquery' ), $groups_version, false );
+		}
+		if ( !wp_style_is( 'chosen' ) ) {
+			wp_enqueue_style( 'chosen', GROUPS_PLUGIN_URL . 'css/chosen/chosen.min.css', array(), $groups_version );
+		}
+		if ( !wp_script_is( 'selectize' ) ) {
+			wp_enqueue_script( 'selectize', GROUPS_PLUGIN_URL . 'js/selectize/selectize.min.js', array( 'jquery' ), $groups_version, false );
+		}
+		if ( !wp_style_is( 'selectize' ) ) {
+			wp_enqueue_style( 'selectize', GROUPS_PLUGIN_URL . 'css/selectize/selectize.bootstrap2.css', array(), $groups_version );
+		}
+	}
+
+	/**
 	 * Render capabilities box for attachment post type (Media).
 	 * @param array $form_fields
 	 * @param object $post
 	 * @return array
 	 */
 	public static function attachment_fields_to_edit( $form_fields, $post ) {
+
+		self::enqueue();
+
 		$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
 		if ( !isset( $post_types_option['attachment']['add_meta_box'] ) || $post_types_option['attachment']['add_meta_box'] ) {
 			if ( self::user_can_restrict() ) {
@@ -438,20 +458,88 @@ class Groups_Access_Meta_Boxes {
 				$output .= __( "Enforce read access", GROUPS_PLUGIN_DOMAIN );
 				$read_caps = get_post_meta( $post->ID, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
 				$valid_read_caps = self::get_valid_read_caps_for_user();
-				$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
-				$output .= '<ul>';
+
+				// @todo On attachments edited within the 'Insert Media' popup, the update is triggered too soon and we end up with only the last capability selected.
+				// This occurs when using normal checkboxes as well as the select below (Chosen and Selectize tested).
+				// With checkboxes it's even more confusing, it's actually better to have it using Selectize as below
+				// because the visual feedback corresponds with what is assigned.
+
+// 				$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
+// 				$output .= '<ul>';
+// 				foreach( $valid_read_caps as $valid_read_cap ) {
+// 					if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
+// 						$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
+// 						$output .= '<li>';
+// 						$output .= '<label>';
+// 						$output .= '<input name="attachments[' . $post->ID . '][' . self::CAPABILITY . '][]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
+// 						$output .= wp_filter_nohtml_kses( $capability->capability );
+// 						$output .= '</label>';
+// 						$output .= '</li>';
+// 					}
+// 				}
+// 				$output .= '</ul>';
+// 				$output .= '</div>';
+
+				$show_groups = Groups_Options::get_user_option( self::SHOW_GROUPS, true );
+				$output .= '<div class="select-capability-container">';
+				$select_id = 'attachments-' . $post->ID . '-' . self::CAPABILITY;
+				$output .= sprintf(
+					'<select id="%s" class="select capability" name="%s" multiple="multiple" data-placeholder="%s" title="%s">',
+					$select_id,
+					'attachments[' . $post->ID . '][' . self::CAPABILITY . '][]',
+					__( 'Type and choose &hellip;', GROUPS_PLUGIN_DOMAIN),
+					__( 'Choose one or more capabilities to restrict access. Groups that grant access through the capabilities are shown in parenthesis. If no capabilities are available yet, you can use the quick-create box to create a group and capability enabled for access restriction on the fly.', GROUPS_PLUGIN_DOMAIN )
+				);
+				$output .= '<option value=""></option>';
 				foreach( $valid_read_caps as $valid_read_cap ) {
 					if ( $capability = Groups_Capability::read_by_capability( $valid_read_cap ) ) {
-						$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
-						$output .= '<li>';
-						$output .= '<label>';
-						$output .= '<input name="attachments[' . $post->ID . '][' . self::CAPABILITY . '][]" ' . $checked . ' type="checkbox" value="' . esc_attr( $capability->capability_id ) . '" />';
-						$output .= wp_filter_nohtml_kses( $capability->capability );
-						$output .= '</label>';
-						$output .= '</li>';
+						if ( $user->can( $capability->capability ) ) {
+							$c = new Groups_Capability( $capability->capability_id );
+							$groups = $c->groups;
+							$group_names = array();
+							if ( !empty( $groups ) ) {
+								foreach( $groups as $group ) {
+									$group_names[] = $group->name;
+								}
+							}
+							if ( count( $group_names ) > 0 ) {
+								$label_title = sprintf(
+									_n(
+										'Members of the %1$s group can access this %2$s through this capability.',
+										'Members of the %1$s groups can access this %2$s through this capability.',
+										count( $group_names ),
+										GROUPS_PLUGIN_DOMAIN
+									),
+									wp_filter_nohtml_kses( implode( ',', $group_names ) ),
+									$post_singular_name
+								);
+							} else {
+								$label_title = __( 'No groups grant access through this capability. To grant access to group members using this capability, you should assign it to a group and enable the capability for access restriction.', GROUPS_PLUGIN_DOMAIN );
+							}
+							$checked = in_array( $capability->capability, $read_caps ) ? ' checked="checked" ' : '';
+							$output .= sprintf( '<option value="%s" %s>', esc_attr( $capability->capability_id ), in_array( $capability->capability, $read_caps ) ? ' selected="selected" ' : '' );
+							$output .= wp_filter_nohtml_kses( $capability->capability );
+							if ( $show_groups ) {
+								if ( count( $group_names ) > 0 ) {
+									$output .= ' ';
+									$output .= '(' . wp_filter_nohtml_kses( implode( ', ', $group_names ) ) . ')';
+								}
+							}
+							$output .= '</option>';
+						}
 					}
 				}
-				$output .= '</ul>';
+				$output .= '</select>';
+				$output .= '<script type="text/javascript">';
+				$output .= 'if (typeof jQuery !== "undefined"){';
+				$output .= 'jQuery("document").ready(function(){';
+				$output .= 'jQuery("#' . $select_id . '").selectize({plugins: ["remove_button"]});';
+				$output .= '});';
+				$output .= '}';
+				$output .= '</script>';
+				$output .= '<style type="text/css">';
+				$output .= '.select-capability-container input[type="text"] { min-height: 2em; }';
+				$output .= '</style>';
 				$output .= '</div>';
 
 				$output .= '<p class="description">';
