@@ -24,7 +24,9 @@
  */
 class Groups_Admin {
 	public static function init() {
-		add_action( 'admin_init', array( __CLASS__, 'admin_init' ) );
+		// Act late: we only register our style and let others provide
+		// their Chosen first.
+		add_action( 'admin_init', array( __CLASS__, 'admin_init' ), 999 );
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
 		add_action( 'network_admin_menu', array( __CLASS__, 'network_admin_menu' ) );
@@ -39,8 +41,8 @@ class Groups_Admin {
 	public static function admin_init() {
 		global $groups_version;
 		wp_register_style( 'groups_admin', GROUPS_PLUGIN_URL . 'css/groups_admin.css', array(), $groups_version );
-		if ( !wp_style_is( 'chosen' ) ) {
-			wp_enqueue_style( 'chosen', GROUPS_PLUGIN_URL . 'css/chosen/chosen.min.css', array(), $groups_version );
+		if ( !wp_style_is( 'chosen', 'registered' ) ) {
+			wp_register_style( 'chosen', GROUPS_PLUGIN_URL . 'css/chosen/chosen.min.css', array(), $groups_version );
 		}
 	}
 	
@@ -51,6 +53,9 @@ class Groups_Admin {
 	 */
 	public static function admin_print_styles() {
 		wp_enqueue_style( 'groups_admin' );
+		if ( !wp_style_is( 'chosen', 'enqueued' ) ) {
+			wp_enqueue_style( 'chosen' );
+		}
 	}
 	
 	/**
