@@ -470,7 +470,7 @@ class Groups_Access_Meta_Boxes {
 
 				// @todo On attachments edited within the 'Insert Media' popup, the update is triggered too soon and we end up with only the last capability selected.
 				// This occurs when using normal checkboxes as well as the select below (Chosen and Selectize tested).
-				// With checkboxes it's even more confusing, it's actually better to have it using Selectize as below
+				// With checkboxes it's even more confusing, it's actually better to have it using a select as below,
 				// because the visual feedback corresponds with what is assigned.
 
 // 				$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
