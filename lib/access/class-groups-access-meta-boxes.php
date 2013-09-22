@@ -348,7 +348,7 @@ class Groups_Access_Meta_Boxes {
 									if ( !empty( $_POST['quick-group-capability'] ) ) {
 										$creator_id = get_current_user_id();
 										$datetime	= date( 'Y-m-d H:i:s', time() );
-										$name		= trim( $_POST['quick-group-capability'] );
+										$name		= ucfirst( strtolower( trim( $_POST['quick-group-capability'] ) ) );
 										if ( strlen( $name ) > 0 ) {
 											// create or obtain the group
 											if ( $group = Groups_Group::read_by_name( $name ) ) {
