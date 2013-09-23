@@ -32,12 +32,13 @@ class Groups_Access_Meta_Boxes {
 	const CAPABILITY     = 'capability';
 	const SHOW_GROUPS    = 'access-meta-box-show-groups';
 
-	const WHICH_SELECT   = 'chosen';
-
 	/**
 	 * Hooks for capabilities meta box and saving options.
 	 */
 	public static function init() {
+
+		require_once GROUPS_VIEWS_LIB . '/class-groups-uie.php';
+
 		add_action( 'add_meta_boxes', array( __CLASS__, "add_meta_boxes" ), 10, 2 );
 		add_action( 'save_post', array( __CLASS__, "save_post" ), 10, 2 );
 		add_filter( 'wp_insert_post_empty_content', array( __CLASS__, 'wp_insert_post_empty_content' ), 10, 2 );
@@ -79,7 +80,7 @@ class Groups_Access_Meta_Boxes {
 					);
 				}
 
-				self::enqueue();
+				Groups_UIE::enqueue( 'select' );
 
 				if ( current_user_can( GROUPS_ADMINISTER_GROUPS ) ) {
 					if ( $screen = get_current_screen() ) {
@@ -220,18 +221,20 @@ class Groups_Access_Meta_Boxes {
 				}
 			}
 			$output .= '</select>';
-			$output .= '<script type="text/javascript">';
-			$output .= 'if (typeof jQuery !== "undefined"){';
-			if ( self::WHICH_SELECT == 'chosen' ) {
-				$output .= 'jQuery(".select.capability").chosen({width:"100%",search_contains:true});';
-			} else {
-				$output .= 'jQuery(".select.capability").selectize({plugins: ["remove_button"]});';
-			}
-			$output .= '}';
-			$output .= '</script>';
-			$output .= '<style type="text/css">';
-			$output .= '.select-capability-container input[type="text"] { min-height: 2em; }';
-			$output .= '</style>';
+			
+			$output .= Groups_UIE::render_select( '.select.capability' );
+// 			$output .= '<script type="text/javascript">';
+// 			$output .= 'if (typeof jQuery !== "undefined"){';
+// 			if ( self::WHICH_SELECT == 'chosen' ) {
+// 				$output .= 'jQuery(".select.capability").chosen({width:"100%",search_contains:true});';
+// 			} else {
+// 				$output .= 'jQuery(".select.capability").selectize({plugins: ["remove_button"]});';
+// 			}
+// 			$output .= '}';
+// 			$output .= '</script>';
+// 			$output .= '<style type="text/css">';
+// 			$output .= '.select-capability-container input[type="text"] { min-height: 2em; }';
+// 			$output .= '</style>';
 			$output .= '</div>';
 
 			$output .= '<p class="description">';
@@ -455,7 +458,7 @@ class Groups_Access_Meta_Boxes {
 	 */
 	public static function attachment_fields_to_edit( $form_fields, $post ) {
 
-		self::enqueue();
+		Groups_UIE::enqueue( 'select' );
 
 		$post_types_option = Groups_Options::get_option( Groups_Post_Access::POST_TYPES, array() );
 		if ( !isset( $post_types_option['attachment']['add_meta_box'] ) || $post_types_option['attachment']['add_meta_box'] ) {
@@ -539,20 +542,9 @@ class Groups_Access_Meta_Boxes {
 					}
 				}
 				$output .= '</select>';
-				$output .= '<script type="text/javascript">';
-				$output .= 'if (typeof jQuery !== "undefined"){';
-				$output .= 'jQuery("document").ready(function(){';
-				if ( self::WHICH_SELECT == 'chosen' ) {
-					$output .= 'jQuery("#' . $select_id . '").chosen({width:"100%",search_contains:true});';
-				} else {
-					$output .= 'jQuery("#' . $select_id . '").selectize({plugins: ["remove_button"]});';
-				}
-				$output .= '});';
-				$output .= '}';
-				$output .= '</script>';
-				$output .= '<style type="text/css">';
-				$output .= '.select-capability-container input[type="text"] { min-height: 2em; }';
-				$output .= '</style>';
+
+				$output .= Groups_UIE::render_select( '#'.$select_id );
+
 				$output .= '</div>';
 
 				$output .= '<p class="description">';

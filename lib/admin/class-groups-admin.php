@@ -24,7 +24,7 @@
  */
 class Groups_Admin {
 	public static function init() {
-		add_action( 'admin_init', array( __CLASS__, 'admin_init' ) );
+		add_action( 'admin_init', array( __CLASS__, 'admin_init' ), 190000 );
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
 		add_action( 'network_admin_menu', array( __CLASS__, 'network_admin_menu' ) );
@@ -38,11 +38,20 @@ class Groups_Admin {
 	*/
 	public static function admin_init() {
 		global $groups_version;
+		
+		// @todo remove / clean up
+// 		global $wp_styles, $wp_scripts;
+		
+
+		
+		
 		wp_register_style( 'groups_admin', GROUPS_PLUGIN_URL . 'css/groups_admin.css', array(), $groups_version );
-		if ( wp_style_is( 'chosen', 'registered' ) ) {
-			wp_deregister_style( 'chosen' );
-		}
-		wp_register_style( 'chosen', GROUPS_PLUGIN_URL . 'css/chosen/chosen.min.css', array(), $groups_version );
+// 		if ( wp_style_is( 'chosen', 'registered' ) ) {
+// 			wp_deregister_style( 'chosen' );
+// 		}
+// 		wp_register_style( 'chosen', GROUPS_PLUGIN_URL . 'css/chosen/chosen.min.css', array(), $groups_version );
+		require_once GROUPS_VIEWS_LIB . '/class-groups-uie.php';
+		
 	}
 	
 	/**
@@ -52,10 +61,10 @@ class Groups_Admin {
 	 */
 	public static function admin_print_styles() {
 		wp_enqueue_style( 'groups_admin' );
-		if ( wp_style_is( 'chosen', 'enqueued' ) ) {
-			wp_dequeue_style( 'chosen' );
-		}
-		wp_enqueue_style( 'chosen' );
+// 		if ( wp_style_is( 'chosen', 'enqueued' ) ) {
+// 			wp_dequeue_style( 'chosen' );
+// 		}
+// 		wp_enqueue_style( 'chosen' );
 	}
 	
 	/**
@@ -63,11 +72,16 @@ class Groups_Admin {
 	 */
 	public static function admin_print_scripts() {
 		global $groups_version;
-		wp_enqueue_script( 'groups', GROUPS_PLUGIN_URL . 'js/groups_admin.js', array( ), $groups_version );
-		if ( wp_script_is( 'chosen' ) ) {
-			wp_dequeue_script( 'chosen' );
-		}
-		wp_enqueue_script( 'chosen', GROUPS_PLUGIN_URL . 'js/chosen/chosen.jquery.min.js', array( 'jquery' ), $groups_version, false );
+		
+		// this one's currently empty
+		//wp_enqueue_script( 'groups_admin', GROUPS_PLUGIN_URL . 'js/groups_admin.js', array( ), $groups_version );
+		
+		Groups_UIE::enqueue( 'select' );
+		
+// 		if ( wp_script_is( 'chosen' ) ) {
+// 			wp_dequeue_script( 'chosen' );
+// 		}
+// 		wp_enqueue_script( 'chosen', GROUPS_PLUGIN_URL . 'js/chosen/chosen.jquery.min.js', array( 'jquery' ), $groups_version, false );
 	}
 	
 	/**
