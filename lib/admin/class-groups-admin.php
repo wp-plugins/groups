@@ -28,7 +28,7 @@ class Groups_Admin {
 	 * Sets up action hooks.
 	 */
 	public static function init() {
-		add_action( 'admin_init', array( __CLASS__, 'admin_init' ), 190000 );
+		add_action( 'admin_init', array( __CLASS__, 'admin_init' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'admin_notices' ) );
 		add_action( 'admin_menu', array( __CLASS__, 'admin_menu' ) );
 		add_action( 'network_admin_menu', array( __CLASS__, 'network_admin_menu' ) );
