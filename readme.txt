@@ -372,8 +372,8 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 * Added the option to quick-create group and capability within the access restriction meta-box.
 * Added the option to show groups granting access per capability in the access restriction meta-box.
 * Added the quick-create field to the access restrictions meta-box which allows to create group & capability on the fly.
-* Added [Chosen](http://harvesthq.github.io/chosen/) and using it in the access restrictions meta-box instead of checkboxes.
-* Improved the Groups > Options screen using a Chosen-based selection of capabilities that are enabled for access restriction.
+* Added [Selectize.js](http://brianreavis.github.io/selectize.js/) and using it in the access restrictions meta-box instead of checkboxes.
+* Improved the Groups > Options screen using a Selectize-based selection of capabilities that are enabled for access restriction.
  
 = 1.3.13 =
 * Fixed duplicate postmeta created when saving access restriction capabilities for a post.
