@@ -46,9 +46,9 @@ function groups_admin_groups_remove( $group_id ) {
 	$output =
 		'<div class="manage-groups">' .
 		'<div>' .
-			'<h2>' .
-				__( 'Remove a group', GROUPS_PLUGIN_DOMAIN ) .
-			'</h2>' .
+		'<h2>' .
+		__( 'Remove a group', GROUPS_PLUGIN_DOMAIN ) .
+		'</h2>' .
 		'</div>' .
 		'<form id="remove-group" action="' . $current_url . '" method="post">' .
 		'<div class="group remove">' .
@@ -96,4 +96,108 @@ function groups_admin_groups_remove_submit() {
 	}
 	return $result;
 } // function groups_admin_groups_remove_submit
-?>
+
+/**
+ * Shows form to confirm bulk-removal of groups.
+ */
+function groups_admin_groups_bulk_remove() {
+
+	global $wpdb;
+
+	$output = '';
+
+	if ( !current_user_can( GROUPS_ADMINISTER_GROUPS ) ) {
+		wp_die( __( 'Access denied.', GROUPS_PLUGIN_DOMAIN ) );
+	}
+
+	$group_ids = isset( $_POST['group_ids'] ) ? $_POST['group_ids'] : null;
+
+	if ( ! $group_ids ) {
+		wp_die( __( 'No such groups.', GROUPS_PLUGIN_DOMAIN ) );
+	}
+
+	$groups = array();
+	foreach ( $group_ids as $group_id ) {
+		$group = Groups_Group::read( intval( $group_id ) );
+		if ( $group ) {
+			$groups[] = $group;
+		}
+	}
+
+	$group_table = _groups_get_tablename( 'group' );
+
+	$current_url = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	$current_url = remove_query_arg( 'action', $current_url );
+	$current_url = remove_query_arg( 'group_id', $current_url );
+
+	$output .= '<div class="manage-groups">';
+	$output .= '<div>';
+	$output .= '<h2>';
+	$output .= __( 'Remove groups', GROUPS_PLUGIN_DOMAIN );
+	$output .= '</h2>';
+	$output .= '</div>';
+
+	$output .= '<form id="groups-action" method="post" action="">';
+	$output .= '<div class="group remove">';
+
+	$output .= '<p>';
+	$output .= __( 'Please confirm removal of the following groups. This action cannot be undone.', GROUPS_PLUGIN_DOMAIN );
+	$output .= '</p>';
+
+	foreach ( $groups as $group ) {
+		$output .= 	'<input id="group_ids" name="group_ids[]" type="hidden" value="' . esc_attr( intval( $group->group_id ) ) . '"/>';
+		$output .= '<ul>';
+		$output .= '<li>';
+		$output .= sprintf( __( '<strong>%s</strong>', GROUPS_PLUGIN_DOMAIN ), wp_filter_nohtml_kses( $group->name ) );
+		$output .= '</li>';
+		$output .= '</ul>';
+	}
+	$output .= '<input class="button" type="submit" name="bulk" value="' . __( "Remove", GROUPS_PLUGIN_DOMAIN ) . '"/>';
+	$output .= '<a class="cancel" href="' . $current_url . '">' . __( 'Cancel', GROUPS_PLUGIN_DOMAIN ) . '</a>';
+
+	$output .= '<input type="hidden" name="action" value="groups-action"/>';
+	$output .= '<input type="hidden" name="bulk-action" value="remove-group"/>';
+	$output .= '<input type="hidden" name="confirm" value="1"/>';
+	$output .= wp_nonce_field( 'admin', GROUPS_ADMIN_GROUPS_ACTION_NONCE, true, false );
+
+	$output .= '</div>';
+	$output .= '</form>';
+	$output .= '</div>';
+
+	echo $output;
+
+	Groups_Help::footer();
+} // function groups_admin_groups_bulk_remove
+
+/**
+ * Handle remove form submission.
+ * @return array of deleted groups' ids
+ */
+function groups_admin_groups_bulk_remove_submit() {
+	global $wpdb;
+
+	$result = array();
+	if ( !current_user_can( GROUPS_ADMINISTER_GROUPS ) ) {
+		wp_die( __( 'Access denied.', GROUPS_PLUGIN_DOMAIN ) );
+	}
+
+	if ( !wp_verify_nonce( $_POST[GROUPS_ADMIN_GROUPS_ACTION_NONCE], 'admin' ) ) {
+		wp_die( __( 'Access denied.', GROUPS_PLUGIN_DOMAIN ) );
+	}
+
+	$group_ids = isset( $_POST['group_ids'] ) ? $_POST['group_ids'] : null;
+	if ( $group_ids ) {
+		foreach ( $group_ids as $group_id ) {
+			$group = Groups_Group::read( $group_id );
+			if ( $group ) {
+				if ( $group->name !== Groups_Registered::REGISTERED_GROUP_NAME ) {
+					if ( Groups_Group::delete( $group_id ) ) {
+						$result[] = $group->group_id;
+					}
+				}
+			}
+		}
+	}
+
+	return $result;
+} // function groups_admin_groups_bulk_remove_submit
