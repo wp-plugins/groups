@@ -180,6 +180,7 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 = 1.4.1 =
 * Added: Better group-assignment on the Users admin screen, allows to assign/remove multiple users to/from multiple groups along with a better UI.
 * Changed: Groups requires at least WordPress 3.5 now, although this only affects the group-action functionality on the Users admin screen, the restrict_manage_users action which is now used to render the UI elements needed, was introduced with WordPress 3.5.
+* Added: Extensions box in Options.
 * Improved: Groups section in user profile with added description.
 
 = 1.4.0 =
