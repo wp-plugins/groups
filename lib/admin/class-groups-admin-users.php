@@ -23,9 +23,9 @@
  * Users admin integration with Groups.
  */
 class Groups_Admin_Users {
-	
+
 	const GROUPS = 'groups_user_groups';
-	
+
 	/**
 	 * Hooks into filters to add the Groups column to the users table.
 	 */
@@ -33,7 +33,7 @@ class Groups_Admin_Users {
 		// we hook this on admin_init so that current_user_can() is available
 		add_action( 'admin_init', array( __CLASS__, 'setup' ) );
 	}
-	
+
 	/**
 	 * Adds the filters and actions only for users who have the right
 	 * Groups permissions.
@@ -47,6 +47,9 @@ class Groups_Admin_Users {
 		}
 		if ( current_user_can( GROUPS_ADMINISTER_GROUPS ) ) {
 			if ( !is_network_admin() ) {
+				// scripts
+				add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
+				// styles
 				add_action( 'admin_head', array( __CLASS__, 'admin_head' ) );
 				// allow to add or remove selected users to groups
 				add_action( 'load-users.php', array( __CLASS__, 'load_users' ) );
@@ -54,10 +57,17 @@ class Groups_Admin_Users {
 				add_filter( 'views_users', array( __CLASS__, 'views_users' ) );
 				// modify query to filter users by group
 				add_filter( 'pre_user_query', array( __CLASS__, 'pre_user_query' ) );
+				// WP_Users_List_Table implements extra_tablenav() where the restrict_manage_users action is invoked.
+				// As the extra_tablenav() method does not define a generic extension point, this is
+				// the best shot we get at inserting our group actions block (currently we're at WordPress 3.6.1). 
+				// We choose to use our own group-actions block instead of re-using the existing bulk-actions,
+				// to have a more explicit user interface which makes it clear that these actions
+				// are directed at relating users and groups.
+				add_action( 'restrict_manage_users', array( __CLASS__, 'restrict_manage_users' ), 0 );
 			}
 		}
 	}
-	
+
 	/**
 	 * Modify query to filter users by group.
 	 * 
@@ -87,61 +97,110 @@ class Groups_Admin_Users {
 		}
 		return $user_query;
 	}
-	
+
+	/**
+	 * Enqueue scripts the group-actions.
+	 */
+	public static function admin_enqueue_scripts() {
+
+		global $pagenow;
+
+		if ( ( $pagenow == 'users.php' ) && empty( $_GET['page'] ) ) {
+			Groups_UIE::enqueue( 'select' );
+		}
+	}
+
 	/**
 	 * Adds the group add/remove buttons after the last action box.
 	 */
 	public static function admin_head() {
-		global $pagenow, $wpdb;
+
+		global $pagenow;
+
 		if ( ( $pagenow == 'users.php' ) && empty( $_GET['page'] ) ) {
-			
-			$group_table = _groups_get_tablename( "group" );
-			// groups select
-			$groups_select = "<select class='groups' style='float:none;' name='group_id'>";
-			$groups = $wpdb->get_results( "SELECT * FROM $group_table ORDER BY name" );
-			foreach( $groups as $group ) {
-				$groups_select .= "<option value='" . esc_attr( $group->group_id ) . "'>" . wp_filter_nohtml_kses( $group->name ) . "</option>";
-			}
-			$groups_select .= "</select>";
-			
-			// we add this inside the form that contains the bulk
-			// action and role change buttons
-			$box = "<div class='alignleft actions' style='padding-left:1em'>";
-			$box .= "<input class='button' type='submit' name='add-to-group' value='" . __( "Add", GROUPS_PLUGIN_DOMAIN ) . "'/>";
-			$box .= "&nbsp;/&nbsp;";
-			$box .= "<input class='button' type='submit' name='remove-from-group' value='" . __( "Remove", GROUPS_PLUGIN_DOMAIN ) . "'/>";
-			$box .= "&nbsp;";
-			$box .= __( 'selected to / from group:', GROUPS_PLUGIN_DOMAIN );
-			$box .= "&nbsp;";
-			$box .= "<label class='screen-reader-text' for='group_id'>" . __( 'Group', GROUPS_PLUGIN_DOMAIN ) . "</label>";
-			$box .= $groups_select;
-			$box .= "</div>";
-			
-			$nonce = wp_nonce_field( 'user-group', 'bulk-user-group-nonce', true, false );
-			$nonce = str_replace('"', "'", $nonce );
-			$box .= $nonce;
-			
-			// @todo replace when a hook allows us to add actions to the users table
-			// Another option is to extend the users table and implement it in extra_tablenav()
-			// but that would require either to replace the users admin screen with
-			// that extended one or create our own section, e.g. Groups > Users.
-			echo '<script type="text/javascript">';
-			echo '
-			jQuery(function(){
-			jQuery(".tablenav.top .alignleft.actions:last").after("' . $box . '");
-			 });
-			 ';
-			echo '</script>';
-			
+
 			// .subsubsub rule added because with views_users() the list can get long
 			// icon distinguishes from role links
 			echo '<style type="text/css">';
 			echo '.subsubsub { white-space: normal; }';
 			echo 'a.group { background: url(' . GROUPS_PLUGIN_URL . '/images/groups-grey-8x8.png) transparent no-repeat left center; padding-left: 10px;}';
 			echo '</style>';
+
+			// group-actions
+			echo '<style type="text/css">';
+			echo '.groups-bulk-container { display: inline-block; line-height: 24px; padding-bottom: 1em; vertical-align: top; margin-left: 1em; margin-right: 1em; }';
+			echo '.groups-bulk-container .groups-select-container { display: inline-block; vertical-align: top; }';
+			echo '.groups-bulk-container .groups-select-container select, .groups-bulk-container select.groups-action { float: none; margin-right: 4px; vertical-align: top; }';
+			echo '.groups-bulk-container .selectize-control { min-width: 128px; }';
+			echo '.groups-bulk-container .selectize-control, .groups-bulk-container select.groups-action { margin-right: 4px; vertical-align: top; }';
+			echo '.groups-bulk-container .selectize-input { font-size: inherit; line-height: 18px; padding: 1px 2px 2px 2px; vertical-align: middle; }';
+			echo '.groups-bulk-container .selectize-input input[type="text"] { font-size: inherit; vertical-align: middle; }';
+			echo '.groups-bulk-container input.button { margin-top: 1px; vertical-align: top; }';
+			echo '.tablenav .actions { overflow: visible; }'; // this is important so that the selectize options aren't hidden
+			echo '</style>';
 		}
 	}
-	
+
+	/**
+	 * Renders group actions in the users table's extra_tablenav().
+	 */
+	public static function restrict_manage_users() {
+
+		global $pagenow, $wpdb;
+
+		$output = '';
+
+		if ( ( $pagenow == 'users.php' ) && empty( $_GET['page'] ) ) {
+			$group_table = _groups_get_tablename( "group" );
+			// groups select
+			$groups_table = _groups_get_tablename( 'group' );
+			if ( $groups = $wpdb->get_results( "SELECT * FROM $groups_table ORDER BY name" ) ) {
+				$groups_select = sprintf(
+					'<select id="user-groups" class="groups" name="group_ids[]" multiple="multiple" placeholder="%s" data-placeholder="%s">',
+					esc_attr( __( 'Choose groups &hellip;', GROUPS_PLUGIN_DOMAIN ) ) ,
+					esc_attr( __( 'Choose groups &hellip;', GROUPS_PLUGIN_DOMAIN ) )
+				);
+				foreach( $groups as $group ) {
+					$is_member = false;
+					$groups_select .= sprintf( '<option value="%d" %s>%s</option>', Groups_Utility::id( $group->group_id ), $is_member ? ' selected="selected" ' : '', wp_filter_nohtml_kses( $group->name ) );
+				}
+				$groups_select .= '</select>';
+
+			}
+
+			// group bulk actions added through extra_tablenav()
+			$box = '<div id="group-bulk-actions" class="groups-bulk-container">';
+			$box .= '<div class="groups-select-container">';
+			$box .= $groups_select;
+			$box .= '</div>';
+			$box .= '<select class="groups-action" name="groups-action">';
+			$box .= '<option selected="selected" value="-1">' . __( 'Group Actions', GROUPS_PLUGIN_DOMAIN ) . '</option>';
+			$box .= '<option value="add-group">' . __( 'Add to group', GROUPS_PLUGIN_DOMAIN ) . '</option>';
+			$box .= '<option value="remove-group">' . __( 'Remove from group', GROUPS_PLUGIN_DOMAIN ) . '</option>';
+			$box .= '</select>';
+			$box .= sprintf( '<input class="button" type="submit" name="groups" value="%s" />', __( 'Apply', GROUPS_PLUGIN_DOMAIN ) );
+			$box .= '</div>';
+			$box = str_replace( '"', "'", $box );
+
+			$nonce = wp_nonce_field( 'user-group', 'bulk-user-group-nonce', true, false );
+			$nonce = str_replace( '"', "'", $nonce );
+			$box .= $nonce;
+
+			$box .= '<script type="text/javascript">';
+			$box .= 'if ( typeof jQuery !== "undefined" ) {';
+			$box .= 'jQuery("document").ready(function(){';
+			$box .= 'jQuery(".tablenav.top .alignleft.actions:last").after("<div id=\"groups-bulk-actions-block\" class=\"alignleft actions\"></div>");';
+			$box .= 'jQuery("#group-bulk-actions").appendTo(jQuery("#groups-bulk-actions-block"));';
+			$box .= '});';
+			$box .= '}';
+			$box .= '</script>';
+
+			$output .= $box;
+			$output .= Groups_UIE::render_select( '#user-groups' );
+		}
+		echo $output;
+	}
+
 	/**
 	 * Hooked on filter in class-wp-list-table.php to add links that
 	 * filter by group.
@@ -171,37 +230,48 @@ class Groups_Admin_Users {
 		}
 		return $views;
 	}
-	
+
 	/**
 	 * Adds or removes users to/from groups.
 	 */
 	public static function load_users() {
 		if ( current_user_can( GROUPS_ADMINISTER_GROUPS ) ) {
-			$group_id = isset( $_REQUEST['group_id'] ) ? $_REQUEST['group_id'] : null;
 			$users = isset( $_REQUEST['users'] ) ? $_REQUEST['users'] : null;
 			$action = null;
-			if ( !empty( $_REQUEST['add-to-group'] ) ) {
-				$action = 'add';
-			} else if ( !empty( $_REQUEST['remove-from-group'] ) ) {
-				$action = 'remove';
+			if ( !empty( $_REQUEST['groups'] ) ) {
+				if ( $_GET['groups-action'] == "add-group" ) {
+					$action = 'add';
+				} else if ( $_GET['groups-action'] == "remove-group" ) {
+					$action = 'remove';
+				}
 			}
-			if ( $group_id !== null && $users !== null && $action !== null ) {
+			if ( $users !== null && $action !== null ) {
 				if ( wp_verify_nonce( $_REQUEST['bulk-user-group-nonce'], 'user-group' ) ) {
 					foreach( $users as $user_id ) {
 						switch ( $action ) {
 							case 'add':
-								if ( !Groups_User_Group::read( $user_id, $group_id ) ) {
-									Groups_User_Group::create(
-										array(
-											'user_id' => $user_id,
-											'group_id' => $group_id
-										)
-									);
+								$group_ids = isset( $_GET['group_ids'] ) ? $_GET['group_ids'] : null;
+								if ( $group_ids !== null ) {
+									foreach ( $group_ids as $group_id ) {
+										if ( !Groups_User_Group::read( $user_id, $group_id ) ) {
+											Groups_User_Group::create(
+												array(
+													'user_id' => $user_id,
+													'group_id' => $group_id
+												)
+											);
+										}
+									}
 								}
 								break;
 							case 'remove':
-								if ( Groups_User_Group::read( $user_id, $group_id ) ) {
-									Groups_User_Group::delete( $user_id, $group_id );
+								$group_ids = isset( $_GET['group_ids'] ) ? $_GET['group_ids'] : null;
+								if ( $group_ids !== null ) {
+									foreach ( $group_ids as $group_id ) {
+										if ( Groups_User_Group::read( $user_id, $group_id ) ) {
+											Groups_User_Group::delete( $user_id, $group_id );
+										}
+									}
 								}
 								break;
 						}
@@ -216,7 +286,7 @@ class Groups_Admin_Users {
 			}
 		}
 	}
-	
+
 	/**
 	 * Adds a new column to the users table to show the groups that users
 	 * belong to.
@@ -228,7 +298,7 @@ class Groups_Admin_Users {
 		$column_headers[self::GROUPS] = __( 'Groups', GROUPS_PLUGIN_DOMAIN );
 		return $column_headers;
 	}
-	
+
 	/**
 	 * Renders custom column content.
 	 * 
@@ -258,7 +328,7 @@ class Groups_Admin_Users {
 		}
 		return $output;
 	}
-	
+
 	/**
 	 * usort helper
 	 * @param Groups_Group $o1

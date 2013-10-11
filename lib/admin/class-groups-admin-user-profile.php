@@ -88,13 +88,20 @@ class Groups_Admin_User_Profile {
 			$user_groups = $user->groups;
 			$groups_table = _groups_get_tablename( 'group' );
 			if ( $groups = $wpdb->get_results( "SELECT * FROM $groups_table ORDER BY name" ) ) {
-				$output .= '<select id="user-groups" class="groups" name="group_ids[]" multiple="multiple">';
+				$output .= sprintf(
+					'<select id="user-groups" class="groups" name="group_ids[]" multiple="multiple" placeholder="%s" data-placeholder="%s">',
+					esc_attr( __( 'Choose groups &hellip;', GROUPS_PLUGIN_DOMAIN ) ) ,
+					esc_attr( __( 'Choose groups &hellip;', GROUPS_PLUGIN_DOMAIN ) )
+				);
 				foreach( $groups as $group ) {
 					$is_member = Groups_User_Group::read( $user->ID, $group->group_id ) ? true : false;
 					$output .= sprintf( '<option value="%d" %s>%s</option>', Groups_Utility::id( $group->group_id ), $is_member ? ' selected="selected" ' : '', wp_filter_nohtml_kses( $group->name ) );
 				}
 				$output .= '</select>';
 				$output .= Groups_UIE::render_select( '#user-groups' );
+				
+				$output .= '<p class="description">' . __( 'The user is a member of the chosen groups.', GROUPS_PLUGIN_DOMAIN ) . '</p>';
+				
 			}
 			echo $output;
 		}
