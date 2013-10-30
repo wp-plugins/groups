@@ -3,7 +3,7 @@ Contributors: itthinx
 Donate link: http://www.itthinx.com/plugins/groups
 Tags: access, access control, capability, capabilities, content, download, downloads, file, file access, files, group, groups, member, members, membership, memberships, paypal, permission, permissions, subscription, subscriptions, woocommerce
 Requires at least: 3.5
-Tested up to: 3.6.1
+Tested up to: 3.7.1
 Stable tag: 1.4.1
 License: GPLv3
 
@@ -177,6 +177,13 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.4.2 =
+* Added: Access restriction capabilities shown for enabled post types on overview screens.
+* WordPress 3.7.1 compatibility checked.
+* Fixed: Error caused by typo when obtaining group_ids_deep property for a Groups_User.
+* Changed: Replaced some __get calls by properties.
+* Added: Filter by access restriction capabilities for enabled post types on overview screens.
+ 
 = 1.4.1 =
 * Added: Better group-assignment on the Users admin screen, allows to assign/remove multiple users to/from multiple groups along with a better UI.
 * Changed: Groups requires at least WordPress 3.5 now, although this only affects the group-action functionality on the Users admin screen, the restrict_manage_users action which is now used to render the UI elements needed, was introduced with WordPress 3.5.
@@ -341,6 +348,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.4.2 =
+* Improved views and filters regarding access restrictions which are now shown in overviews for enabled post types. Checked WordPress 3.7.1 compatibility. Some bug fixes and internal improvements.
 
 = 1.4.1 =
 * From this release on, Groups requires at least WordPress 3.5. It includes improved group-actions for the Users admin screen, where multiple users can now be added to or removed from multiple groups at once.
