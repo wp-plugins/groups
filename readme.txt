@@ -177,6 +177,11 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.4.5 =
+* Using a WordPress API function get_post_type_capabilities() instead of semi-hardcoded capabilities for access restriction checks (affects CPTs).
+* Changed: Taking role-based capabilities into account when creating cache entries for the Groups_User object. The new groups_user_add_role_capabilities filter allows to modify this new behaviour by returning false.
+* Added: groups_user_add_role_capabilities filter.
+
 = 1.4.4 =
 * WordPress 3.8 compatibility checked.
 * Fixed: Access restriction options per post type when none is checked.
@@ -358,6 +363,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.4.5 =
+* Fixed incompatible access restriction checks on some custom post types. Taking role-based capabilities into account.
 
 = 1.4.4 =
 * WordPress 3.8 compatibility checked and fixed a minor bug.
