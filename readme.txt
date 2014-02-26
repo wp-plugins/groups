@@ -177,6 +177,20 @@ See also [Groups](http://www.itthinx.com/plugins/groups/)
 
 == Changelog ==
 
+= 1.4.8 =
+* Fixed: A closing tag in the group list on the user profile.
+* Fixed: Help wording.
+* Improved: Capabilities in the Access Restrictions column are sorted for more consistent display.
+* Improved: Reduced ID, Edit and Remove column widths on Groups and Capabilities screens.
+* Fixed: Stripping added slashes from groups and capabilities displayed.
+* Added: Feedback when groups and capabilities are created, updated or removed in admin.
+* Added: group and exclude_group attributes for the [groups_user_groups] shortcode.
+* Improved: Replaced remnant CR LF line-endings in code.
+* Fixed: Handling updates to a capability when the capability field is empty.
+* Fixed: Handling updates to a group when the name field is empty.
+* Fixed: Don't allow to use the name of another existing group when updating a group.
+* Fixed: Don't allow to use the name of another existing capability when updating one.
+
 = 1.4.7 =
 * Security improvement: plugin files accessed directly exit
 
@@ -372,6 +386,9 @@ Some installations wouldn't work correctly, showing no capabilities and making i
 * This is the first public beta release.
 
 == Upgrade Notice ==
+
+= 1.4.8 =
+* Several minor fixes and giving more feedback on the admin side for groups and capabilities.
 
 = 1.4.7 =
 * This update provides a low-priority security improvement and a fix related to output obtained through the_content and get_the_excerpt filters.
