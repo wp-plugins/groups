@@ -41,6 +41,7 @@ class Groups_Access_Meta_Boxes {
 	 */
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'wp_init' ) );
+		add_action( 'admin_init', array(__CLASS__,'admin_init' ) );
 	}
 
 	/**
@@ -57,6 +58,25 @@ class Groups_Access_Meta_Boxes {
 			add_action( 'attachment_fields_to_edit', array( __CLASS__, 'attachment_fields_to_edit' ), 10, 2 );
 			add_action( 'attachment_fields_to_save', array( __CLASS__, 'attachment_fields_to_save' ), 10, 2 );
 		}
+	}
+
+	/**
+	 * Hooked on admin_init to register our action on admin_enqueue_scripts.
+	 */
+	public static function admin_init() {
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_enqueue_scripts' ) );
+	}
+
+	/**
+	 * Hooked on admin_enqueue_scripts to timely enqueue resources required
+	 * on the media upload / attachment popup.
+	 */
+	public static function admin_enqueue_scripts() {
+		global $pagenow;
+		if ( $pagenow == 'upload.php' ) {
+			Groups_UIE::enqueue( 'select' );
+		}
+		
 	}
 
 	/**
@@ -496,10 +516,13 @@ class Groups_Access_Meta_Boxes {
 				$read_caps = get_post_meta( $post->ID, Groups_Post_Access::POSTMETA_PREFIX . Groups_Post_Access::READ_POST_CAPABILITY );
 				$valid_read_caps = self::get_valid_read_caps_for_user();
 
-				// @todo On attachments edited within the 'Insert Media' popup, the update is triggered too soon and we end up with only the last capability selected.
+				// On attachments edited within the 'Insert Media' popup, the update is triggered too soon and we end up with only the last capability selected.
 				// This occurs when using normal checkboxes as well as the select below (Chosen and Selectize tested).
 				// With checkboxes it's even more confusing, it's actually better to have it using a select as below,
 				// because the visual feedback corresponds with what is assigned.
+				// See http://wordpress.org/support/topic/multiple-access-restrictions-for-media-items-are-not-saved-in-grid-view
+				// and https://core.trac.wordpress.org/ticket/28053 - this is an issue with multiple value fields and should
+				// be fixed within WordPress.
 
 // 				$output .= '<div style="padding:0 1em;margin:1em 0;border:1px solid #ccc;border-radius:4px;">';
 // 				$output .= '<ul>';
