@@ -55,6 +55,9 @@
 div.field {
 	padding-bottom: 0.62em;
 }
+div.field a.cancel {
+	vertical-align: middle;
+}
 div.field input[type="submit"],
 div.group.remove input[type="submit"],
 div.capability.remove input[type="submit"] {
@@ -132,6 +135,10 @@ div.capability.edit label {
 
 .groups-overview td.capabilities ul {
 	margin: 0;
+}
+
+.groups-overview td.capabilities span.inherited {
+	font-style: italic;
 }
 
 .manage-groups .required,
@@ -213,7 +220,7 @@ div.groups-footer form {
 .groups-bulk-container .selectize-input {
 	font-size: inherit;
 	line-height: 18px;
-	padding: 0;
+	padding: 0 4px;
 	vertical-align: middle;
 }
 .groups-bulk-container .selectize-input input[type="text"] {

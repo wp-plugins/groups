@@ -134,11 +134,30 @@ function groups_admin_groups_edit( $group_id ) {
 	$output .= '</div>'; // .field
 	$output .= Groups_UIE::render_select( '.select.capability' );
 
+	$group_object = new Groups_Group( $group_id );
+	$group_capabilities = $group_object->capabilities;
+	$group_capabilities_deep = $group_object->capabilities_deep;
+	if ( ( count( $group_capabilities_deep ) - count( $group_capabilities ) ) > 0 ) {
+		usort( $group_capabilities_deep, 'groups_admin_sort_capabilities_by_capability' );
+		$output .= '<div class="field">';
+		$output .= __( 'Inherited capabilities:', GROUPS_PLUGIN_DOMAIN );
+		$output .= ' ';
+		$inherited_caps = array();
+		foreach ( $group_capabilities_deep as $group_capability ) {
+			$class = '';
+			if ( empty( $group_capabilities ) || !in_array( $group_capability, $group_capabilities ) ) {
+				$inherited_caps[] = wp_filter_nohtml_kses( $group_capability->capability->capability );
+			}
+		}
+		$output .= implode( ' ', $inherited_caps );
+		$output .= '</div>';
+	}
+
 	$output .= '<div class="field">';
 	$output .= wp_nonce_field( 'groups-edit', GROUPS_ADMIN_GROUPS_NONCE, true, false );
-	$output .= '<input class="button" type="submit" value="' . __( 'Save', GROUPS_PLUGIN_DOMAIN ) . '"/>';
+	$output .= '<input class="button button-primary" type="submit" value="' . __( 'Save', GROUPS_PLUGIN_DOMAIN ) . '"/>';
 	$output .= '<input type="hidden" value="edit" name="action"/>';
-	$output .= '<a class="cancel" href="' . $current_url . '">' . __( 'Cancel', GROUPS_PLUGIN_DOMAIN ) . '</a>';
+	$output .= '<a class="cancel button" href="' . $current_url . '">' . __( 'Cancel', GROUPS_PLUGIN_DOMAIN ) . '</a>';
 	$output .= '</div>';
 	$output .= '</div>'; // .group.edit
 	$output .= '</form>';
@@ -229,3 +248,15 @@ function groups_admin_groups_edit_submit() {
 	}
 
 } // function groups_admin_groups_edit_submit
+
+if ( !function_exists( 'groups_admin_sort_capabilities_by_capability' ) ) {
+/**
+ * usort helper
+ * @param Groups_Capability $o1
+ * @param Groups_Capability $o2
+ * @return int strcmp result for group names
+ */
+function groups_admin_sort_capabilities_by_capability( $o1, $o2 ) {
+	return strcmp( $o1->capability->capability, $o2->capability->capability );
+}
+}

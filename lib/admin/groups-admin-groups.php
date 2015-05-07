@@ -219,7 +219,7 @@ function groups_admin_groups() {
 	if ( $offset < 0 ) {
 		$offset = 0;
 	}
-	$paged = isset( $_GET['paged'] ) ? intval( $_GET['paged'] ) : 0;
+	$paged = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 0;
 	if ( $paged < 0 ) {
 		$paged = 0;
 	} 
@@ -426,14 +426,24 @@ function groups_admin_groups() {
 			$output .= "<td class='group-description'>" . stripslashes( wp_filter_nohtml_kses( $result->description ) ) . "</td>";
 
 			$output .= '<td class="capabilities">';
-			$group_capabilities = $wpdb->get_results( $wpdb->prepare(
-				"SELECT * FROM $capability_table WHERE capability_id IN ( SELECT capability_id FROM $group_capability_table WHERE group_id = %d )",
-				Groups_Utility::id( $result->group_id )
-			) );
-			if ( count( $group_capabilities ) > 0 ) {
+
+			$group = new Groups_Group( $result->group_id );
+			$group_capabilities = $group->capabilities;
+			$group_capabilities_deep = $group->capabilities_deep;
+			usort( $group_capabilities_deep, 'groups_admin_sort_capabilities_by_capability' );
+
+			if ( count( $group_capabilities_deep ) > 0 ) {
 				$output .= '<ul>';
-				foreach ( $group_capabilities as $group_capability ) {
-					$output .= '<li>' . wp_filter_nohtml_kses( $group_capability->capability ) . '</li>';
+				foreach ( $group_capabilities_deep as $group_capability ) {
+					$output .= '<li>';
+					$class = '';
+					if ( empty( $group_capabilities ) || !in_array( $group_capability, $group_capabilities ) ) {
+						$class = 'inherited';
+					}
+					$output .= sprintf( '<span class="%s">', $class );
+					$output .= wp_filter_nohtml_kses( $group_capability->capability->capability );
+					$output .= '</span>';
+					$output .= '</li>';
 				}
 				$output .= '</ul>';
 			} else {
@@ -478,4 +488,15 @@ function groups_admin_groups() {
 	echo $output;
 	Groups_Help::footer();
 } // function groups_admin_groups()
-?>
+
+if ( !function_exists( 'groups_admin_sort_capabilities_by_capability' ) ) {
+/**
+ * usort helper
+ * @param Groups_Capability $o1
+ * @param Groups_Capability $o2
+ * @return int strcmp result for group names
+ */
+function groups_admin_sort_capabilities_by_capability( $o1, $o2 ) {
+	return strcmp( $o1->capability->capability, $o2->capability->capability );
+}
+}

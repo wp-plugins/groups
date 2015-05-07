@@ -61,9 +61,9 @@ function groups_admin_groups_remove( $group_id ) {
 		'<li>' . sprintf( __( 'Group Name : %s', GROUPS_PLUGIN_DOMAIN ), stripslashes( wp_filter_nohtml_kses( $group->name ) ) ) . '</li>' .
 		'</ul> ' .
 		wp_nonce_field( 'groups-remove', GROUPS_ADMIN_GROUPS_NONCE, true, false ) .
-		'<input class="button" type="submit" value="' . __( 'Remove', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
+		'<input class="button button-primary" type="submit" value="' . __( 'Remove', GROUPS_PLUGIN_DOMAIN ) . '"/>' .
 		'<input type="hidden" value="remove" name="action"/>' .
-		'<a class="cancel" href="' . $current_url . '">' . __( 'Cancel', GROUPS_PLUGIN_DOMAIN ) . '</a>' .
+		'<a class="cancel button" href="' . $current_url . '">' . __( 'Cancel', GROUPS_PLUGIN_DOMAIN ) . '</a>' .
 		'</div>' .
 		'</div>' . // .group.remove
 		'</form>' .
@@ -156,8 +156,8 @@ function groups_admin_groups_bulk_remove() {
 		$output .= '</li>';
 		$output .= '</ul>';
 	}
-	$output .= '<input class="button" type="submit" name="bulk" value="' . __( "Remove", GROUPS_PLUGIN_DOMAIN ) . '"/>';
-	$output .= '<a class="cancel" href="' . $current_url . '">' . __( 'Cancel', GROUPS_PLUGIN_DOMAIN ) . '</a>';
+	$output .= '<input class="button button-primary" type="submit" name="bulk" value="' . __( "Remove", GROUPS_PLUGIN_DOMAIN ) . '"/>';
+	$output .= '<a class="cancel button" href="' . $current_url . '">' . __( 'Cancel', GROUPS_PLUGIN_DOMAIN ) . '</a>';
 
 	$output .= '<input type="hidden" name="action" value="groups-action"/>';
 	$output .= '<input type="hidden" name="bulk-action" value="remove-group"/>';
